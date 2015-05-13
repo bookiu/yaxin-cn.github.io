@@ -1,0 +1,223 @@
+<!--
+                  _         _                      _ _                 _
+ _   _  __ ___  _(_)_ __   | | _____   _____    __| (_)_ __   __ _  __| | __ _ _ __   __ _
+| | | |/ _` \ \/ / | '_ \  | |/ _ \ \ / / _ \  / _` | | '_ \ / _` |/ _` |/ _` | '_ \ / _` |
+| |_| | (_| |>  <| | | | | | | (_) \ V /  __/ | (_| | | | | | (_| | (_| | (_| | | | | (_| |
+ \__, |\__,_/_/\_\_|_| |_| |_|\___/ \_/ \___|  \__,_|_|_| |_|\__, |\__,_|\__,_|_| |_|\__, |
+ |___/                                                       |___/                   |___/
+-->
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+  <meta charset="utf-8">
+  
+  <title>Python中的类方法和静态方法 | 馨木</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
+  
+  
+  <link rel="icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/assets/app.css">
+<link rel="stylesheet" href="/assets/highlight-default.css">
+<link rel="stylesheet" href="/assets/pace-theme-flash.css">
+
+  <!-- <script src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script> -->
+  <!--[if lt IE 9]>
+    <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <![endif]-->
+</head>
+
+
+<body id="sinle-post">
+  <header id="site-header">
+  <div id="site-nav">
+    <nav class="site-nav">
+      <ul>
+        <li ><a href="/">所有文章</a></li>
+        <li ><a href="/about.html">关于我</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div id="site-title">
+	
+  </div>
+</header> <!-- #site-header -->
+  <div id="site-main">
+    <article id="post-1419219716" class="article article-type-post">
+  <header class="post-header">
+    <div class="post-header-wrap">
+      <h1 class="post-title" itemprop="name"><a href="http://yaxin-cn.github.io/Python/classmethod-and-staticmethod-in-python.html" rel="bookmark" title="Python中的类方法和静态方法" itemprop="url">Python中的类方法和静态方法</a></h1>
+      <h2>2014-12-22</h2>
+    </div><!-- .post-header-wrap -->
+  </header>
+  <div class="section-box">
+    <div class="post-content">
+      <p>Python类中有两个特殊的修饰符@classmethod和@staticmethod(即类方法和静态方法), 想要理解需要先理解类属性和实例属性的感念</p>
+<h2 id="类属性和实例属性">类属性和实例属性</h2><p>看下面的代码</p>
+<pre><code class="python">&gt;&gt;&gt; class TestProperty(object):
+...     class_property = &quot;class property&quot;
+...     
+...     def __init__(self):
+...         self.instance_property = &quot;instance property&quot;
+&gt;&gt;&gt; 
+&gt;&gt;&gt; test_property = TestProperty()
+&gt;&gt;&gt; # 实例可以访问实例属性和类属性
+&gt;&gt;&gt; print test_property.class_property
+class property
+&gt;&gt;&gt; print test_property.instance_property
+instance property
+&gt;&gt;&gt; # 类可以访问类属性
+&gt;&gt;&gt; print TestProperty.class_property
+class property
+&gt;&gt;&gt; # 但不可以访问实例属性
+&gt;&gt;&gt; print TestProperty.instance_property
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+AttributeError: type object &#39;TestProperty&#39; has no attribute &#39;instance_property&#39;
+&gt;&gt;&gt; # 注意下面的报错
+&gt;&gt;&gt; del test_property.class_property
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+AttributeError: class_property
+</code></pre>
+<p>总结起来就是:</p>
+<ol>
+<li><strong>实例属性</strong>的初始化在<code>__init__</code>构造器方法中进行(当然也可以通过其它方法赋值)</li>
+<li><strong>类实例</strong>可以访问实例属性和类属性</li>
+<li>通过类本身则能访问类属性,无法访问实例属性</li>
+<li>类属性与类实例没有任何关系</li>
+<li>类属性其实就是其它语言中的静态变量(变量前加static)</li>
+<li>为什么要有类属性, 一句话<strong>命名空间</strong></li>
+</ol>
+<h2 id="类方法和静态方法">类方法和静态方法</h2><pre><code class="python">&gt;&gt;&gt; class TestMethod(object):
+...     class_property = &quot;class property&quot;
+...     def __init__(self):
+...         self.instance_property = &quot;instance property&quot;
+...     def instance_method(self, arvg):
+...         print &quot;instance_method(%s, %s)&quot; % (self, arvg)
+...         print &quot;instance property: &quot;, self.instance_property
+...     @classmethod
+...     def class_method(cls, arvg):
+...         print &quot;class_method(%s, %s)&quot; % (cls, arvg)
+...         print &quot;class property: &quot;, cls.class_property
+...     @staticmethod
+...     def static_method(arvg):
+...         print &quot;static_method(%s)&quot; % arvg
+... 
+&gt;&gt;&gt;
+&gt;&gt;&gt; test_method = TestMethod()
+&gt;&gt;&gt; # 执行普通方法, 打印出实例的内存地址和实例属性
+&gt;&gt;&gt; test_method.instance_method(&quot;Hello&quot;)
+instance_method(&lt;__main__.TestMethod object at 0x7fd8fc56eb90&gt;, Hello)
+instance property:  instance property
+&gt;&gt;&gt; # 执行类方法
+&gt;&gt;&gt; # 通过实例访问, 打印出类本身和类属性
+&gt;&gt;&gt; test_method.class_method(&quot;Hello&quot;)
+class_method(&lt;class &#39;__main__.TestMethod&#39;&gt;, Hello)
+class property:  class property
+&gt;&gt;&gt; # 通过类直接访问, 同上
+&gt;&gt;&gt; TestMethod.class_method(&quot;Hello&quot;)
+class_method(&lt;class &#39;__main__.TestMethod&#39;&gt;, Hello)
+class property:  class property
+&gt;&gt;&gt; # 执行静态方法
+&gt;&gt;&gt; # 通过实例访问, 打印出静态方法本身
+&gt;&gt;&gt; test_method.static_method(&quot;Hello&quot;)
+static_method(Hello)
+&gt;&gt;&gt; # 通过类直接访问, 同上
+&gt;&gt;&gt; TestMethod.static_method(&quot;Hello&quot;)
+static_method(Hello)
+</code></pre>
+<p>可以看出类方法中<code>cls</code>代表的是类本身, 如果将类方法中的访问类属性的cls去掉, 则会报出<em>NameError</em>的错误</p>
+<pre><code class="python">&gt;&gt;&gt; class TestMethod(object):
+...     class_property = &quot;class property&quot;
+...     @classmethod
+...     def class_method(cls, arvg):
+...         print &quot;class property: &quot;, cls.class_property
+... 
+&gt;&gt;&gt; TestMethod.class_method(&quot;Hello&quot;)
+class property: 
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;stdin&gt;&quot;, line 5, in class_method
+NameError: global name &#39;class_property&#39; is not defined
+</code></pre>
+<ol>
+<li><strong>类方法是为了访问类属性更加方便</strong></li>
+<li>类方法和静态方法可以通过类和实例来访问,效果是相同的</li>
+<li>静态方法跟普通函数没有什么区别</li>
+</ol>
+<p>可以通过在实例方法中直接通过<code>TestMethod.class_property</code>来访问, 但是这样不方便也不好维护(如果类名称改了,就会出错), 也可以使用<code>self.class_property</code>来访问, 但注意, 实例本身获取的并不应该是类属性即<code>TestMethod.class_property</code>, 只是因为实例中并没有<code>class_property</code>这个变量, 而是通过查找类属性,发现有同名变量,然后打印出来,通过上面无法实例无法删除类属性是可以看出来的. 当然,如果不信,可以看下面的例子</p>
+<pre><code class="python">&gt;&gt;&gt; class TestMethod(object):
+...     class_property = &quot;class property&quot;
+...     def __init__(self):
+...         pass
+... 
+&gt;&gt;&gt; test_method = TestMethod()
+&gt;&gt;&gt; id(test_method.class_property)
+140488040794968
+&gt;&gt;&gt; id(TestMethod.class_property)
+140488040794968
+&gt;&gt;&gt; print test_method.class_property
+class property
+&gt;&gt;&gt; test_method.class_property = test_method.class_property + &quot;!!!&quot;
+&gt;&gt;&gt; print test_method.class_property
+class property!!!
+&gt;&gt;&gt; print TestMethod.class_property
+class property
+&gt;&gt;&gt; id(test_method.class_property)
+140488040795080
+&gt;&gt;&gt; id(TestMethod.class_property)
+140488040794968
+</code></pre>
+
+    </div> <!-- .post-content -->
+    <div class="post-footer">
+      <div class="entry-meta article-entry-meta clearfix">
+        <div class="entry-date date published updated pull-left mr-10">
+          <i class="icon-clock"></i><time datetime="2014-12-22T03:41:56.000Z" itemprop="datePublished">2014-12-22</time>
+        </div>
+        <div class="entry-tags pull-left clearfix">
+          
+            <i class="icon-tags"></i>
+            <a class="article-tag-link" href="/tags/Python/">Python</a>
+          
+        </div>
+      </div><!-- .entry-meta -->
+    </div> <!-- .post-footer -->
+  </div>
+</article>
+
+
+
+  </div> <!-- #site-main -->
+  <footer id="site-footer">
+  <div class="copyright">
+    <span>&copy; 2014 yaxin</span>
+  </div>
+  <div class="site-script">
+    <script>
+      window.headerBg = '//yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,//yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
+    </script>
+    <script src="/assets/app.js"></script>
+<script src="/assets/pace.min.js"></script>
+<script src="/assets/highlight.pack.js"></script>
+
+    <script>
+      // var site_header = document.getElementById('site-header');
+      // var img_urls = site_header.getAttribute('data-bg-images');
+      // var header_bg_array = img_urls.split(',');
+      // var header_bg_len = header_bg_array.length;
+      // var random_num = parseInt(Math.random() * header_bg_len);
+      // site_header.style.backgroundImage = 'url("' + header_bg_array[random_num] + '")';
+      hljs.initHighlightingOnLoad();
+    </script>
+  </div>
+  <div id="tongji" style="display: none">
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5926023'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/stat.php%3Fid%3D5926023' type='text/javascript'%3E%3C/script%3E"));</script>
+  </div>
+</footer> <!-- #site-footer -->
+
+</body>
+</html>

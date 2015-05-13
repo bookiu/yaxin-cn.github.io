@@ -1,0 +1,123 @@
+<!--
+                  _         _                      _ _                 _
+ _   _  __ ___  _(_)_ __   | | _____   _____    __| (_)_ __   __ _  __| | __ _ _ __   __ _
+| | | |/ _` \ \/ / | '_ \  | |/ _ \ \ / / _ \  / _` | | '_ \ / _` |/ _` |/ _` | '_ \ / _` |
+| |_| | (_| |>  <| | | | | | | (_) \ V /  __/ | (_| | | | | | (_| | (_| | (_| | | | | (_| |
+ \__, |\__,_/_/\_\_|_| |_| |_|\___/ \_/ \___|  \__,_|_|_| |_|\__, |\__,_|\__,_|_| |_|\__, |
+ |___/                                                       |___/                   |___/
+-->
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+  <meta charset="utf-8">
+  
+  <title>未知元素高度情况下使其垂直居中方案 | 馨木</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
+  
+  
+  <link rel="icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/assets/app.css">
+<link rel="stylesheet" href="/assets/highlight-default.css">
+<link rel="stylesheet" href="/assets/pace-theme-flash.css">
+
+  <!-- <script src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script> -->
+  <!--[if lt IE 9]>
+    <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <![endif]-->
+</head>
+
+
+<body id="sinle-post">
+  <header id="site-header">
+  <div id="site-nav">
+    <nav class="site-nav">
+      <ul>
+        <li ><a href="/">所有文章</a></li>
+        <li ><a href="/about.html">关于我</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div id="site-title">
+	
+  </div>
+</header> <!-- #site-header -->
+  <div id="site-main">
+    <article id="post-1356228416" class="article article-type-post">
+  <header class="post-header">
+    <div class="post-header-wrap">
+      <h1 class="post-title" itemprop="name"><a href="http://yaxin-cn.github.io/front-end/make-element-vertical-center-with-css.html" rel="bookmark" title="未知元素高度情况下使其垂直居中方案" itemprop="url">未知元素高度情况下使其垂直居中方案</a></h1>
+      <h2>2012-12-23</h2>
+    </div><!-- .post-header-wrap -->
+  </header>
+  <div class="section-box">
+    <div class="post-content">
+      <p>一直以来都是使用<a href="http://xinmu.me/blog" target="_blank" rel="external">xinmu.me/blog</a>作为博客的首页，而<a href="http://xinmu.me" target="_blank" rel="external">xinmu.me</a>则一直荒废着。今天忽然想起了它，便想着先放一个链接上去，一个链接还是居中的好（浏览器正中央）。上网搜了各种方法，都需要知道元素的高度才可以，遂上SegmentFault（一个很好的地方）提问，得到了大神神飞的帮助，解决了问题，下面只是将解决办法复制、粘贴一下，原问题在此<a href="http://segmentfault.com/q/1010000000153017" target="_blank" rel="external">http://segmentfault.com/q/1010000000153017</a></p>
+<pre><code class="html">&lt;!DOCTYPE HTML&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;
+&lt;title&gt;只是文字的水平和垂直居中&lt;/title&gt;
+&lt;style&gt;
+html,body{width: 100%;height: 100%;margin: 0;padding: 0}
+body{background-color: green;display: table;}
+p{line-height: 1.6;text-align: center;padding: 0;margin: 0;display: table-cell;vertical-align: middle;}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;p&gt;wording&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+    </div> <!-- .post-content -->
+    <div class="post-footer">
+      <div class="entry-meta article-entry-meta clearfix">
+        <div class="entry-date date published updated pull-left mr-10">
+          <i class="icon-clock"></i><time datetime="2012-12-23T02:06:56.000Z" itemprop="datePublished">2012-12-23</time>
+        </div>
+        <div class="entry-tags pull-left clearfix">
+          
+            <i class="icon-tags"></i>
+            <a class="article-tag-link" href="/tags/css/">css</a>, <a class="article-tag-link" href="/tags/html/">html</a>, <a class="article-tag-link" href="/tags/前端/">前端</a>
+          
+        </div>
+      </div><!-- .entry-meta -->
+    </div> <!-- .post-footer -->
+  </div>
+</article>
+
+
+
+  </div> <!-- #site-main -->
+  <footer id="site-footer">
+  <div class="copyright">
+    <span>&copy; 2014 yaxin</span>
+  </div>
+  <div class="site-script">
+    <script>
+      window.headerBg = '//yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,//yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
+    </script>
+    <script src="/assets/app.js"></script>
+<script src="/assets/pace.min.js"></script>
+<script src="/assets/highlight.pack.js"></script>
+
+    <script>
+      // var site_header = document.getElementById('site-header');
+      // var img_urls = site_header.getAttribute('data-bg-images');
+      // var header_bg_array = img_urls.split(',');
+      // var header_bg_len = header_bg_array.length;
+      // var random_num = parseInt(Math.random() * header_bg_len);
+      // site_header.style.backgroundImage = 'url("' + header_bg_array[random_num] + '")';
+      hljs.initHighlightingOnLoad();
+    </script>
+  </div>
+  <div id="tongji" style="display: none">
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5926023'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/stat.php%3Fid%3D5926023' type='text/javascript'%3E%3C/script%3E"));</script>
+  </div>
+</footer> <!-- #site-footer -->
+
+</body>
+</html>

@@ -1,0 +1,1071 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title><![CDATA[馨木]]></title>
+    <link>http://yaxin-cn.github.io/</link>
+    <atom:link href="/rss.xml" rel="self" type="application/rss+xml"/>
+    <description><![CDATA[为梦想添砖加瓦]]></description>
+    <pubDate>Wed, 13 May 2015 09:21:22 GMT</pubDate>
+    <generator>http://hexo.io/</generator>
+    
+    <item>
+      <title><![CDATA[管理ubuntu server自启程序]]></title>
+      <link>http://yaxin-cn.github.io/Linux/manage-startup-program-on-ubuntu-server.html</link>
+      <guid>http://yaxin-cn.github.io/Linux/manage-startup-program-on-ubuntu-server.html</guid>
+      <pubDate>Wed, 13 May 2015 12:28:30 GMT</pubDate>
+      <description>
+      <![CDATA[<p>本文所使用的环境为ubuntu14.04，ubuntu15.04使用systemd，可能会有很大的不同</p>
+<h2 id="方法一">方法一</h2><p>使用类图形的<code>sysv-rc-conf</code>命令，你需要首先安装<code>sysv-rc-co]]>
+      </description>
+      <content:encoded><![CDATA[<p>本文所使用的环境为ubuntu14.04，ubuntu15.04使用systemd，可能会有很大的不同</p>
+<h2 id="方法一">方法一</h2><p>使用类图形的<code>sysv-rc-conf</code>命令，你需要首先安装<code>sysv-rc-conf</code></p>
+<pre><code class="bash">[yaxin@~]$sudo apt-get install sysv-rc-conf
+[yaxin@~]$sudo sysv-rc-conf
+</code></pre>
+<p>运行之后会有一个类图形的界面, 这个操作起来相当简单, 也容易懂，这里就不多介绍</p>
+<h2 id="方法二">方法二</h2><p>首先使用<code>runlevel</code>命令获取系统运行在哪个<strong>level</strong>下（ubuntu server一般是2），如下：</p>
+<pre><code class="bash">[yaxin@~]$runlevel
+N 2
+[yaxin@~]$
+</code></pre>
+<p>然后将启动脚本放到<code>/etc/rcX.d</code> 其中X为运行级别，如<code>/etc/rc2.d</code>, 注意脚本要以大写<strong>S</strong>开头, 后面接一个两位数的数字，表示启动顺序，数字越小表示越先启动</p>
+<p>一般<code>/etc/rc2.d</code>中会有很多软链接到<code>/etc/init.d</code>下的启动脚本, 这样的好处是集中管理，很方便, 并且可以使用<code>service</code>这个程序对进程进行重启等操作.</p>
+<p>如，编译安装完php后，将<code>sapi/fpm</code>文件夹下的<code>init.d.php-fpm</code>文件复制到<code>/etc/init.d</code>文件夹下，然后在<code>/etc/rc2.d</code>下创建一个软链接</p>
+<pre><code class="bash">[yaxin@php-5.6.8]$sudo cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+[yaxin@php-5.6.8]$sudo chmod +x /etc/init.d/php-fpm
+[yaxin@php-5.6.8]$sudo ln -s /etc/init.d/php-fpm /etc/rc2.d/S20php-fpm
+[yaxin@php-5.6.8]$service php-fpm start
+</code></pre>
+<p>当然，如果你想关闭一个自启的程序，直接将对应的<code>/etc/rcX.d</code>下的启动脚本删除即可</p>
+<pre><code class="bash">[yaxin@~]$sudo rm /etc/rc2.d/S20php-fpm
+</code></pre>
+<p>或则</p>
+<pre><code class="bash">[yaxin@~]$sudo unlink /etc/rc2.d/S20php-fpm
+</code></pre>
+<p><strong>注意</strong>: <code>sysv-rc-conf</code>命令就是使用这个方法来实现程序自启和禁止自启的.</p>
+<h2 id="方法三">方法三</h2><p>直接将需要启动的程序添加到<code>/etc/rc.local</code>文件中</p>
+<p>如你需要开机启动nginx，那么可以这样</p>
+<pre><code class="bash">[root@~]$echo &quot;/etc/nginx/sbin/nginx&quot; &gt;&gt; /etc/rc.local
+</code></pre>
+<p>其实这个就是方法二的快捷操作，如果你查看<code>/etc/rc2.d</code>文件夹下面的文件会发现有一个<code>S99rc.local</code>的软链接，它链接到<code>/etc/init.d/rc.local</code>, 而<code>/etc/init.d/rc.local</code>这个脚本中又会执行<code>/etc/rc.local</code>这个脚本</p>
+<h3 id="方法四">方法四</h3><p>其实前几种方式并不是正统的自启管理方式, 使用<code>rcX.d</code>是<strong>传统init</strong>的方式, 而ubuntu14.04是使用<strong>Upstart</strong>来初始化守护进程, 但为了照顾使用从<strong>init</strong>过来(如centos6等)的人才创建的. 而真正的启动脚本(应该说配置)是放在<code>/etc/init</code>这个文件夹下的</p>
+<p><code>/etc/init</code>文件夹下有很多的以<strong>.conf</strong>结尾的文件，这些就是正统的管理自启程序的配置文件.</p>
+<p>随便打开一个文件, 有一行<strong>start on runlevel [234]</strong>, 这就说明在runlevel为234的情况下启动</p>
+<pre><code class="bash">[yaxin@/etc/init]$head ssh.conf
+# ssh - OpenBSD Secure Shell server
+#
+# The OpenSSH server provides secure shell access to the system.
+
+description &quot;OpenSSH server&quot;
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+</code></pre>
+<p>如上，ssh将在runlevel为2 3 4 5的时候开机启动, 而启动的具体命令在配置文件后面.</p>
+<p>当然，如果你想关闭自启，那么删除但钱runlevel即可，或则直接删除该配置文件.</p>
+<p>所以，如果你有一个开机自启的程序，当你使用前面的方法删除以后，程序还是自启，那么问题肯定出在这一步.</p>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Linux/manage-startup-program-on-ubuntu-server.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[Python中的类方法和静态方法]]></title>
+      <link>http://yaxin-cn.github.io/Python/classmethod-and-staticmethod-in-python.html</link>
+      <guid>http://yaxin-cn.github.io/Python/classmethod-and-staticmethod-in-python.html</guid>
+      <pubDate>Mon, 22 Dec 2014 03:41:56 GMT</pubDate>
+      <description>
+      <![CDATA[<p>Python类中有两个特殊的修饰符@classmethod和@staticmethod(即类方法和静态方法), 想要理解需要先理解类属性和实例属性的感念</p>
+<h2 id="类属性和实例属性">类属性和实例属性</h2><p>看下面的代码</p>
+<pre><code ]]>
+      </description>
+      <content:encoded><![CDATA[<p>Python类中有两个特殊的修饰符@classmethod和@staticmethod(即类方法和静态方法), 想要理解需要先理解类属性和实例属性的感念</p>
+<h2 id="类属性和实例属性">类属性和实例属性</h2><p>看下面的代码</p>
+<pre><code class="python">&gt;&gt;&gt; class TestProperty(object):
+...     class_property = &quot;class property&quot;
+...     
+...     def __init__(self):
+...         self.instance_property = &quot;instance property&quot;
+&gt;&gt;&gt; 
+&gt;&gt;&gt; test_property = TestProperty()
+&gt;&gt;&gt; # 实例可以访问实例属性和类属性
+&gt;&gt;&gt; print test_property.class_property
+class property
+&gt;&gt;&gt; print test_property.instance_property
+instance property
+&gt;&gt;&gt; # 类可以访问类属性
+&gt;&gt;&gt; print TestProperty.class_property
+class property
+&gt;&gt;&gt; # 但不可以访问实例属性
+&gt;&gt;&gt; print TestProperty.instance_property
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+AttributeError: type object &#39;TestProperty&#39; has no attribute &#39;instance_property&#39;
+&gt;&gt;&gt; # 注意下面的报错
+&gt;&gt;&gt; del test_property.class_property
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+AttributeError: class_property
+</code></pre>
+<p>总结起来就是:</p>
+<ol>
+<li><strong>实例属性</strong>的初始化在<code>__init__</code>构造器方法中进行(当然也可以通过其它方法赋值)</li>
+<li><strong>类实例</strong>可以访问实例属性和类属性</li>
+<li>通过类本身则能访问类属性,无法访问实例属性</li>
+<li>类属性与类实例没有任何关系</li>
+<li>类属性其实就是其它语言中的静态变量(变量前加static)</li>
+<li>为什么要有类属性, 一句话<strong>命名空间</strong></li>
+</ol>
+<h2 id="类方法和静态方法">类方法和静态方法</h2><pre><code class="python">&gt;&gt;&gt; class TestMethod(object):
+...     class_property = &quot;class property&quot;
+...     def __init__(self):
+...         self.instance_property = &quot;instance property&quot;
+...     def instance_method(self, arvg):
+...         print &quot;instance_method(%s, %s)&quot; % (self, arvg)
+...         print &quot;instance property: &quot;, self.instance_property
+...     @classmethod
+...     def class_method(cls, arvg):
+...         print &quot;class_method(%s, %s)&quot; % (cls, arvg)
+...         print &quot;class property: &quot;, cls.class_property
+...     @staticmethod
+...     def static_method(arvg):
+...         print &quot;static_method(%s)&quot; % arvg
+... 
+&gt;&gt;&gt;
+&gt;&gt;&gt; test_method = TestMethod()
+&gt;&gt;&gt; # 执行普通方法, 打印出实例的内存地址和实例属性
+&gt;&gt;&gt; test_method.instance_method(&quot;Hello&quot;)
+instance_method(&lt;__main__.TestMethod object at 0x7fd8fc56eb90&gt;, Hello)
+instance property:  instance property
+&gt;&gt;&gt; # 执行类方法
+&gt;&gt;&gt; # 通过实例访问, 打印出类本身和类属性
+&gt;&gt;&gt; test_method.class_method(&quot;Hello&quot;)
+class_method(&lt;class &#39;__main__.TestMethod&#39;&gt;, Hello)
+class property:  class property
+&gt;&gt;&gt; # 通过类直接访问, 同上
+&gt;&gt;&gt; TestMethod.class_method(&quot;Hello&quot;)
+class_method(&lt;class &#39;__main__.TestMethod&#39;&gt;, Hello)
+class property:  class property
+&gt;&gt;&gt; # 执行静态方法
+&gt;&gt;&gt; # 通过实例访问, 打印出静态方法本身
+&gt;&gt;&gt; test_method.static_method(&quot;Hello&quot;)
+static_method(Hello)
+&gt;&gt;&gt; # 通过类直接访问, 同上
+&gt;&gt;&gt; TestMethod.static_method(&quot;Hello&quot;)
+static_method(Hello)
+</code></pre>
+<p>可以看出类方法中<code>cls</code>代表的是类本身, 如果将类方法中的访问类属性的cls去掉, 则会报出<em>NameError</em>的错误</p>
+<pre><code class="python">&gt;&gt;&gt; class TestMethod(object):
+...     class_property = &quot;class property&quot;
+...     @classmethod
+...     def class_method(cls, arvg):
+...         print &quot;class property: &quot;, cls.class_property
+... 
+&gt;&gt;&gt; TestMethod.class_method(&quot;Hello&quot;)
+class property: 
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;stdin&gt;&quot;, line 5, in class_method
+NameError: global name &#39;class_property&#39; is not defined
+</code></pre>
+<ol>
+<li><strong>类方法是为了访问类属性更加方便</strong></li>
+<li>类方法和静态方法可以通过类和实例来访问,效果是相同的</li>
+<li>静态方法跟普通函数没有什么区别</li>
+</ol>
+<p>可以通过在实例方法中直接通过<code>TestMethod.class_property</code>来访问, 但是这样不方便也不好维护(如果类名称改了,就会出错), 也可以使用<code>self.class_property</code>来访问, 但注意, 实例本身获取的并不应该是类属性即<code>TestMethod.class_property</code>, 只是因为实例中并没有<code>class_property</code>这个变量, 而是通过查找类属性,发现有同名变量,然后打印出来,通过上面无法实例无法删除类属性是可以看出来的. 当然,如果不信,可以看下面的例子</p>
+<pre><code class="python">&gt;&gt;&gt; class TestMethod(object):
+...     class_property = &quot;class property&quot;
+...     def __init__(self):
+...         pass
+... 
+&gt;&gt;&gt; test_method = TestMethod()
+&gt;&gt;&gt; id(test_method.class_property)
+140488040794968
+&gt;&gt;&gt; id(TestMethod.class_property)
+140488040794968
+&gt;&gt;&gt; print test_method.class_property
+class property
+&gt;&gt;&gt; test_method.class_property = test_method.class_property + &quot;!!!&quot;
+&gt;&gt;&gt; print test_method.class_property
+class property!!!
+&gt;&gt;&gt; print TestMethod.class_property
+class property
+&gt;&gt;&gt; id(test_method.class_property)
+140488040795080
+&gt;&gt;&gt; id(TestMethod.class_property)
+140488040794968
+</code></pre>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Python/classmethod-and-staticmethod-in-python.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[Docker中使用固定IP]]></title>
+      <link>http://yaxin-cn.github.io/Docker/docker-container-use-static-IP.html</link>
+      <guid>http://yaxin-cn.github.io/Docker/docker-container-use-static-IP.html</guid>
+      <pubDate>Thu, 11 Dec 2014 06:14:08 GMT</pubDate>
+      <description>
+      <![CDATA[<p>默认情况下启动一个container，其会自动获取一个跟<code>docker0</code>同网段的IP，而且重启container其IP一般会发生变化，但有时候我们会需要固定的IP。要实现这个并不困难。</p>
+<p><a href="https://docs.doc]]>
+      </description>
+      <content:encoded><![CDATA[<p>默认情况下启动一个container，其会自动获取一个跟<code>docker0</code>同网段的IP，而且重启container其IP一般会发生变化，但有时候我们会需要固定的IP。要实现这个并不困难。</p>
+<p><a href="https://docs.docker.com/reference/commandline/cli/#run" target="_blank" rel="external"><code>docker run</code></a>启动一个container的命令有一个<code>--net</code>的参数用于指定container的网络类型</p>
+<blockquote>
+<p>--net=”bridge”  Set the Network mode for the container<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;’bridge’: creates a new network stack for the container on the docker bridge<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;’none’: no networking for this container<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;’container:&lt;name|id&gt;’: reuses another container network stack<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;’host’: use the host network stack inside the container.  Note: the host mode gives the container full access to local system services such as D-bus and is therefore considered insecure. </p>
+</blockquote>
+<p>docker默认使用’bridge’来设置container的网络模式（即从与docker0同网段的未使用的IP中取一个作为container的IP），我们这里使用’<strong>none</strong>‘来实现自己手动配置container的网络。</p>
+<p>首先我们以<strong><code>--net=&#39;none&#39;</code></strong>的方式启动一个container</p>
+<pre><code class="shell">[yaxin@cube2x ~]$docker run -i -t --rm --net=&#39;none&#39; ubuntu /bin/bash
+root@db84e747c362:/# ifconfig -a
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+root@db84e747c362:/#
+</code></pre>
+<p>可以看到，由于我们使用’none’模式，container中没有获取到IP，甚至连网卡都没有，下面我们开始给container配置IP</p>
+<p>首先获取container的pid（我们需要通过pid获取file descriptor）</p>
+
+```bash
+[yaxin@cube2x ~]$docker ps
+CONTAINER ID        IMAGE                            COMMAND             CREATED             STATUS              PORTS               NAMES
+db84e747c362        docker.cn/docker/ubuntu:latest   "/bin/bash"         4 minutes ago       Up 4 minutes                            sharp_kirch
+[yaxin@cube2x ~]$docker inspect -f "{{.State.Pid}}" sharp_kirch
+23090
+```
+
+<p>ip-netns的man page中有这样一句</p>
+<blockquote>
+<p>By convention a named network namespace is an object at /var/run/netns/NAME that can be opened.  The file descriptor resulting from opening/var/run/netns/NAME refers to the specified network namespace</p>
+</blockquote>
+<p>因而我们需要创建一个链接</p>
+<pre><code class="shell">[yaxin@cube2x ~]$sudo ln -s /proc/23090/ns/net /var/run/netns/23090
+</code></pre>
+<p>然后创建一对端到端的网卡，将<code>veth_db84e747c3</code>绑定到docker0网桥，并启动。将另一块网卡<code>X</code>放到container内部</p>
+<pre><code class="shell">[yaxin@cube2x ~]$sudo ip link add veth_db84e747c3 type veth peer name X
+[yaxin@cube2x ~]$sudo brctl addif docker0 veth_db84e747c3
+[yaxin@cube2x ~]$sudo ip link set veth_db84e747c3 up
+[yaxin@cube2x ~]$sudo ip link set X netns 23090
+</code></pre>
+<p>这时查看container的IP，会发现多了一个名为<code>X</code>的网卡</p>
+<pre><code class="shell">root@db84e747c362:/# ifconfig  -a
+X         Link encap:Ethernet  HWaddr 5a:7e:4d:ba:63:1c  
+          BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+root@db84e747c362:/#
+</code></pre>
+<p>然后对container内部新添加的网卡进行配置（可以通过<code>man ip-netns</code>更详细查看）</p>
+<pre><code>[yaxin@cube2x ~]$sudo ip netns exec 23090 ip link set dev X name eth0
+[yaxin@cube2x ~]$sudo ip netns exec 23090 ip link set eth0 up
+[yaxin@cube2x ~]$sudo ip netns exec 23090 ip addr add 172.17.111.10/16 dev eth0
+[yaxin@cube2x ~]$sudo ip netns exec 23090 ip route add default via 172.17.42.1
+</code></pre><p><strong>注意: 指定给container的IP必须跟docker0在同一网段,且给container的网关应该为docker0的IP</strong></p>
+<p>最后，写成shell脚本如下:</p>
+
+```shell
+#!/usr/bin/env bash
+# filename: bind_addr.sh
+
+if [ `id -u` -ne 0 ];then
+    echo '必须使用root权限'
+    exit
+fi
+
+if [ $# != 2 ]; then
+    echo "使用方法: $0 容器名字 IP"
+    exit 1
+fi
+
+container_name=$1
+bind_ip=$2
+
+container_id=`docker inspect -f '{{.Id}}' $container_name 2> /dev/null`
+if [ ! $container_id ];then
+    echo "容器不存在"
+    exit 2
+fi
+bind_ip=`echo $bind_ip | egrep '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'`
+if [ ! $bind_ip ];then
+    echo "IP地址格式不正确"
+    exit 3
+fi
+
+container_minid=`echo $container_id | cut -c 1-10`
+container_netmask=`ip addr show docker0 | grep "inet\b" | awk '{print $2}' | cut -d / -f2`
+container_gw=`ip addr show docker0 | grep "inet\b" | awk '{print $2}' | cut -d / -f1`
+
+bridge_name="veth_$container_minid"
+container_ip=$bind_ip/$container_netmask
+pid=`docker inspect -f '{{.State.Pid}}' salt-master 2> /dev/null`
+if [ ! $pid ];then
+    echo "获取容器$container_name的id失败"
+    exit 4
+fi
+
+if [ ! -d /var/run/netns ];then
+    mkdir -p /var/run/netns
+fi
+
+ln -sf /proc/$pid/ns/net /var/run/netns/$pid
+
+ip link add $bridge_name type veth peer name X
+brctl addif docker0 $bridge_name
+ip link set $bridge_name up
+ip link set X netns $pid
+ip netns exec $pid ip link set dev X name eth0
+ip netns exec $pid ip link set eth0 up
+ip netns exec $pid ip addr add $container_ip dev eth0
+ip netns exec $pid ip route add default via $container_gw
+```
+
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Docker/docker-container-use-static-IP.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[Python实现矩阵加法运算]]></title>
+      <link>http://yaxin-cn.github.io/Python/matrix-addition-in-python.html</link>
+      <guid>http://yaxin-cn.github.io/Python/matrix-addition-in-python.html</guid>
+      <pubDate>Fri, 07 Nov 2014 10:04:06 GMT</pubDate>
+      <description>
+      <![CDATA[<p>写一个数据分析的程序，中间要处理一个2x3矩阵的相加，遂写出了下面的代码</p>
+<pre><code class="python">def add(x, y):
+    return x + y
+
+
+def two_matrix_add(x, y):
+    result]]>
+      </description>
+      <content:encoded><![CDATA[<p>写一个数据分析的程序，中间要处理一个2x3矩阵的相加，遂写出了下面的代码</p>
+<pre><code class="python">def add(x, y):
+    return x + y
+
+
+def two_matrix_add(x, y):
+    result = []
+    for i in xrange(len(x)):
+        result.append(tuple(map(lambda t: reduce(add, t), zip(x[i], y[i]))))
+    return tuple(result)
+
+
+def matrix_add(matrix_list):
+    return reduce(two_matrix_add, matrix_list)
+</code></pre>
+<p>下面测试一下：</p>
+<pre><code class="python">&gt;&gt;&gt; matrix_1 = [
+...     [0, 1, 2, 3],
+...     [4, 5, 6, 7],
+...     [8, 9, 10, 11]
+... ]
+&gt;&gt;&gt; matrix_2 = [
+...     [128, 204, 125, 66],
+...     [230, 222, 186, 220],
+...     [110, 86, 176, 249]
+... ]
+&gt;&gt;&gt; matrix_3 = [
+...     [189, 138, 188, 113],
+...     [214, 85, 180, 217],
+...     [126, 195, 203, 207]
+... ]
+&gt;&gt;&gt; matrix_add([matrix_1, matrix_2])
+((128, 205, 127, 69), (234, 227, 192, 227), (118, 95, 186, 260))
+&gt;&gt;&gt; matrix_add([matrix_1, matrix_2, matrix_3])
+((317, 343, 315, 182), (448, 312, 372, 444), (244, 290, 389, 467))
+</code></pre>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Python/matrix-addition-in-python.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[更改ubuntu语系和时区]]></title>
+      <link>http://yaxin-cn.github.io/Linux/change-locale-and-timezone-of-ubuntu.html</link>
+      <guid>http://yaxin-cn.github.io/Linux/change-locale-and-timezone-of-ubuntu.html</guid>
+      <pubDate>Tue, 04 Nov 2014 07:59:29 GMT</pubDate>
+      <description>
+      <![CDATA[<h2 id="一、修改时区">一、修改时区</h2><h3 id="1-_交互式修改">1. 交互式修改</h3><p>ubuntu提供了一个交互式的选择时区的命令<code>dpkg-reconfigure tzdata</code>，直接在命令行中输入此命令，然后选择自己的]]>
+      </description>
+      <content:encoded><![CDATA[<h2 id="一、修改时区">一、修改时区</h2><h3 id="1-_交互式修改">1. 交互式修改</h3><p>ubuntu提供了一个交互式的选择时区的命令<code>dpkg-reconfigure tzdata</code>，直接在命令行中输入此命令，然后选择自己的时区即可</p>
+<h3 id="2-_直接修改">2. 直接修改</h3><p>另外一种方法相对简单，即直接复制相应的时区文件覆盖当前系统的时区文件</p>
+<pre><code class="bash">[yaxin@ubox:~]$ cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+[yaxin@ubox:~]$ date
+Tue Nov  4 16:18:55 CST 2014
+</code></pre>
+<p>修改是立即生效的。</p>
+<h2 id="二、修改语系">二、修改语系</h2><p>首先你需要使用<code>locale-gen</code>编译locale定义文件，直接在命令后面指定要编译的locale（可以查看/usr/share/i18n/SUPPORTED来获取locale的格式）</p>
+<pre><code class="bash">[yaxin@ubox:~]$ sudo locale-gen zh_CN.UTF-8 en_US.UTF-8
+Generating locales...
+  en_US.UTF-8... up-to-date
+  zh_CN.UTF-8... up-to-date
+Generation complete.
+[yaxin@ubox:~]$ echo &#39;LANG=&quot;en_US.UTF-8&quot;&#39; &gt; /etc/default/locale
+</code></pre>
+<p>语系的修改并不是立即生效的，你需要重启机器才能生效。</p>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Linux/change-locale-and-timezone-of-ubuntu.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[PHP中的DateTime类]]></title>
+      <link>http://yaxin-cn.github.io/PHP/class-datetime-in-php.html</link>
+      <guid>http://yaxin-cn.github.io/PHP/class-datetime-in-php.html</guid>
+      <pubDate>Fri, 22 Aug 2014 04:13:30 GMT</pubDate>
+      <description>
+      <![CDATA[<p><a href="http://php.net/manual/zh/class.datetime.php" target="_blank" rel="external"><code>DataTime</code></a>类跟<code>date()</code>,<code]]>
+      </description>
+      <content:encoded><![CDATA[<p><a href="http://php.net/manual/zh/class.datetime.php" target="_blank" rel="external"><code>DataTime</code></a>类跟<code>date()</code>,<code>strtotime()</code>,<code>gmdate()</code>等函数有相同的作用，都是用来处理日期和时间的，但<code>DateTime</code>类更加直观、方便, 所以在PHP5.2.0以后推荐使用<code>DateTime</code>类而不是相应的函数。</p>
+<p>下面来看一下<code>DateTime</code>类的用法。</p>
+<h2 id="1-_获取当前系统时间并打印">1. 获取当前系统时间并打印</h2><pre><code class="php">&lt;?php
+$date = new DateTime();
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+?&gt;
+</code></pre>
+<blockquote>
+<p>执行结果为：2014-08-25 12:58:29</p>
+</blockquote>
+<h2 id="2-_获取特定时间并打印">2. 获取特定时间并打印</h2><pre><code class="php">&lt;?php
+$date = new DateTime(&#39;2014-05-04&#39;);
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+$date2 = new DateTime(&#39;tomorrow&#39;);
+echo $date2-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+$date2 = new DateTime(&#39;+2 days&#39;);
+echo $date2-&gt;format(&#39;Y-m-d H:i:s&#39;);
+?&gt;
+</code></pre>
+<blockquote>
+<p>执行结果为：<br>2014-05-04 00:00:00<br>2014-08-26 00:00:00<br>2014-08-27 13:13:34</p>
+</blockquote>
+<p>或则通过DateTime的其他方法</p>
+<pre><code class="php">&lt;?php
+$date = new DateTime();
+// add方法
+$date-&gt;add(new DateInterval(&#39;P1D&#39;));
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+// modify方法
+$date-&gt;modify(&#39;+1 day&#39;);
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+// setDate方法
+$date-&gt;setDate(&#39;1989-11-10&#39;);
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+// setTime方法
+$date-&gt;setTime(&#39;11:10:10&#39;);
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
+<blockquote>
+<p>执行结果分别为：<br>2014-08-26 15:02:57<br>2014-08-27 15:02:57<br>1989-11-10 15:02:57<br>1989-11-10 11:10:10 </p>
+</blockquote>
+<h2 id="3-_unix时间戳的转换">3. unix时间戳的转换</h2><h3 id="获取当前时间的时间戳">获取当前时间的时间戳</h3><pre><code class="php">&lt;?php
+$date = new DateTime();
+echo $date-&gt;format(&#39;U&#39;);
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
+<blockquote>
+<p>执行结果为：1408950651</p>
+</blockquote>
+<p>或者</p>
+<pre><code class="php">&lt;?php
+$date = new DateTime();
+echo $date-&gt;getTimestamp();
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
+<h3 id="将时间戳转换为可读时间">将时间戳转换为可读时间</h3><pre><code class="php">&lt;?php
+$date = new DateTime(&#39;@1408950651&#39;);
+$date-&gt;setTimezone(new DateTimeZone(&#39;Asia/Shanghai&#39;));
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
+<blockquote>
+<p>执行结果为：2014-08-25 15:10:51</p>
+</blockquote>
+<p>或者</p>
+<pre><code class="php">&lt;?php
+$date = new DateTime();
+$date-&gt;setTimestamp(1408950651);
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
+<h2 id="4-_日期的比较">4. 日期的比较</h2><h3 id="日期大小比较">日期大小比较</h3><pre><code class="php">&lt;?php
+$date1 = new DateTime();
+$date2 = new DateTime(&#39;2014-09-15&#39;);
+
+if($date1 &lt; $date2) {
+    echo $date2-&gt;format(&#39;Y-m-d H:i:s&#39;) . &#39; is in the future&#39;;
+}
+?&gt;
+</code></pre>
+<h3 id="日期间隔">日期间隔</h3><pre><code class="php">&lt;?php
+$date1 = new DateTime();
+$date2 = new DateTime(&#39;2014-09-15&#39;);
+
+$diff = $date1-&gt;diff($date2);
+print_r($diff);
+?&gt;
+</code></pre>
+<blockquote>
+<p>执行结果为:<br>DateInterval Object<br>(<br>    [y] =&gt; 0<br>    [m] =&gt; 0<br>    [d] =&gt; 20<br>    [h] =&gt; 7<br>    [i] =&gt; 35<br>    [s] =&gt; 50<br>    [weekday] =&gt; 0<br>    [weekday_behavior] =&gt; 0<br>    [first_last_day_of] =&gt; 0<br>    [invert] =&gt; 0<br>    [days] =&gt; 20<br>    [special_type] =&gt; 0<br>    [special_amount] =&gt; 0<br>    [have_weekday_relative] =&gt; 0<br>    [have_special_relative] =&gt; 0<br>)</p>
+</blockquote>
+<p>将返回的对象格式化输出</p>
+<pre><code class="php">&lt;?php
+$date1 = new DateTime();
+$date2 = new DateTime(&#39;2014-09-15&#39;);
+
+$diff = $date1-&gt;diff($date2);
+echo $diff-&gt;format(&quot;The future will come in %Y years %m months and %d days&quot;);
+?&gt;
+</code></pre>
+<blockquote>
+<p>输出结果为：The future will come in 00 years 0 months and 20 days</p>
+</blockquote>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/PHP/class-datetime-in-php.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[解决ssh到ubuntu server卡顿]]></title>
+      <link>http://yaxin-cn.github.io/Linux/solve-ssh-slow-to-ubuntu.html</link>
+      <guid>http://yaxin-cn.github.io/Linux/solve-ssh-slow-to-ubuntu.html</guid>
+      <pubDate>Tue, 08 Jul 2014 12:15:34 GMT</pubDate>
+      <description>
+      <![CDATA[<p>ssh到ubuntu14.04卡的要死，google一下无非是修改<strong>sshd_config</strong>文件中的<code>GSSAPIAuthentication</code>和<code>UseDNS</code>选项，但依然无济于事。</p>
+<p>]]>
+      </description>
+      <content:encoded><![CDATA[<p>ssh到ubuntu14.04卡的要死，google一下无非是修改<strong>sshd_config</strong>文件中的<code>GSSAPIAuthentication</code>和<code>UseDNS</code>选项，但依然无济于事。</p>
+<p>使用<code>-v</code>参数（可以输出ssh详细过程）ssh发现卡顿是发生在输入密码之后的</p>
+<pre><code class="bash">yaxin@192.168.1.1&#39;s password:
+debug1: Authentication succeeded (password).
+debug1: channel 0: new [client-session]
+debug1: Requesting no-more-sessions@openssh.com
+debug1: Entering interactive session. # 卡一段时间
+</code></pre>
+<p>这说明进入交互式终端的时候卡了，再来看登录后</p>
+<pre><code class="bash">Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
+......
+62 packages can be updated.
+43 updates are security updates.
+
+Last login: Tue Jul  8 20:29:20 2014 from 192.168.1.5
+</code></pre>
+<p>上面的内容在其它版本中为<code>/etc/motd</code>中的内容，但ubuntu是动态生成该内容，生成脚本在<code>/etc/update-motd.d</code>目录下，查看脚本可以是联网检测系统更新等情况。呵呵，如何禁用。</p>
+<p>修改<code>/etc/pam.d/sshd</code>和<code>/etc/pam.d/login</code>文件中的有<strong>pam_motd.so</strong>的行注释掉</p>
+<pre><code class="bash">#session    optional     pam_motd.so  motd=/run/motd.dynamic noupdate
+#session    optional     pam_motd.so # [1]
+</code></pre>
+<p>再次ssh，这次没有了上面的update等信息了，但ssh也不卡顿了。</p>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Linux/solve-ssh-slow-to-ubuntu.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[Docker中搭建开发环境1]]></title>
+      <link>http://yaxin-cn.github.io/Docker/setup-development-enviroment-in-docker-1.html</link>
+      <guid>http://yaxin-cn.github.io/Docker/setup-development-enviroment-in-docker-1.html</guid>
+      <pubDate>Fri, 04 Jul 2014 05:06:58 GMT</pubDate>
+      <description>
+      <![CDATA[<p>由于docker有很好的隔离性，所以开发使用最适合不过。windows下配合<strong><a href="https://github.com/boot2docker/windows-installer/releases" target="_blank" rel="ex]]>
+      </description>
+      <content:encoded><![CDATA[<p>由于docker有很好的隔离性，所以开发使用最适合不过。windows下配合<strong><a href="https://github.com/boot2docker/windows-installer/releases" target="_blank" rel="external">boot2docker</a></strong>轻松击败重量级虚拟机。</p>
+<p>由于是开发环境，我们首先需要将docker container开启ssh服务，以便随时登录到上面查看修改配置，之后再去搭建真正的开发环境。所以我们可以先创建一个开启了ssh服务的image来作为base image，然后在它的基础之上搭建不通的开发环境。</p>
+<p>创建镜像需要使用到Dockerfile，Dockerfile的具体语法可以到<a href="http://docker-docs.qiniudn.com/reference/builder/" title="Dockerfile文档" target="_blank" rel="external">官网</a>去查看，这里不详细介绍。</p>
+<p>先上<em>Dockerfile</em>内容：</p>
+<pre><code class="bash"># sshd
+# VERSION 1.0.0
+
+FROM ubuntu:14.04
+MAINTAINER yaxin &lt;yaxin.me@gmail.com&gt;
+
+# make sure the package repository is up to date
+RUN sed -i &quot;s/archive.ubuntu.com/mirrors.aliyun.com/g&quot; /etc/apt/sources.list
+RUN apt-get update
+RUN apt-get install -y openssh-server
+# Config ssh server
+RUN mkdir -p /var/run/sshd
+RUN sed -i &quot;s/^PermitRootLogin without-password/PermitRootLogin yes/g&quot; /etc/ssh/sshd_config
+RUN sed -i &quot;s/^#GSSAPIAuthentication no/GSSAPIAuthentication no/g&quot; /etc/ssh/sshd_config
+RUN echo &quot;UseDNS no&quot; &gt;&gt; /etc/ssh/sshd_config
+RUN echo &#39;root:root&#39; | chpasswd
+
+EXPOSE 22
+CMD [&quot;/usr/sbin/sshd&quot;, &quot;-D&quot;]
+</code></pre>
+<p>新建文件夹并将上面的代码保存为以<strong>Dockerfile</strong>命名的文本文件。</p>
+<p>然后执行</p>
+<pre><code class="bash">[yaxin@ubox sshd]$ls
+Dockerfile
+[yaxin@ubox sshd]$docker build -t ubuntu:base .
+</code></pre>
+<p>来创建镜像。下面来稍微解释一下Dockerfile的内容</p>
+<h3 id="FROM">FROM</h3><p>必须是Dockerfile的第一句，之后的操作都是在这个镜像之上进行的。如果你没有，那要先下载，<code>docker pull ubuntu</code>，如果无法下载，翻墙吧。如果你有国外vps，那么你可以在vps上<code>docker pull ubuntu</code>下载该镜像然后<code>docker save ubuntu:14.04 | bzip2 -9 -c &gt; ubuntu_14.04.tar.bz2</code>，然后下载ubuntu_14.04.tar.bz2到本机，运行<code>bzip2 -d -c &lt; ubuntu_14.04.tar.bz2 | docker load</code>导入镜像，我就是这么干的。</p>
+<h3 id="RUN">RUN</h3><p>执行shell命令。</p>
+<h3 id="ADD">ADD</h3><p>将外部文件导入到镜像中。</p>
+<h3 id="EXPOSE">EXPOSE</h3><p>将22端口‘暴漏’出来，以便在外部访问该端口。没有的话，将无法从外部（非运行docker的主机）ssh。</p>
+<h3 id="CMD">CMD</h3><p>跟<code>RUN</code>一样，也是执行shell命令，不同的是<code>RUN</code>是在创建镜像的时候执行，而<code>CMD</code>是在每次执行<code>docker run image</code>的时候执行。</p>
+<p>build完镜像后，我们执行<code>docker images</code>会发现多了一个镜像</p>
+<pre><code class="bash">[yaxin@ubox sshd]$docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+ubuntu              base                615ea4d4c1e0        2 weeks ago         396.4 MB
+ubuntu              14.04               ad892dd21d60        4 weeks ago         275.5 MB
+</code></pre>
+<p>然后启动镜像</p>
+<pre><code class="bash">[yaxin@ubox sshd]$docker run -d -P --name=&quot;sshd&quot; ubuntu:base
+c2518b7cf9289567c258171e93462bdb7fffe873bf2251d7086cd97e03e3ee57
+[yaxin@ubox sshd]$docker ps
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                   NAMES
+c2518b7cf928        ubuntu:base         /usr/sbin/sshd -D      4 seconds ago       Up 3 seconds        0.0.0.0:49153-&gt;22/tcp   sshd
+</code></pre>
+<p>然后ssh 49153端口</p>
+<pre><code class="bash">[yaxin@ubox sshd]$ssh root@localhost -p 49153
+The authenticity of host &#39;[localhost]:49153 ([::1]:49153)&#39; can&#39;t be established.
+ECDSA key fingerprint is c4:a5:26:07:8b:72:97:40:f2:42:fa:35:9a:7c:d0:79.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added &#39;[localhost]:49153&#39; (ECDSA) to the list of known hosts.
+root@localhost&#39;s password: 
+Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.2.0-58-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+root@c2518b7cf928:~#
+</code></pre>
+<p>自此，一个装有ssh服务的可以运行的base image就创建成功了。</p>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Docker/setup-development-enviroment-in-docker-1.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[icmp包检验和计算方法及python实现]]></title>
+      <link>http://yaxin-cn.github.io/Python/icmp-packet-checksum-with-python.html</link>
+      <guid>http://yaxin-cn.github.io/Python/icmp-packet-checksum-with-python.html</guid>
+      <pubDate>Fri, 30 May 2014 06:24:01 GMT</pubDate>
+      <description>
+      <![CDATA[<p>发送icmp包时，需要计算icmp包的校验和，与ip包不同的是，icmp包需要连通头部信息加数据本身一起进行校验（ip包只需要校验头部信息）</p>
+<p>校验方法如下：</p>
+<ol>
+<li>把校验和字段置为0</li>
+<li>将icmp包（包括header和dat]]>
+      </description>
+      <content:encoded><![CDATA[<p>发送icmp包时，需要计算icmp包的校验和，与ip包不同的是，icmp包需要连通头部信息加数据本身一起进行校验（ip包只需要校验头部信息）</p>
+<p>校验方法如下：</p>
+<ol>
+<li>把校验和字段置为0</li>
+<li>将icmp包（包括header和data）以16bit（2个字节）为一组，并将所有组相加（二进制求和）</li>
+<li>若高16bit不为0，则将高16bit与低16bit反复相加，直到高16bit的值为0，从而获得一个只有16bit长度的值</li>
+<li>将此16bit值进行按位求反操作，将所得值替换到校验和字段</li>
+</ol>
+<p><strong>注意</strong>: 第四步中的<em>按位求反</em>值C语言的的<em>按位求反</em>（即~操作符），不是python中的<em>按位求反</em></p>
+<p>例如下图中的icmp包：</p>
+<p><img src="//cube2x-blog.qiniudn.com/blog-img/icmp_data.png" alt="icmp抓包截图"></p>
+<p>其中icmp包的内容为：</p>
+<blockquote>
+<p>08 00 F9 CE 7C E2 01 00 20 28 20 52 64 77 6A 6D 58 67 65 42 5A 2A 61 64 52 41 44 78 75 40 35 28 6F 76 20 43 56 76 59 20 4E 4F 64 20 20 6B 75 64 40 72 31 4A 50 20 20 33 67 20 2B 31 2A 51 20 52 70</p>
+</blockquote>
+<p>校验字段为<strong>F9 CE</strong></p>
+<p>将校验字段置为0，然后以16bit为一组将全部字段二进制相加，即：</p>
+<p>0800 + 0000 + 7CE2 + 0100 + 2028 + 2052 + 6477 + 6A6D + 5867 + 6542 + 5A2A + 6164 + 5241 + 4478 + 7540 + 3528 + 6F76 + 2043 + 5676 + 5920 + 4E4F + 6420 + 206B + 7564 + 4072 + 314A + 5020 + 2033 + 6720 + 2B31 + 2A51 + 2052 + 70 = 930fd</p>
+<p><strong>注意该数据的长度并不是16bit的整数倍，计算方式一样，只不过将最后8bit直接与之前相加</strong></p>
+<p>然后将结果的高16bit和低16bit继续相加：</p>
+<p>0009 + 30fd = 3106</p>
+<p>然后对结果（3106）进行c语言的<em>按位求反</em>操作（C语言的按位求反）：</p>
+<p>~3106 =&gt; CEF9</p>
+<p><strong>C语言的<em>按位求反</em>是让操作数的二进制位上的1变为0，0变为1， 而python的<em>按位求反</em>这是将操作数加一然后乘以负一（~5 == -6），两者之所以出现不同就在于操作数是否是unsigned</strong></p>
+<p>附上最后的程序（注意一下如何将python的<em>按位求反</em>转为C语言的<em>按位求反</em>）</p>
+<pre><code class="python">def checksum(data):
+    length = len(data)
+    s = 0
+    n = length % 2
+    # 分割数据每两比特(16bit)为一组
+    for i in range(0, length - n, 2):
+        s += ord(data[i]) + (ord(data[i+1]) &lt;&lt; 8)
+    # 如果数据长度为基数,则将最后一位单独相加
+    if n:
+        s += ord(data[-1])
+    # 重复将高16位与低16位相加直到高16位为0
+    while (s &gt;&gt; 16):
+        s = (s &amp; 0xFFFF) + (s &gt;&gt; 16)
+    s = ~s &amp; 0xffff
+    # 返回的是十进制整数
+    return s
+</code></pre>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Python/icmp-packet-checksum-with-python.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[理解Python中数值和字符串对象是不可变化的]]></title>
+      <link>http://yaxin-cn.github.io/Python/understand-python-string-objects-are-immutable.html</link>
+      <guid>http://yaxin-cn.github.io/Python/understand-python-string-objects-are-immutable.html</guid>
+      <pubDate>Mon, 19 May 2014 13:11:32 GMT</pubDate>
+      <description>
+      <![CDATA[<p>在Python中数值和字符串对象是不可以改变的，但对于新手的我们很难理解，于是乎会有下面的代码:</p>
+<pre><code class="python">x = &#39;Hello World&#39;
+print x
+x = &#39;Hello Hello&#39]]>
+      </description>
+      <content:encoded><![CDATA[<p>在Python中数值和字符串对象是不可以改变的，但对于新手的我们很难理解，于是乎会有下面的代码:</p>
+<pre><code class="python">x = &#39;Hello World&#39;
+print x
+x = &#39;Hello Hello&#39;
+print x
+</code></pre>
+<p>上面的代码明显的说明了变量<code>x</code>是可以改变的。其实变量<code>x</code>的改变伴随着<code>x</code>内存地址的变化，也就是说系统重新创建了一个名为<strong>x</strong>的变量用于保存新字符串。想要证明这个需要用到Python的<code>id</code>函数。</p>
+<p>id函数返回一个数字，这个数字跟该对象的分配内存地址密切相关。也可以近似认为这个数值就是该对象（变量）的所在内存地址。</p>
+<blockquote>
+<p>python中id函数的说明<br>Help on built-in function id in module <strong>builtin</strong>:</p>
+<p>id(…)<br>   id(object) -&gt; integer</p>
+<p>   Return the identity of an object.  This is guaranteed to be unique among<br>    simultaneously existing objects.  (Hint: it’s the object’s memory address.)</p>
+</blockquote>
+<p>现在再来看下面的代码：</p>
+<pre><code class="python">x = &#39;Hello World&#39;
+print id(x)
+x = &#39;Hello Hello&#39;
+print id(x)
+y = [&#39;a&#39;, &#39;b&#39;]
+print id(y)
+y.append(&#39;c&#39;)
+print id(y)
+</code></pre>
+<p>你运行结果如下：</p>
+<blockquote>
+<p>21908576<br>21906752<br>23032176<br>23032176</p>
+</blockquote>
+<p>可以看出前两个<code>id</code>的结果并不相同，而后面的两个（python中列表、字典对象是可变的）结果却是一样的，这说明字符串对象在python中是不可变的，即使重新对变量赋值，也只是重新生成相同变量的字符串而并不是直接改变当前的字符串变量。</p>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Python/understand-python-string-objects-are-immutable.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[docker中如何删除image（镜像）]]></title>
+      <link>http://yaxin-cn.github.io/Docker/how-to-delete-a-docker-image.html</link>
+      <guid>http://yaxin-cn.github.io/Docker/how-to-delete-a-docker-image.html</guid>
+      <pubDate>Sat, 22 Mar 2014 07:46:29 GMT</pubDate>
+      <description>
+      <![CDATA[<p>docker中删除images的命令是<code>docker rmi</code>，但有时候执行此命令并不能删除images</p>
+<pre><code class="bash">[yaxin@ubox ~]$docker images
+REPOSITORY      ]]>
+      </description>
+      <content:encoded><![CDATA[<p>docker中删除images的命令是<code>docker rmi</code>，但有时候执行此命令并不能删除images</p>
+<pre><code class="bash">[yaxin@ubox ~]$docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+eg_sshd             latest              ed9c93747fe1        45 hours ago        329.8 MB
+CentOS65            latest              e55a74a32125        2 days ago          360.6 MB
+[yaxin@ubox ~]$docker rmi ed9c93747fe1
+Untagged: ed9c93747fe16627be822ad3f7feeb8b4468200e5357877d3046aa83cc44c6af
+[yaxin@ubox ~]$docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+&lt;none&gt;              &lt;none&gt;              ed9c93747fe1        45 hours ago        329.8 MB
+CentOS65            latest              e55a74a32125        2 days ago          360.6 MB
+</code></pre>
+<p>可以看出，image并没有被删除，只是他的tag被删除了，再次执行<code>docker rmi IMAGE_ID</code>只会报错</p>
+<pre><code class="bash">[yaxin@ubox ~]$docker rmi ed9c93747fe1
+Error: image_delete: Conflict, ed9c93747fe1 wasn&#39;t deleted
+2014/03/22 15:58:27 Error: failed to remove one or more images
+</code></pre>
+<p>查看docker的帮助会发现有两个与删除有关的命令<code>rm</code>和<code>rmi</code></p>
+<blockquote>
+<p>rm        Remove one or more containers<br>rmi       Remove one or more images</p>
+</blockquote>
+<p>这里有两个不同的单词，<strong>images</strong>和<strong>container</strong>。其中images很好理解，跟平常使用的虚拟机的镜像一个意思，相当于一个模版，而container则是images运行时的的状态。docker对于运行过的image都保留一个状态（container），可以使用命令<code>docker ps</code>来查看正在运行的container，对于已经退出的container，则可以使用<code>docker ps -a</code>来查看。 如果你退出了一个container而忘记保存其中的数据，你可以使用<code>docker ps -a</code>来找到对应的运行过的container使用<code>docker commit</code>命令将其保存为image然后运行。</p>
+<p>回到之前的问题，由于image被某个container引用（拿来运行），如果不将这个引用的container销毁（删除），那image肯定是不能被删除。</p>
+<p>所以想要删除运行过的images必须首先删除它的container。继续来看刚才的例子，</p>
+<pre><code class="bash">[yaxin@ubox ~]$docker ps -a
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                   NAMES
+117843ade696        ed9c93747fe1        /bin/sh -c /usr/sbin   46 hours ago        Up 46 hours         0.0.0.0:49153-&gt;22/tcp   test_sshd
+</code></pre>
+<p>可以看出<strong>ed9c93747fe1</strong>的image被<strong>117843ade696</strong>的container使用着，所以必须首先删除该container</p>
+<pre><code class="bash">[yaxin@ubox ~]$docker rm 117843ade696
+Error: container_delete: Impossible to remove a running container, please stop it first
+2014/03/22 16:36:44 Error: failed to remove one or more containers
+</code></pre>
+<p>出现错误，这是因为该container正在运行中(运行<code>docker ps</code>查看)，先将其关闭</p>
+<pre><code class="bash">[yaxin@ubox ~]$docker stop 117843ade696
+117843ade696
+</code></pre>
+<pre><code class="bash">[yaxin@ubox ~]$docker rm 117843ade696
+117843ade696
+[yaxin@ubox ~]$docker rmi ed9c93747fe1
+Deleted: ed9c93747fe16627be822ad3f7feeb8b4468200e5357877d3046aa83cc44c6af
+Deleted: c8a0c19429daf73074040a14e527ad5734e70363c644f18c6815388b63eedc9b
+Deleted: 95dba4c468f0e53e5f1e5d76b8581d6740aab9f59141f783f8e263ccd7cf2a8e
+Deleted: c25dc743e40af6858c34375d450851bd606a70ace5d04e231a7fcc6d2ea23cc1
+Deleted: 20562f5714a5ce764845119399ef75e652e23135cd5c54265ff8218b61ccbd33
+Deleted: c8af1dc23af7a7aea0c25ba9b28bdee68caa8866f056e4f2aa2a5fa1bcb12693
+Deleted: 38fdb2c5432e08ec6121f8dbb17e1fde17d5db4c1f149a9b702785dbf7b0f3be
+Deleted: 79ca14274c80ac1df1333b89b2a41c0e0e3b91cd1b267b31bef852ceab3b2044
+[yaxin@ubox ~]$docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+CentOS65            latest              e55a74a32125        2 days ago          360.6 MB
+</code></pre>
+<p>可以看出，image已经被删除。</p>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Docker/how-to-delete-a-docker-image.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[shell实现输入密码显示星号]]></title>
+      <link>http://yaxin-cn.github.io/Linux/replace-password-with-stars-under-shell.html</link>
+      <guid>http://yaxin-cn.github.io/Linux/replace-password-with-stars-under-shell.html</guid>
+      <pubDate>Sat, 07 Sep 2013 07:02:48 GMT</pubDate>
+      <description>
+      <![CDATA[<p>shell脚本可以使用read -s来默认禁止回显输入字符，这样做一定程度上可以保证安全性。但这并不是一个好的交互，因为对于输入密码并不能知道已经输入了多少个字符。而使用*（星号）来代替输入的字符是一个很不错的想法，即保证安全又有好的交互性。</p>
+<p>程序的实现</p]]>
+      </description>
+      <content:encoded><![CDATA[<p>shell脚本可以使用read -s来默认禁止回显输入字符，这样做一定程度上可以保证安全性。但这并不是一个好的交互，因为对于输入密码并不能知道已经输入了多少个字符。而使用*（星号）来代替输入的字符是一个很不错的想法，即保证安全又有好的交互性。</p>
+<p>程序的实现</p>
+<p>首先要实现不显示输入字符，这个可以使用命令stty来实现</p>
+<pre><code class="bash">stty cbreak -echo
+dd if=/dev/tty bs=1 count=1 2&gt;/dev/null
+stty -cbreak echo
+</code></pre>
+<p>运行上面的命令（放在脚本中），可以发现输入一个字符并不会在屏幕上显示出来，这是因为<code>stty -echo</code>会禁止回显，而<code>dd if=/dev/tty bs=1 count=1 2&gt;/dev/null</code>则是获取刚刚输入的字符，如果将上面的命令放在$()中运行，并将其赋值给变量，打印会发现就是刚刚输入的字符。</p>
+<p>由于上面的命令只是接收一个字符，要多个字符的话需要使用while语句来实现，然后通过判断输入的字符是否为回车键来实现结束输入。</p>
+<pre><code class="bash">while : ;do
+    char=`
+        stty cbreak -echo
+        dd if=/dev/tty bs=1 count=1 2&gt;/dev/null
+        stty -cbreak echo
+    `
+    if [ &quot;$char&quot; =  &quot;&quot; ];then
+        break
+    fi
+    password=&quot;$password$char&quot;
+done
+</code></pre>
+<p>然后我们来实现输出为星号。这个很简单，上面的程序在整个过程中不会输出任何字符，要实现输出只需要在每次while循环的结束输出一个*即可。</p>
+<pre><code class="bash">while : ;do
+    char=`
+        stty cbreak -echo
+        dd if=/dev/tty bs=1 count=1 2&gt;/dev/null
+        stty -cbreak echo
+    `
+    if [ &quot;$char&quot; =  &quot;&quot; ];then
+        break
+    fi
+    password=&quot;$password$char&quot;
+    echo -n &quot;*&quot;
+done
+</code></pre>
+<p>OK，全部实现完毕，密码存在password变量中。</p>
+<p>错误解决</p>
+<p>但在运行中会发现，按删除（backspace）不会减少个数，反而增加了。直接运行read命令，然后按backspace键，会发现输出了“^H”，这是因为backspace并未绑定为删除功能，需要在脚本中添加<code>stty erase &quot;^H&quot;</code>来解决这一问题。但此时问题还是存在，原因在于backspace也是一个按键，而while中的判断并未判断按键为backspace的情况，因而程序会运行到输出一行。解决的方法就是在while中判断backspace按键并进行相应的操作。</p>
+<p>首先是判断backspace按键，获取backspace按键的方法有两种：第一种是使用子shell输出backspace的转义字符即<code>$(echo -ne &quot;\b&quot;)</code>、第二种是利用vim，先按ctrl+v然后再backspace，就会输出backspace的标志。</p>
+<p>然后是删除之前的一个字符，这里使用shell的ANSI控制码，首先将光标前移一个字符<code>printf &quot;33[1D&quot;</code>，然后删除光标之后的字符<code>printf &quot;33[K&quot;</code>，当然，还要将最后一个字符从password变量中移除。</p>
+<p>最后完整的程序应该是：</p>
+<pre><code class="bash">x=0
+while : ;do
+    char=`
+        stty cbreak -echo
+        dd if=/dev/tty bs=1 count=1 2&gt;/dev/null
+        stty -cbreak echo
+    `
+    if [ &quot;$char&quot; =  &quot;&quot; ];then
+        break
+    fi
+    if [[ &quot;$ret&quot; == $(echo -ne &#39;\b&#39;) ]];then
+        if [ $x -eq 0 ];then
+            continue
+        fi
+        password=&quot;${password%?}&quot;
+        printf &quot;33[1D&quot;
+        printf &quot;33[K&quot;
+        let x--
+        continue
+    fi
+    password=&quot;$password$char&quot;
+    echo -n &quot;*&quot;
+    let x++
+done
+</code></pre>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Linux/replace-password-with-stars-under-shell.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[未知元素高度情况下使其垂直居中方案]]></title>
+      <link>http://yaxin-cn.github.io/front-end/make-element-vertical-center-with-css.html</link>
+      <guid>http://yaxin-cn.github.io/front-end/make-element-vertical-center-with-css.html</guid>
+      <pubDate>Sun, 23 Dec 2012 02:06:56 GMT</pubDate>
+      <description>
+      <![CDATA[<p>一直以来都是使用<a href="http://xinmu.me/blog" target="_blank" rel="external">xinmu.me/blog</a>作为博客的首页，而<a href="http://xinmu.me" target="_blank"]]>
+      </description>
+      <content:encoded><![CDATA[<p>一直以来都是使用<a href="http://xinmu.me/blog" target="_blank" rel="external">xinmu.me/blog</a>作为博客的首页，而<a href="http://xinmu.me" target="_blank" rel="external">xinmu.me</a>则一直荒废着。今天忽然想起了它，便想着先放一个链接上去，一个链接还是居中的好（浏览器正中央）。上网搜了各种方法，都需要知道元素的高度才可以，遂上SegmentFault（一个很好的地方）提问，得到了大神神飞的帮助，解决了问题，下面只是将解决办法复制、粘贴一下，原问题在此<a href="http://segmentfault.com/q/1010000000153017" target="_blank" rel="external">http://segmentfault.com/q/1010000000153017</a></p>
+<pre><code class="html">&lt;!DOCTYPE HTML&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;
+&lt;title&gt;只是文字的水平和垂直居中&lt;/title&gt;
+&lt;style&gt;
+html,body{width: 100%;height: 100%;margin: 0;padding: 0}
+body{background-color: green;display: table;}
+p{line-height: 1.6;text-align: center;padding: 0;margin: 0;display: table-cell;vertical-align: middle;}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;p&gt;wording&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/front-end/make-element-vertical-center-with-css.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[Linux下查看网卡MAC地址]]></title>
+      <link>http://yaxin-cn.github.io/Linux/check-mac-address-under-linux.html</link>
+      <guid>http://yaxin-cn.github.io/Linux/check-mac-address-under-linux.html</guid>
+      <pubDate>Tue, 18 Dec 2012 01:56:51 GMT</pubDate>
+      <description>
+      <![CDATA[<h2 id="方法一：使用ifconfig命令">方法一：使用ifconfig命令</h2><p>直接在命令行中ifconfig，即可看到所有已连接网线（已经激活的网卡）的网卡信息</p>
+<pre><code class="bash">[yaxin@oishi ~]$ifco]]>
+      </description>
+      <content:encoded><![CDATA[<h2 id="方法一：使用ifconfig命令">方法一：使用ifconfig命令</h2><p>直接在命令行中ifconfig，即可看到所有已连接网线（已经激活的网卡）的网卡信息</p>
+<pre><code class="bash">[yaxin@oishi ~]$ifconfig
+eth0      Link encap:Ethernet  HWaddr 00:50:56:AC:57:30  
+          inet addr:10.10.8.110  Bcast:10.10.8.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:11645825 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:9430946 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:2446979632 (2.2 GiB)  TX bytes:1937455163 (1.8 GiB)
+
+eth0:1    Link encap:Ethernet  HWaddr 00:50:56:AC:57:30  
+          inet addr:10.10.8.10  Bcast:10.10.8.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:12722 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:12722 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:710416 (693.7 KiB)  TX bytes:710416 (693.7 KiB)
+</code></pre>
+<h2 id="方法二：使用/sys目录">方法二：使用/sys目录</h2><p>使用cd命令进入/sys/class/net/目录，然后ls查看目录下的文件，你会惊奇的发现里面有以网卡名命名的文件夹，</p>
+<pre><code class="bash">[yaxin@oishi net]$ls
+eth0  lo
+</code></pre>
+<p>这些文件夹便是你电脑中所有网卡，包括激活和未激活的（lo是本地回环网卡，并不是真实的网卡），cd进入任何一个目录（不是lo），然后，该网卡的所有信息便包含在里面(包括网卡的MAC地址信息)。</p>
+<pre><code class="bash">[yaxin@oishi net]$ls
+eth0  lo
+[yaxin@oishi net]$cd eth0/
+[yaxin@oishi eth0]$ls
+addr_assign_type  broadcast  dev_id   features  ifindex    mtu        queues      subsystem     uevent
+address           carrier    dormant  flags     iflink     operstate  speed       tx_queue_len
+addr_len          device     duplex   ifalias   link_mode  power      statistics  type
+[yaxin@oishi eth0]$
+</code></pre>
+<p>然后使用cat命令查看一下address文件，显示的便是该网卡的MAC地址</p>
+<pre><code class="bash">[yaxin@oishi eth0]$cat address 
+00:50:56:ac:57:30
+[yaxin@oishi eth0]$
+</code></pre>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Linux/check-mac-address-under-linux.html#disqus_comments</comments>
+    </item>
+    
+    <item>
+      <title><![CDATA[Linux下文件的打包与解压缩命令]]></title>
+      <link>http://yaxin-cn.github.io/Linux/file-compress-cmd-under-linux.html</link>
+      <guid>http://yaxin-cn.github.io/Linux/file-compress-cmd-under-linux.html</guid>
+      <pubDate>Sun, 16 Dec 2012 00:52:16 GMT</pubDate>
+      <description>
+      <![CDATA[<p>打包与解压缩命令属于Linux下最常用的命令之一。打包是指将一大堆文件或文件夹变成一个文件，压缩则是将一个大的文件通过一些压缩算法变成一个小文件。这跟Windows下使用WinRAR的打包不通，因为WinRAR打包后的文件也进行了压缩。下面就给出解压缩与打包的命令。</p>]]>
+      </description>
+      <content:encoded><![CDATA[<p>打包与解压缩命令属于Linux下最常用的命令之一。打包是指将一大堆文件或文件夹变成一个文件，压缩则是将一个大的文件通过一些压缩算法变成一个小文件。这跟Windows下使用WinRAR的打包不通，因为WinRAR打包后的文件也进行了压缩。下面就给出解压缩与打包的命令。</p>
+<h2 id="一、基础篇">一、基础篇</h2><p>我将本文分为两个部分：基础篇和提升篇。这部分是基础篇，主要介绍一些常用的打包和解压缩命令。学会使用这些命令，足够应付日常使用了。</p>
+<h3 id="1-_打包、压缩命令">1. 打包、压缩命令</h3><p>首先给出命令：</p>
+<blockquote>
+<p>tar.gz格式:tar zcvf FileName.tar.gz DirName<br>tar.bz2格式:tar jcvf FileName.tar.bz2 DirName<br>zip格式:zip FileName.zip DirName</p>
+</blockquote>
+<p>一般来说，打包要伴随着压缩，所以我这里只是给出了打包压缩一体命令，并未将打包和压缩命令分开。上面命令中“DirName”为你要打包的文件夹，“FileName.**”为打包压缩后的文件名。在Linux下，常见的压缩包格式为tar.gz、tar.bz2和zip，所以这里不再给出rar格式的打包命令。</p>
+<h3 id="2-_解压缩命令">2. 解压缩命令</h3><p>同样先给出命令：</p>
+<blockquote>
+<p>tar.gz格式:tar zxvf FileName.tar.gz<br>tar.bz2格式:tar jxvf FileName.tar.bz2<br>zip格式:unzip FileName.zip</p>
+</blockquote>
+<p>其中“FileName.*”为你需要解包的文件。</p>
+<p>如果您只是想会解包打包，那么您可以就此停下来了，因为下面的都是上面命令的分析和补充。</p>
+<h2 id="二、提升篇">二、提升篇</h2><p>在Linux下打包和压缩命令是两个概念，各自的命令也不同，你可以只打包而不压缩或则只压缩而不打包。下面我们来看一下linux中的打包和压缩格式：</p>
+<blockquote>
+<p>.tar打包格式：tar程序打包的数据，并没有压缩过<br>.Z格式：compress程序压缩的文件<br>.gz压缩格式：gzip程序压缩的文件<br>.bz2压缩格式：bzip2程序压缩的文件<br>.tar.gz打包压缩：tar程序打包的文件，其中并且经过 gzip 的压缩<br>.tar.bz2打包压缩：tar程序打包的文件，其中并且经过 bzip2 的压缩</p>
+</blockquote>
+<p>在这些格式中，.Z（compress程序压缩的文件）已经几乎不见了，所以这里不再搭理。</p>
+<h3 id="1-打包">1.打包</h3><p>在Linux中，你会经常看到tar.gz或tar.bz2格式的源码包，其中的tar便是Linux下最常用的打包程序，使用tar程序打包过的文件一般称为tar包（格式为.tar）。下面我们就来看一下tar命令的基本使用方法：</p>
+<p>首先给出tar命令的参数</p>
+<blockquote>
+<p>-c：(create)建立打包文件，搭配-v可察看打包过程中被打包的文件<br>-t：查看打包文件的内容含有哪些文件名<br>-x：解包或解压缩的功能，搭配-C（大写）可以在特定目录解开<br>-j：通过bzip2的进行压缩/解压缩，此时文件名正常情况下为<em>.tar.bz2<br>-z：通过gzip的进行压缩/解压缩，此时文件名正常情况下为</em>.tar.gz<br>-v：在压缩/解压缩的过程中，将正在处理的文件显示出来<br>-f：-f后面要立刻接要被处理的文件名，不要再加参数。也可以把-f单独写一个选项<br>-C：这个选项用在解压缩，后面跟目录。目的就是把文件解压缩到指定的目录<br>-p：保留数据的原本权限与属性，常用于备份(-c)<br>-P：保留绝对路径，也就是说允许备份数据中含有根目录存在之意<br>-r：向打包文件里面追加文件。例如用户已经打包好文件，又发现还有一个目录或是一些文件忘记打包了，这时可以使用该选项，将忘记的目录或文件追加到打包的文件中<br>–exclude=FILE：在压缩的过程中，不要将FILE打包<br>-u：更新文件。就是说，用新增的文件取代原备份文件，如果在备份文件中找不到要更新的文件，则把它追加到备份文件的最后<br>-N：比后面接的日期(yyyy/mm/dd)还要新的才会被打包进新建的文件中</p>
+</blockquote>
+<p>注意：-c, -t, -x参数不可同时出现。</p>
+<p>下面来举几个例子：</p>
+<p>tar -cf FileName.tar DirName：这条命令是将DirName的文件夹打成一个名为FileName.tar的包。-c是表示产生新的包，-f指定包的文件名；</p>
+<p>tar -cf FileName.tar *.jpg：这条命令是将所有.jpg的文件打成一个名为FileName.tar的包；</p>
+<p>tar -rf FileName.tar *.gif：这条命令是将所有.gif的文件增加到FileName.tar的包里面去。-r是表示增加文件的意思；</p>
+<p>tar -uf FileName.tar logo.gif：这条命令是更新原来tar包FileName.tar中logo.gif文件，-u是表示更新文件的意思；</p>
+<p>tar -tf FileName.tar：这条命令是列出FileName.tar包中所有文件，-t是列出文件的意思；</p>
+<p>tar -xf FileName.tar：这条命令是解出FileName.tar包中所有文件，-x是解开的意思。</p>
+<h3 id="2-压缩和解压">2.压缩和解压</h3><p>①首先列出gzip程序命令压缩解压的参数：</p>
+<blockquote>
+<p>-c：将压缩的数据输出到屏幕上；<br>-d：解压缩 ；<br>-t：用来检验压缩文件有无错误；<br>-v：显示出原文件/压缩文件案的压缩比等信息；<br>-#：压缩等级，-1最快，但是压缩比最差。-9最慢，但是压缩比最好，预设是-6。</p>
+</blockquote>
+<p>当你使用gzip进行压缩时，在默认的状态下原来的文件被压缩成为。gz文件的同时源文件也就不再存在了。</p>
+<p>下面给出使用gzip程序压缩解压的例子：</p>
+<p>gzip FileName：此命令是压缩FileName文件；</p>
+<p>gunzip FileName.gz：这条命令是解压缩FileName.gz文件;</p>
+<p>gzip -d FileName.gz：此命令功能同上。</p>
+<p>②接下来给出bizp2程序命令的压缩解压参数：</p>
+<blockquote>
+<p>-c：将压缩的过程产生的数据输出到屏幕上<br>-d：解压缩<br>-k：保留源文件，而不会删除原始的文件<br>-z：压缩<br>-v：可以显示出原文件/压缩文件的压缩比等信息<br>-#：与gzip同样的，都是在计算压缩比的参数，-9最佳，-1最快</p>
+</blockquote>
+<p>同样，在默认的状态下原来的文件被压缩成.bz2的文件，而源文件也会不存在了。但可以用-k参数保留源文件。</p>
+<p>下面给出使用bzip2程序压缩解压的例子：</p>
+<p>bzip2 -z FileName：这条命令是压缩FileName文件；</p>
+<p>bzip2 -d FileName.bz2：解压FileName.bz2;</p>
+<p>bunzip2 FileName.bz2：功能同上。</p>
+<h3 id="3-打包和压缩解压命令合并">3.打包和压缩解压命令合并</h3><p>如果将打包和压缩命令分开的话，会无故增加一步操作，从而带来很多不便，好在在执行打包（解包）命令的同时可以调用压缩（解压）的命令。</p>
+<p>①tar调用gzip</p>
+<p>-z：tar中使用此参数来调用gzip。<br>下面举例说明：</p>
+<p>tar -zcvf FileName.tar.gz *.jpg：将所有的jpg格式的图片打包并压缩成FileName.tar.gz文件；</p>
+<p>tar -zxvf FileName.tar.gz：将FileName.tar.gz文件解压。</p>
+<p>②tar调用bzip2</p>
+<p>-j：tar可以使用这个参数调用gzip。<br>下面举例说明：</p>
+<p>tar -jcvf FileName.tar.bz2 *.jpg：将所有的jpg格式的图片打包并压缩成FileName.tar.bz2文件；</p>
+<p>tar -jxvf FileName.tar.bz2：将FileName.tar.bz2文件解压。</p>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Linux/file-compress-cmd-under-linux.html#disqus_comments</comments>
+    </item>
+    
+  </channel>
+</rss>

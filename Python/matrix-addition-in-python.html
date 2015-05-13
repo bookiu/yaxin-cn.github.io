@@ -1,0 +1,142 @@
+<!--
+                  _         _                      _ _                 _
+ _   _  __ ___  _(_)_ __   | | _____   _____    __| (_)_ __   __ _  __| | __ _ _ __   __ _
+| | | |/ _` \ \/ / | '_ \  | |/ _ \ \ / / _ \  / _` | | '_ \ / _` |/ _` |/ _` | '_ \ / _` |
+| |_| | (_| |>  <| | | | | | | (_) \ V /  __/ | (_| | | | | | (_| | (_| | (_| | | | | (_| |
+ \__, |\__,_/_/\_\_|_| |_| |_|\___/ \_/ \___|  \__,_|_|_| |_|\__, |\__,_|\__,_|_| |_|\__, |
+ |___/                                                       |___/                   |___/
+-->
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+  <meta charset="utf-8">
+  
+  <title>Python实现矩阵加法运算 | 馨木</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
+  
+  
+  <link rel="icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/assets/app.css">
+<link rel="stylesheet" href="/assets/highlight-default.css">
+<link rel="stylesheet" href="/assets/pace-theme-flash.css">
+
+  <!-- <script src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script> -->
+  <!--[if lt IE 9]>
+    <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <![endif]-->
+</head>
+
+
+<body id="sinle-post">
+  <header id="site-header">
+  <div id="site-nav">
+    <nav class="site-nav">
+      <ul>
+        <li ><a href="/">所有文章</a></li>
+        <li ><a href="/about.html">关于我</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div id="site-title">
+	
+  </div>
+</header> <!-- #site-header -->
+  <div id="site-main">
+    <article id="post-1415354646" class="article article-type-post">
+  <header class="post-header">
+    <div class="post-header-wrap">
+      <h1 class="post-title" itemprop="name"><a href="http://yaxin-cn.github.io/Python/matrix-addition-in-python.html" rel="bookmark" title="Python实现矩阵加法运算" itemprop="url">Python实现矩阵加法运算</a></h1>
+      <h2>2014-11-07</h2>
+    </div><!-- .post-header-wrap -->
+  </header>
+  <div class="section-box">
+    <div class="post-content">
+      <p>写一个数据分析的程序，中间要处理一个2x3矩阵的相加，遂写出了下面的代码</p>
+<pre><code class="python">def add(x, y):
+    return x + y
+
+
+def two_matrix_add(x, y):
+    result = []
+    for i in xrange(len(x)):
+        result.append(tuple(map(lambda t: reduce(add, t), zip(x[i], y[i]))))
+    return tuple(result)
+
+
+def matrix_add(matrix_list):
+    return reduce(two_matrix_add, matrix_list)
+</code></pre>
+<p>下面测试一下：</p>
+<pre><code class="python">&gt;&gt;&gt; matrix_1 = [
+...     [0, 1, 2, 3],
+...     [4, 5, 6, 7],
+...     [8, 9, 10, 11]
+... ]
+&gt;&gt;&gt; matrix_2 = [
+...     [128, 204, 125, 66],
+...     [230, 222, 186, 220],
+...     [110, 86, 176, 249]
+... ]
+&gt;&gt;&gt; matrix_3 = [
+...     [189, 138, 188, 113],
+...     [214, 85, 180, 217],
+...     [126, 195, 203, 207]
+... ]
+&gt;&gt;&gt; matrix_add([matrix_1, matrix_2])
+((128, 205, 127, 69), (234, 227, 192, 227), (118, 95, 186, 260))
+&gt;&gt;&gt; matrix_add([matrix_1, matrix_2, matrix_3])
+((317, 343, 315, 182), (448, 312, 372, 444), (244, 290, 389, 467))
+</code></pre>
+
+    </div> <!-- .post-content -->
+    <div class="post-footer">
+      <div class="entry-meta article-entry-meta clearfix">
+        <div class="entry-date date published updated pull-left mr-10">
+          <i class="icon-clock"></i><time datetime="2014-11-07T10:04:06.000Z" itemprop="datePublished">2014-11-07</time>
+        </div>
+        <div class="entry-tags pull-left clearfix">
+          
+            <i class="icon-tags"></i>
+            <a class="article-tag-link" href="/tags/Python/">Python</a>
+          
+        </div>
+      </div><!-- .entry-meta -->
+    </div> <!-- .post-footer -->
+  </div>
+</article>
+
+
+
+  </div> <!-- #site-main -->
+  <footer id="site-footer">
+  <div class="copyright">
+    <span>&copy; 2014 yaxin</span>
+  </div>
+  <div class="site-script">
+    <script>
+      window.headerBg = '//yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,//yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
+    </script>
+    <script src="/assets/app.js"></script>
+<script src="/assets/pace.min.js"></script>
+<script src="/assets/highlight.pack.js"></script>
+
+    <script>
+      // var site_header = document.getElementById('site-header');
+      // var img_urls = site_header.getAttribute('data-bg-images');
+      // var header_bg_array = img_urls.split(',');
+      // var header_bg_len = header_bg_array.length;
+      // var random_num = parseInt(Math.random() * header_bg_len);
+      // site_header.style.backgroundImage = 'url("' + header_bg_array[random_num] + '")';
+      hljs.initHighlightingOnLoad();
+    </script>
+  </div>
+  <div id="tongji" style="display: none">
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5926023'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/stat.php%3Fid%3D5926023' type='text/javascript'%3E%3C/script%3E"));</script>
+  </div>
+</footer> <!-- #site-footer -->
+
+</body>
+</html>

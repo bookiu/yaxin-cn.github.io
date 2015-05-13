@@ -1,0 +1,425 @@
+<!--
+                  _         _                      _ _                 _
+ _   _  __ ___  _(_)_ __   | | _____   _____    __| (_)_ __   __ _  __| | __ _ _ __   __ _
+| | | |/ _` \ \/ / | '_ \  | |/ _ \ \ / / _ \  / _` | | '_ \ / _` |/ _` |/ _` | '_ \ / _` |
+| |_| | (_| |>  <| | | | | | | (_) \ V /  __/ | (_| | | | | | (_| | (_| | (_| | | | | (_| |
+ \__, |\__,_/_/\_\_|_| |_| |_|\___/ \_/ \___|  \__,_|_|_| |_|\__, |\__,_|\__,_|_| |_|\__, |
+ |___/                                                       |___/                   |___/
+-->
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+  <meta charset="utf-8">
+  
+  <title>馨木</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
+  
+  
+  <link rel="icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/assets/app.css">
+<link rel="stylesheet" href="/assets/highlight-default.css">
+<link rel="stylesheet" href="/assets/pace-theme-flash.css">
+
+  <!-- <script src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script> -->
+  <!--[if lt IE 9]>
+    <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <![endif]-->
+</head>
+
+
+<body id="home">
+  <header id="site-header">
+  <div id="site-nav">
+    <nav class="site-nav">
+      <ul>
+        <li class="active"><a href="/">所有文章</a></li>
+        <li ><a href="/about.html">关于我</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div id="site-title">
+	
+	    <!-- <h1><a href="/">馨木</a></h1> -->
+      <div class="avatar"><a href="/" title="馨木"><img src="/assets/avatar.png" alt="avatar"></a></div>
+	    
+	      <h2>为梦想添砖加瓦</h2>
+	    
+	
+  </div>
+</header> <!-- #site-header -->
+  <div id="site-main">
+    
+  <article id="post-1395474389" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
+    <header class="entry-header">
+      <div class="entry-meta">
+        <span class="entry-date date published updated">
+          <time datetime="2014-03-22T07:46:29.000Z" itemprop="datePublished"><a href="/Docker/how-to-delete-a-docker-image.html"><i class="icon-clock"></i>2014-03-22</a></time>
+        </span>
+        <span>•</span>
+        <span class="entry-comments">
+          <a href="/Docker/how-to-delete-a-docker-image.html#comments"><i class="icon-chat"></i>评论</a>
+        </span>
+      </div><!-- .entry-meta -->
+      <h1 class="entry-title" itemprop="name">
+        <a href="http://yaxin-cn.github.io/Docker/how-to-delete-a-docker-image.html" rel="bookmark" title="docker中如何删除image（镜像）" itemprop="url">docker中如何删除image（镜像）</a>
+      </h1> <!-- .entry-title -->
+    </header>
+    <div class="entry-content" itemprop="description">
+        <p>docker中删除images的命令是<code>docker rmi</code>，但有时候执行此命令并不能删除images</p>
+<pre><code class="bash">[yaxin@ubox ~]$docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+eg_sshd             latest              ed9c93747fe1        45 hours ago        329.8 MB
+CentOS65            latest              e55a74a32125        2 days ago          360.6 MB
+[yaxin@ubox ~]$docker rmi ed9c93747fe1
+Untagged: ed9c93747fe16627be822ad3f7feeb8b4468200e5357877d3046aa83cc44c6af
+[yaxin@ubox ~]$docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+&lt;none&gt;              &lt;none&gt;              ed9c93747fe1        45 hours ago        329.8 MB
+CentOS65            latest              e55a74a32125        2 days ago          360.6 MB
+</code></pre>
+<p>可以看出，image并没有被删除，只是他的tag被删除了，再次执行<code>docker rmi IMAGE_ID</code>只会报错</p>
+<pre><code class="bash">[yaxin@ubox ~]$docker rmi ed9c93747fe1
+Error: image_delete: Conflict, ed9c93747fe1 wasn&#39;t deleted
+2014/03/22 15:58:27 Error: failed to remove one or more images
+</code></pre>
+<p>查看docker的帮助会发现有两个与删除有关的命令<code>rm</code>和<code>rmi</code></p>
+<blockquote>
+<p>rm        Remove one or more containers<br>rmi       Remove one or more images</p>
+</blockquote>
+<p>这里有两个不同的单词，<strong>images</strong>和<strong>container</strong>。其中images很好理解，跟平常使用的虚拟机的镜像一个意思，相当于一个模版，而container则是images运行时的的状态。docker对于运行过的image都保留一个状态（container），可以使用命令<code>docker ps</code>来查看正在运行的container，对于已经退出的container，则可以使用<code>docker ps -a</code>来查看。 如果你退出了一个container而忘记保存其中的数据，你可以使用<code>docker ps -a</code>来找到对应的运行过的container使用<code>docker commit</code>命令将其保存为image然后运行。</p>
+<p>回到之前的问题，由于image被某个container引用（拿来运行），如果不将这个引用的container销毁（删除），那image肯定是不能被删除。</p>
+<p>所以想要删除运行过的images必须首先删除它的container。继续来看刚才的例子，</p>
+<pre><code class="bash">[yaxin@ubox ~]$docker ps -a
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                   NAMES
+117843ade696        ed9c93747fe1        /bin/sh -c /usr/sbin   46 hours ago        Up 46 hours         0.0.0.0:49153-&gt;22/tcp   test_sshd
+</code></pre>
+<p>可以看出<strong>ed9c93747fe1</strong>的image被<strong>117843ade696</strong>的container使用着，所以必须首先删除该container</p>
+<pre><code class="bash">[yaxin@ubox ~]$docker rm 117843ade696
+Error: container_delete: Impossible to remove a running container, please stop it first
+2014/03/22 16:36:44 Error: failed to remove one or more containers
+</code></pre>
+<p>出现错误，这是因为该container正在运行中(运行<code>docker ps</code>查看)，先将其关闭</p>
+<pre><code class="bash">[yaxin@ubox ~]$docker stop 117843ade696
+117843ade696
+</code></pre>
+<pre><code class="bash">[yaxin@ubox ~]$docker rm 117843ade696
+117843ade696
+[yaxin@ubox ~]$docker rmi ed9c93747fe1
+Deleted: ed9c93747fe16627be822ad3f7feeb8b4468200e5357877d3046aa83cc44c6af
+Deleted: c8a0c19429daf73074040a14e527ad5734e70363c644f18c6815388b63eedc9b
+Deleted: 95dba4c468f0e53e5f1e5d76b8581d6740aab9f59141f783f8e263ccd7cf2a8e
+Deleted: c25dc743e40af6858c34375d450851bd606a70ace5d04e231a7fcc6d2ea23cc1
+Deleted: 20562f5714a5ce764845119399ef75e652e23135cd5c54265ff8218b61ccbd33
+Deleted: c8af1dc23af7a7aea0c25ba9b28bdee68caa8866f056e4f2aa2a5fa1bcb12693
+Deleted: 38fdb2c5432e08ec6121f8dbb17e1fde17d5db4c1f149a9b702785dbf7b0f3be
+Deleted: 79ca14274c80ac1df1333b89b2a41c0e0e3b91cd1b267b31bef852ceab3b2044
+[yaxin@ubox ~]$docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+CentOS65            latest              e55a74a32125        2 days ago          360.6 MB
+</code></pre>
+<p>可以看出，image已经被删除。</p>
+
+    </div> <!-- .entry-content -->
+  </article>
+
+  <article id="post-1378537368" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
+    <header class="entry-header">
+      <div class="entry-meta">
+        <span class="entry-date date published updated">
+          <time datetime="2013-09-07T07:02:48.000Z" itemprop="datePublished"><a href="/Linux/replace-password-with-stars-under-shell.html"><i class="icon-clock"></i>2013-09-07</a></time>
+        </span>
+        <span>•</span>
+        <span class="entry-comments">
+          <a href="/Linux/replace-password-with-stars-under-shell.html#comments"><i class="icon-chat"></i>评论</a>
+        </span>
+      </div><!-- .entry-meta -->
+      <h1 class="entry-title" itemprop="name">
+        <a href="http://yaxin-cn.github.io/Linux/replace-password-with-stars-under-shell.html" rel="bookmark" title="shell实现输入密码显示星号" itemprop="url">shell实现输入密码显示星号</a>
+      </h1> <!-- .entry-title -->
+    </header>
+    <div class="entry-content" itemprop="description">
+        <p>shell脚本可以使用read -s来默认禁止回显输入字符，这样做一定程度上可以保证安全性。但这并不是一个好的交互，因为对于输入密码并不能知道已经输入了多少个字符。而使用*（星号）来代替输入的字符是一个很不错的想法，即保证安全又有好的交互性。</p>
+<p>程序的实现</p>
+<p>首先要实现不显示输入字符，这个可以使用命令stty来实现</p>
+<pre><code class="bash">stty cbreak -echo
+dd if=/dev/tty bs=1 count=1 2&gt;/dev/null
+stty -cbreak echo
+</code></pre>
+<p>运行上面的命令（放在脚本中），可以发现输入一个字符并不会在屏幕上显示出来，这是因为<code>stty -echo</code>会禁止回显，而<code>dd if=/dev/tty bs=1 count=1 2&gt;/dev/null</code>则是获取刚刚输入的字符，如果将上面的命令放在$()中运行，并将其赋值给变量，打印会发现就是刚刚输入的字符。</p>
+<p>由于上面的命令只是接收一个字符，要多个字符的话需要使用while语句来实现，然后通过判断输入的字符是否为回车键来实现结束输入。</p>
+<pre><code class="bash">while : ;do
+    char=`
+        stty cbreak -echo
+        dd if=/dev/tty bs=1 count=1 2&gt;/dev/null
+        stty -cbreak echo
+    `
+    if [ &quot;$char&quot; =  &quot;&quot; ];then
+        break
+    fi
+    password=&quot;$password$char&quot;
+done
+</code></pre>
+<p>然后我们来实现输出为星号。这个很简单，上面的程序在整个过程中不会输出任何字符，要实现输出只需要在每次while循环的结束输出一个*即可。</p>
+<pre><code class="bash">while : ;do
+    char=`
+        stty cbreak -echo
+        dd if=/dev/tty bs=1 count=1 2&gt;/dev/null
+        stty -cbreak echo
+    `
+    if [ &quot;$char&quot; =  &quot;&quot; ];then
+        break
+    fi
+    password=&quot;$password$char&quot;
+    echo -n &quot;*&quot;
+done
+</code></pre>
+<p>OK，全部实现完毕，密码存在password变量中。</p>
+<p>错误解决</p>
+<p>但在运行中会发现，按删除（backspace）不会减少个数，反而增加了。直接运行read命令，然后按backspace键，会发现输出了“^H”，这是因为backspace并未绑定为删除功能，需要在脚本中添加<code>stty erase &quot;^H&quot;</code>来解决这一问题。但此时问题还是存在，原因在于backspace也是一个按键，而while中的判断并未判断按键为backspace的情况，因而程序会运行到输出一行。解决的方法就是在while中判断backspace按键并进行相应的操作。</p>
+<p>首先是判断backspace按键，获取backspace按键的方法有两种：第一种是使用子shell输出backspace的转义字符即<code>$(echo -ne &quot;\b&quot;)</code>、第二种是利用vim，先按ctrl+v然后再backspace，就会输出backspace的标志。</p>
+<p>然后是删除之前的一个字符，这里使用shell的ANSI控制码，首先将光标前移一个字符<code>printf &quot;33[1D&quot;</code>，然后删除光标之后的字符<code>printf &quot;33[K&quot;</code>，当然，还要将最后一个字符从password变量中移除。</p>
+<p>最后完整的程序应该是：</p>
+<pre><code class="bash">x=0
+while : ;do
+    char=`
+        stty cbreak -echo
+        dd if=/dev/tty bs=1 count=1 2&gt;/dev/null
+        stty -cbreak echo
+    `
+    if [ &quot;$char&quot; =  &quot;&quot; ];then
+        break
+    fi
+    if [[ &quot;$ret&quot; == $(echo -ne &#39;\b&#39;) ]];then
+        if [ $x -eq 0 ];then
+            continue
+        fi
+        password=&quot;${password%?}&quot;
+        printf &quot;33[1D&quot;
+        printf &quot;33[K&quot;
+        let x--
+        continue
+    fi
+    password=&quot;$password$char&quot;
+    echo -n &quot;*&quot;
+    let x++
+done
+</code></pre>
+
+    </div> <!-- .entry-content -->
+  </article>
+
+  <article id="post-1356228416" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
+    <header class="entry-header">
+      <div class="entry-meta">
+        <span class="entry-date date published updated">
+          <time datetime="2012-12-23T02:06:56.000Z" itemprop="datePublished"><a href="/front-end/make-element-vertical-center-with-css.html"><i class="icon-clock"></i>2012-12-23</a></time>
+        </span>
+        <span>•</span>
+        <span class="entry-comments">
+          <a href="/front-end/make-element-vertical-center-with-css.html#comments"><i class="icon-chat"></i>评论</a>
+        </span>
+      </div><!-- .entry-meta -->
+      <h1 class="entry-title" itemprop="name">
+        <a href="http://yaxin-cn.github.io/front-end/make-element-vertical-center-with-css.html" rel="bookmark" title="未知元素高度情况下使其垂直居中方案" itemprop="url">未知元素高度情况下使其垂直居中方案</a>
+      </h1> <!-- .entry-title -->
+    </header>
+    <div class="entry-content" itemprop="description">
+        <p>一直以来都是使用<a href="http://xinmu.me/blog" target="_blank" rel="external">xinmu.me/blog</a>作为博客的首页，而<a href="http://xinmu.me" target="_blank" rel="external">xinmu.me</a>则一直荒废着。今天忽然想起了它，便想着先放一个链接上去，一个链接还是居中的好（浏览器正中央）。上网搜了各种方法，都需要知道元素的高度才可以，遂上SegmentFault（一个很好的地方）提问，得到了大神神飞的帮助，解决了问题，下面只是将解决办法复制、粘贴一下，原问题在此<a href="http://segmentfault.com/q/1010000000153017" target="_blank" rel="external">http://segmentfault.com/q/1010000000153017</a></p>
+<pre><code class="html">&lt;!DOCTYPE HTML&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;
+&lt;title&gt;只是文字的水平和垂直居中&lt;/title&gt;
+&lt;style&gt;
+html,body{width: 100%;height: 100%;margin: 0;padding: 0}
+body{background-color: green;display: table;}
+p{line-height: 1.6;text-align: center;padding: 0;margin: 0;display: table-cell;vertical-align: middle;}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;p&gt;wording&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+    </div> <!-- .entry-content -->
+  </article>
+
+  <article id="post-1355795811" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
+    <header class="entry-header">
+      <div class="entry-meta">
+        <span class="entry-date date published updated">
+          <time datetime="2012-12-18T01:56:51.000Z" itemprop="datePublished"><a href="/Linux/check-mac-address-under-linux.html"><i class="icon-clock"></i>2012-12-18</a></time>
+        </span>
+        <span>•</span>
+        <span class="entry-comments">
+          <a href="/Linux/check-mac-address-under-linux.html#comments"><i class="icon-chat"></i>评论</a>
+        </span>
+      </div><!-- .entry-meta -->
+      <h1 class="entry-title" itemprop="name">
+        <a href="http://yaxin-cn.github.io/Linux/check-mac-address-under-linux.html" rel="bookmark" title="Linux下查看网卡MAC地址" itemprop="url">Linux下查看网卡MAC地址</a>
+      </h1> <!-- .entry-title -->
+    </header>
+    <div class="entry-content" itemprop="description">
+        <h2 id="方法一：使用ifconfig命令">方法一：使用ifconfig命令</h2><p>直接在命令行中ifconfig，即可看到所有已连接网线（已经激活的网卡）的网卡信息</p>
+<pre><code class="bash">[yaxin@oishi ~]$ifconfig
+eth0      Link encap:Ethernet  HWaddr 00:50:56:AC:57:30  
+          inet addr:10.10.8.110  Bcast:10.10.8.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:11645825 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:9430946 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:2446979632 (2.2 GiB)  TX bytes:1937455163 (1.8 GiB)
+
+eth0:1    Link encap:Ethernet  HWaddr 00:50:56:AC:57:30  
+          inet addr:10.10.8.10  Bcast:10.10.8.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:12722 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:12722 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:710416 (693.7 KiB)  TX bytes:710416 (693.7 KiB)
+</code></pre>
+<h2 id="方法二：使用/sys目录">方法二：使用/sys目录</h2><p>使用cd命令进入/sys/class/net/目录，然后ls查看目录下的文件，你会惊奇的发现里面有以网卡名命名的文件夹，</p>
+<pre><code class="bash">[yaxin@oishi net]$ls
+eth0  lo
+</code></pre>
+<p>这些文件夹便是你电脑中所有网卡，包括激活和未激活的（lo是本地回环网卡，并不是真实的网卡），cd进入任何一个目录（不是lo），然后，该网卡的所有信息便包含在里面(包括网卡的MAC地址信息)。</p>
+<pre><code class="bash">[yaxin@oishi net]$ls
+eth0  lo
+[yaxin@oishi net]$cd eth0/
+[yaxin@oishi eth0]$ls
+addr_assign_type  broadcast  dev_id   features  ifindex    mtu        queues      subsystem     uevent
+address           carrier    dormant  flags     iflink     operstate  speed       tx_queue_len
+addr_len          device     duplex   ifalias   link_mode  power      statistics  type
+[yaxin@oishi eth0]$
+</code></pre>
+<p>然后使用cat命令查看一下address文件，显示的便是该网卡的MAC地址</p>
+<pre><code class="bash">[yaxin@oishi eth0]$cat address 
+00:50:56:ac:57:30
+[yaxin@oishi eth0]$
+</code></pre>
+
+    </div> <!-- .entry-content -->
+  </article>
+
+  <article id="post-1355619136" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
+    <header class="entry-header">
+      <div class="entry-meta">
+        <span class="entry-date date published updated">
+          <time datetime="2012-12-16T00:52:16.000Z" itemprop="datePublished"><a href="/Linux/file-compress-cmd-under-linux.html"><i class="icon-clock"></i>2012-12-16</a></time>
+        </span>
+        <span>•</span>
+        <span class="entry-comments">
+          <a href="/Linux/file-compress-cmd-under-linux.html#comments"><i class="icon-chat"></i>评论</a>
+        </span>
+      </div><!-- .entry-meta -->
+      <h1 class="entry-title" itemprop="name">
+        <a href="http://yaxin-cn.github.io/Linux/file-compress-cmd-under-linux.html" rel="bookmark" title="Linux下文件的打包与解压缩命令" itemprop="url">Linux下文件的打包与解压缩命令</a>
+      </h1> <!-- .entry-title -->
+    </header>
+    <div class="entry-content" itemprop="description">
+        <p>打包与解压缩命令属于Linux下最常用的命令之一。打包是指将一大堆文件或文件夹变成一个文件，压缩则是将一个大的文件通过一些压缩算法变成一个小文件。这跟Windows下使用WinRAR的打包不通，因为WinRAR打包后的文件也进行了压缩。下面就给出解压缩与打包的命令。</p>
+<h2 id="一、基础篇">一、基础篇</h2><p>我将本文分为两个部分：基础篇和提升篇。这部分是基础篇，主要介绍一些常用的打包和解压缩命令。学会使用这些命令，足够应付日常使用了。</p>
+<h3 id="1-_打包、压缩命令">1. 打包、压缩命令</h3><p>首先给出命令：</p>
+<blockquote>
+<p>tar.gz格式:tar zcvf FileName.tar.gz DirName<br>tar.bz2格式:tar jcvf FileName.tar.bz2 DirName<br>zip格式:zip FileName.zip DirName</p>
+</blockquote>
+<p>一般来说，打包要伴随着压缩，所以我这里只是给出了打包压缩一体命令，并未将打包和压缩命令分开。上面命令中“DirName”为你要打包的文件夹，“FileName.**”为打包压缩后的文件名。在Linux下，常见的压缩包格式为tar.gz、tar.bz2和zip，所以这里不再给出rar格式的打包命令。</p>
+<h3 id="2-_解压缩命令">2. 解压缩命令</h3><p>同样先给出命令：</p>
+<blockquote>
+<p>tar.gz格式:tar zxvf FileName.tar.gz<br>tar.bz2格式:tar jxvf FileName.tar.bz2<br>zip格式:unzip FileName.zip</p>
+</blockquote>
+<p>其中“FileName.*”为你需要解包的文件。</p>
+<p>如果您只是想会解包打包，那么您可以就此停下来了，因为下面的都是上面命令的分析和补充。</p>
+<h2 id="二、提升篇">二、提升篇</h2><p>在Linux下打包和压缩命令是两个概念，各自的命令也不同，你可以只打包而不压缩或则只压缩而不打包。下面我们来看一下linux中的打包和压缩格式：</p>
+<blockquote>
+<p>.tar打包格式：tar程序打包的数据，并没有压缩过<br>.Z格式：compress程序压缩的文件<br>.gz压缩格式：gzip程序压缩的文件<br>.bz2压缩格式：bzip2程序压缩的文件<br>.tar.gz打包压缩：tar程序打包的文件，其中并且经过 gzip 的压缩<br>.tar.bz2打包压缩：tar程序打包的文件，其中并且经过 bzip2 的压缩</p>
+</blockquote>
+<p>在这些格式中，.Z（compress程序压缩的文件）已经几乎不见了，所以这里不再搭理。</p>
+<h3 id="1-打包">1.打包</h3><p>在Linux中，你会经常看到tar.gz或tar.bz2格式的源码包，其中的tar便是Linux下最常用的打包程序，使用tar程序打包过的文件一般称为tar包（格式为.tar）。下面我们就来看一下tar命令的基本使用方法：</p>
+<p>首先给出tar命令的参数</p>
+<blockquote>
+<p>-c：(create)建立打包文件，搭配-v可察看打包过程中被打包的文件<br>-t：查看打包文件的内容含有哪些文件名<br>-x：解包或解压缩的功能，搭配-C（大写）可以在特定目录解开<br>-j：通过bzip2的进行压缩/解压缩，此时文件名正常情况下为<em>.tar.bz2<br>-z：通过gzip的进行压缩/解压缩，此时文件名正常情况下为</em>.tar.gz<br>-v：在压缩/解压缩的过程中，将正在处理的文件显示出来<br>-f：-f后面要立刻接要被处理的文件名，不要再加参数。也可以把-f单独写一个选项<br>-C：这个选项用在解压缩，后面跟目录。目的就是把文件解压缩到指定的目录<br>-p：保留数据的原本权限与属性，常用于备份(-c)<br>-P：保留绝对路径，也就是说允许备份数据中含有根目录存在之意<br>-r：向打包文件里面追加文件。例如用户已经打包好文件，又发现还有一个目录或是一些文件忘记打包了，这时可以使用该选项，将忘记的目录或文件追加到打包的文件中<br>–exclude=FILE：在压缩的过程中，不要将FILE打包<br>-u：更新文件。就是说，用新增的文件取代原备份文件，如果在备份文件中找不到要更新的文件，则把它追加到备份文件的最后<br>-N：比后面接的日期(yyyy/mm/dd)还要新的才会被打包进新建的文件中</p>
+</blockquote>
+<p>注意：-c, -t, -x参数不可同时出现。</p>
+<p>下面来举几个例子：</p>
+<p>tar -cf FileName.tar DirName：这条命令是将DirName的文件夹打成一个名为FileName.tar的包。-c是表示产生新的包，-f指定包的文件名；</p>
+<p>tar -cf FileName.tar *.jpg：这条命令是将所有.jpg的文件打成一个名为FileName.tar的包；</p>
+<p>tar -rf FileName.tar *.gif：这条命令是将所有.gif的文件增加到FileName.tar的包里面去。-r是表示增加文件的意思；</p>
+<p>tar -uf FileName.tar logo.gif：这条命令是更新原来tar包FileName.tar中logo.gif文件，-u是表示更新文件的意思；</p>
+<p>tar -tf FileName.tar：这条命令是列出FileName.tar包中所有文件，-t是列出文件的意思；</p>
+<p>tar -xf FileName.tar：这条命令是解出FileName.tar包中所有文件，-x是解开的意思。</p>
+<h3 id="2-压缩和解压">2.压缩和解压</h3><p>①首先列出gzip程序命令压缩解压的参数：</p>
+<blockquote>
+<p>-c：将压缩的数据输出到屏幕上；<br>-d：解压缩 ；<br>-t：用来检验压缩文件有无错误；<br>-v：显示出原文件/压缩文件案的压缩比等信息；<br>-#：压缩等级，-1最快，但是压缩比最差。-9最慢，但是压缩比最好，预设是-6。</p>
+</blockquote>
+<p>当你使用gzip进行压缩时，在默认的状态下原来的文件被压缩成为。gz文件的同时源文件也就不再存在了。</p>
+<p>下面给出使用gzip程序压缩解压的例子：</p>
+<p>gzip FileName：此命令是压缩FileName文件；</p>
+<p>gunzip FileName.gz：这条命令是解压缩FileName.gz文件;</p>
+<p>gzip -d FileName.gz：此命令功能同上。</p>
+<p>②接下来给出bizp2程序命令的压缩解压参数：</p>
+<blockquote>
+<p>-c：将压缩的过程产生的数据输出到屏幕上<br>-d：解压缩<br>-k：保留源文件，而不会删除原始的文件<br>-z：压缩<br>-v：可以显示出原文件/压缩文件的压缩比等信息<br>-#：与gzip同样的，都是在计算压缩比的参数，-9最佳，-1最快</p>
+</blockquote>
+<p>同样，在默认的状态下原来的文件被压缩成.bz2的文件，而源文件也会不存在了。但可以用-k参数保留源文件。</p>
+<p>下面给出使用bzip2程序压缩解压的例子：</p>
+<p>bzip2 -z FileName：这条命令是压缩FileName文件；</p>
+<p>bzip2 -d FileName.bz2：解压FileName.bz2;</p>
+<p>bunzip2 FileName.bz2：功能同上。</p>
+<h3 id="3-打包和压缩解压命令合并">3.打包和压缩解压命令合并</h3><p>如果将打包和压缩命令分开的话，会无故增加一步操作，从而带来很多不便，好在在执行打包（解包）命令的同时可以调用压缩（解压）的命令。</p>
+<p>①tar调用gzip</p>
+<p>-z：tar中使用此参数来调用gzip。<br>下面举例说明：</p>
+<p>tar -zcvf FileName.tar.gz *.jpg：将所有的jpg格式的图片打包并压缩成FileName.tar.gz文件；</p>
+<p>tar -zxvf FileName.tar.gz：将FileName.tar.gz文件解压。</p>
+<p>②tar调用bzip2</p>
+<p>-j：tar可以使用这个参数调用gzip。<br>下面举例说明：</p>
+<p>tar -jcvf FileName.tar.bz2 *.jpg：将所有的jpg格式的图片打包并压缩成FileName.tar.bz2文件；</p>
+<p>tar -jxvf FileName.tar.bz2：将FileName.tar.bz2文件解压。</p>
+
+    </div> <!-- .entry-content -->
+  </article>
+
+
+
+  <nav id="page-nav" class="pagination clearfix">
+    <a class="extend prev" rel="prev" href="/">Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav> <!-- page-navigation -->
+
+  </div> <!-- #site-main -->
+  <footer id="site-footer">
+  <div class="copyright">
+    <span>&copy; 2014 yaxin</span>
+  </div>
+  <div class="site-script">
+    <script>
+      window.headerBg = '//yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,//yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
+    </script>
+    <script src="/assets/app.js"></script>
+<script src="/assets/pace.min.js"></script>
+<script src="/assets/highlight.pack.js"></script>
+
+    <script>
+      // var site_header = document.getElementById('site-header');
+      // var img_urls = site_header.getAttribute('data-bg-images');
+      // var header_bg_array = img_urls.split(',');
+      // var header_bg_len = header_bg_array.length;
+      // var random_num = parseInt(Math.random() * header_bg_len);
+      // site_header.style.backgroundImage = 'url("' + header_bg_array[random_num] + '")';
+      hljs.initHighlightingOnLoad();
+    </script>
+  </div>
+  <div id="tongji" style="display: none">
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5926023'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/stat.php%3Fid%3D5926023' type='text/javascript'%3E%3C/script%3E"));</script>
+  </div>
+</footer> <!-- #site-footer -->
+
+</body>
+</html>

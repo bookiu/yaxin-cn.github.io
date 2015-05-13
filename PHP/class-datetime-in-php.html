@@ -1,0 +1,220 @@
+<!--
+                  _         _                      _ _                 _
+ _   _  __ ___  _(_)_ __   | | _____   _____    __| (_)_ __   __ _  __| | __ _ _ __   __ _
+| | | |/ _` \ \/ / | '_ \  | |/ _ \ \ / / _ \  / _` | | '_ \ / _` |/ _` |/ _` | '_ \ / _` |
+| |_| | (_| |>  <| | | | | | | (_) \ V /  __/ | (_| | | | | | (_| | (_| | (_| | | | | (_| |
+ \__, |\__,_/_/\_\_|_| |_| |_|\___/ \_/ \___|  \__,_|_|_| |_|\__, |\__,_|\__,_|_| |_|\__, |
+ |___/                                                       |___/                   |___/
+-->
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+  <meta charset="utf-8">
+  
+  <title>PHP中的DateTime类 | 馨木</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
+  
+  
+  <link rel="icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/assets/app.css">
+<link rel="stylesheet" href="/assets/highlight-default.css">
+<link rel="stylesheet" href="/assets/pace-theme-flash.css">
+
+  <!-- <script src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script> -->
+  <!--[if lt IE 9]>
+    <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <![endif]-->
+</head>
+
+
+<body id="sinle-post">
+  <header id="site-header">
+  <div id="site-nav">
+    <nav class="site-nav">
+      <ul>
+        <li ><a href="/">所有文章</a></li>
+        <li ><a href="/about.html">关于我</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div id="site-title">
+	
+  </div>
+</header> <!-- #site-header -->
+  <div id="site-main">
+    <article id="post-1408680810" class="article article-type-post">
+  <header class="post-header">
+    <div class="post-header-wrap">
+      <h1 class="post-title" itemprop="name"><a href="http://yaxin-cn.github.io/PHP/class-datetime-in-php.html" rel="bookmark" title="PHP中的DateTime类" itemprop="url">PHP中的DateTime类</a></h1>
+      <h2>2014-08-22</h2>
+    </div><!-- .post-header-wrap -->
+  </header>
+  <div class="section-box">
+    <div class="post-content">
+      <p><a href="http://php.net/manual/zh/class.datetime.php" target="_blank" rel="external"><code>DataTime</code></a>类跟<code>date()</code>,<code>strtotime()</code>,<code>gmdate()</code>等函数有相同的作用，都是用来处理日期和时间的，但<code>DateTime</code>类更加直观、方便, 所以在PHP5.2.0以后推荐使用<code>DateTime</code>类而不是相应的函数。</p>
+<p>下面来看一下<code>DateTime</code>类的用法。</p>
+<h2 id="1-_获取当前系统时间并打印">1. 获取当前系统时间并打印</h2><pre><code class="php">&lt;?php
+$date = new DateTime();
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+?&gt;
+</code></pre>
+<blockquote>
+<p>执行结果为：2014-08-25 12:58:29</p>
+</blockquote>
+<h2 id="2-_获取特定时间并打印">2. 获取特定时间并打印</h2><pre><code class="php">&lt;?php
+$date = new DateTime(&#39;2014-05-04&#39;);
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+$date2 = new DateTime(&#39;tomorrow&#39;);
+echo $date2-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+$date2 = new DateTime(&#39;+2 days&#39;);
+echo $date2-&gt;format(&#39;Y-m-d H:i:s&#39;);
+?&gt;
+</code></pre>
+<blockquote>
+<p>执行结果为：<br>2014-05-04 00:00:00<br>2014-08-26 00:00:00<br>2014-08-27 13:13:34</p>
+</blockquote>
+<p>或则通过DateTime的其他方法</p>
+<pre><code class="php">&lt;?php
+$date = new DateTime();
+// add方法
+$date-&gt;add(new DateInterval(&#39;P1D&#39;));
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+// modify方法
+$date-&gt;modify(&#39;+1 day&#39;);
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+// setDate方法
+$date-&gt;setDate(&#39;1989-11-10&#39;);
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+// setTime方法
+$date-&gt;setTime(&#39;11:10:10&#39;);
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
+<blockquote>
+<p>执行结果分别为：<br>2014-08-26 15:02:57<br>2014-08-27 15:02:57<br>1989-11-10 15:02:57<br>1989-11-10 11:10:10 </p>
+</blockquote>
+<h2 id="3-_unix时间戳的转换">3. unix时间戳的转换</h2><h3 id="获取当前时间的时间戳">获取当前时间的时间戳</h3><pre><code class="php">&lt;?php
+$date = new DateTime();
+echo $date-&gt;format(&#39;U&#39;);
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
+<blockquote>
+<p>执行结果为：1408950651</p>
+</blockquote>
+<p>或者</p>
+<pre><code class="php">&lt;?php
+$date = new DateTime();
+echo $date-&gt;getTimestamp();
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
+<h3 id="将时间戳转换为可读时间">将时间戳转换为可读时间</h3><pre><code class="php">&lt;?php
+$date = new DateTime(&#39;@1408950651&#39;);
+$date-&gt;setTimezone(new DateTimeZone(&#39;Asia/Shanghai&#39;));
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
+<blockquote>
+<p>执行结果为：2014-08-25 15:10:51</p>
+</blockquote>
+<p>或者</p>
+<pre><code class="php">&lt;?php
+$date = new DateTime();
+$date-&gt;setTimestamp(1408950651);
+echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
+<h2 id="4-_日期的比较">4. 日期的比较</h2><h3 id="日期大小比较">日期大小比较</h3><pre><code class="php">&lt;?php
+$date1 = new DateTime();
+$date2 = new DateTime(&#39;2014-09-15&#39;);
+
+if($date1 &lt; $date2) {
+    echo $date2-&gt;format(&#39;Y-m-d H:i:s&#39;) . &#39; is in the future&#39;;
+}
+?&gt;
+</code></pre>
+<h3 id="日期间隔">日期间隔</h3><pre><code class="php">&lt;?php
+$date1 = new DateTime();
+$date2 = new DateTime(&#39;2014-09-15&#39;);
+
+$diff = $date1-&gt;diff($date2);
+print_r($diff);
+?&gt;
+</code></pre>
+<blockquote>
+<p>执行结果为:<br>DateInterval Object<br>(<br>    [y] =&gt; 0<br>    [m] =&gt; 0<br>    [d] =&gt; 20<br>    [h] =&gt; 7<br>    [i] =&gt; 35<br>    [s] =&gt; 50<br>    [weekday] =&gt; 0<br>    [weekday_behavior] =&gt; 0<br>    [first_last_day_of] =&gt; 0<br>    [invert] =&gt; 0<br>    [days] =&gt; 20<br>    [special_type] =&gt; 0<br>    [special_amount] =&gt; 0<br>    [have_weekday_relative] =&gt; 0<br>    [have_special_relative] =&gt; 0<br>)</p>
+</blockquote>
+<p>将返回的对象格式化输出</p>
+<pre><code class="php">&lt;?php
+$date1 = new DateTime();
+$date2 = new DateTime(&#39;2014-09-15&#39;);
+
+$diff = $date1-&gt;diff($date2);
+echo $diff-&gt;format(&quot;The future will come in %Y years %m months and %d days&quot;);
+?&gt;
+</code></pre>
+<blockquote>
+<p>输出结果为：The future will come in 00 years 0 months and 20 days</p>
+</blockquote>
+
+    </div> <!-- .post-content -->
+    <div class="post-footer">
+      <div class="entry-meta article-entry-meta clearfix">
+        <div class="entry-date date published updated pull-left mr-10">
+          <i class="icon-clock"></i><time datetime="2014-08-22T04:13:30.000Z" itemprop="datePublished">2014-08-22</time>
+        </div>
+        <div class="entry-tags pull-left clearfix">
+          
+            <i class="icon-tags"></i>
+            <a class="article-tag-link" href="/tags/PHP/">PHP</a>
+          
+        </div>
+      </div><!-- .entry-meta -->
+    </div> <!-- .post-footer -->
+  </div>
+</article>
+
+
+
+  </div> <!-- #site-main -->
+  <footer id="site-footer">
+  <div class="copyright">
+    <span>&copy; 2014 yaxin</span>
+  </div>
+  <div class="site-script">
+    <script>
+      window.headerBg = '//yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,//yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
+    </script>
+    <script src="/assets/app.js"></script>
+<script src="/assets/pace.min.js"></script>
+<script src="/assets/highlight.pack.js"></script>
+
+    <script>
+      // var site_header = document.getElementById('site-header');
+      // var img_urls = site_header.getAttribute('data-bg-images');
+      // var header_bg_array = img_urls.split(',');
+      // var header_bg_len = header_bg_array.length;
+      // var random_num = parseInt(Math.random() * header_bg_len);
+      // site_header.style.backgroundImage = 'url("' + header_bg_array[random_num] + '")';
+      hljs.initHighlightingOnLoad();
+    </script>
+  </div>
+  <div id="tongji" style="display: none">
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5926023'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/stat.php%3Fid%3D5926023' type='text/javascript'%3E%3C/script%3E"));</script>
+  </div>
+</footer> <!-- #site-footer -->
+
+</body>
+</html>

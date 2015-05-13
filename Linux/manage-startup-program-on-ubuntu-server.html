@@ -1,0 +1,153 @@
+<!--
+                  _         _                      _ _                 _
+ _   _  __ ___  _(_)_ __   | | _____   _____    __| (_)_ __   __ _  __| | __ _ _ __   __ _
+| | | |/ _` \ \/ / | '_ \  | |/ _ \ \ / / _ \  / _` | | '_ \ / _` |/ _` |/ _` | '_ \ / _` |
+| |_| | (_| |>  <| | | | | | | (_) \ V /  __/ | (_| | | | | | (_| | (_| | (_| | | | | (_| |
+ \__, |\__,_/_/\_\_|_| |_| |_|\___/ \_/ \___|  \__,_|_|_| |_|\__, |\__,_|\__,_|_| |_|\__, |
+ |___/                                                       |___/                   |___/
+-->
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+  <meta charset="utf-8">
+  
+  <title>管理ubuntu server自启程序 | 馨木</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
+  
+  
+  <link rel="icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/assets/app.css">
+<link rel="stylesheet" href="/assets/highlight-default.css">
+<link rel="stylesheet" href="/assets/pace-theme-flash.css">
+
+  <!-- <script src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script> -->
+  <!--[if lt IE 9]>
+    <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <![endif]-->
+</head>
+
+
+<body id="sinle-post">
+  <header id="site-header">
+  <div id="site-nav">
+    <nav class="site-nav">
+      <ul>
+        <li ><a href="/">所有文章</a></li>
+        <li ><a href="/about.html">关于我</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div id="site-title">
+	
+  </div>
+</header> <!-- #site-header -->
+  <div id="site-main">
+    <article id="post-1431520110" class="article article-type-post">
+  <header class="post-header">
+    <div class="post-header-wrap">
+      <h1 class="post-title" itemprop="name"><a href="http://yaxin-cn.github.io/Linux/manage-startup-program-on-ubuntu-server.html" rel="bookmark" title="管理ubuntu server自启程序" itemprop="url">管理ubuntu server自启程序</a></h1>
+      <h2>2015-05-13</h2>
+    </div><!-- .post-header-wrap -->
+  </header>
+  <div class="section-box">
+    <div class="post-content">
+      <p>本文所使用的环境为ubuntu14.04，ubuntu15.04使用systemd，可能会有很大的不同</p>
+<h2 id="方法一">方法一</h2><p>使用类图形的<code>sysv-rc-conf</code>命令，你需要首先安装<code>sysv-rc-conf</code></p>
+<pre><code class="bash">[yaxin@~]$sudo apt-get install sysv-rc-conf
+[yaxin@~]$sudo sysv-rc-conf
+</code></pre>
+<p>运行之后会有一个类图形的界面, 这个操作起来相当简单, 也容易懂，这里就不多介绍</p>
+<h2 id="方法二">方法二</h2><p>首先使用<code>runlevel</code>命令获取系统运行在哪个<strong>level</strong>下（ubuntu server一般是2），如下：</p>
+<pre><code class="bash">[yaxin@~]$runlevel
+N 2
+[yaxin@~]$
+</code></pre>
+<p>然后将启动脚本放到<code>/etc/rcX.d</code> 其中X为运行级别，如<code>/etc/rc2.d</code>, 注意脚本要以大写<strong>S</strong>开头, 后面接一个两位数的数字，表示启动顺序，数字越小表示越先启动</p>
+<p>一般<code>/etc/rc2.d</code>中会有很多软链接到<code>/etc/init.d</code>下的启动脚本, 这样的好处是集中管理，很方便, 并且可以使用<code>service</code>这个程序对进程进行重启等操作.</p>
+<p>如，编译安装完php后，将<code>sapi/fpm</code>文件夹下的<code>init.d.php-fpm</code>文件复制到<code>/etc/init.d</code>文件夹下，然后在<code>/etc/rc2.d</code>下创建一个软链接</p>
+<pre><code class="bash">[yaxin@php-5.6.8]$sudo cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+[yaxin@php-5.6.8]$sudo chmod +x /etc/init.d/php-fpm
+[yaxin@php-5.6.8]$sudo ln -s /etc/init.d/php-fpm /etc/rc2.d/S20php-fpm
+[yaxin@php-5.6.8]$service php-fpm start
+</code></pre>
+<p>当然，如果你想关闭一个自启的程序，直接将对应的<code>/etc/rcX.d</code>下的启动脚本删除即可</p>
+<pre><code class="bash">[yaxin@~]$sudo rm /etc/rc2.d/S20php-fpm
+</code></pre>
+<p>或则</p>
+<pre><code class="bash">[yaxin@~]$sudo unlink /etc/rc2.d/S20php-fpm
+</code></pre>
+<p><strong>注意</strong>: <code>sysv-rc-conf</code>命令就是使用这个方法来实现程序自启和禁止自启的.</p>
+<h2 id="方法三">方法三</h2><p>直接将需要启动的程序添加到<code>/etc/rc.local</code>文件中</p>
+<p>如你需要开机启动nginx，那么可以这样</p>
+<pre><code class="bash">[root@~]$echo &quot;/etc/nginx/sbin/nginx&quot; &gt;&gt; /etc/rc.local
+</code></pre>
+<p>其实这个就是方法二的快捷操作，如果你查看<code>/etc/rc2.d</code>文件夹下面的文件会发现有一个<code>S99rc.local</code>的软链接，它链接到<code>/etc/init.d/rc.local</code>, 而<code>/etc/init.d/rc.local</code>这个脚本中又会执行<code>/etc/rc.local</code>这个脚本</p>
+<h3 id="方法四">方法四</h3><p>其实前几种方式并不是正统的自启管理方式, 使用<code>rcX.d</code>是<strong>传统init</strong>的方式, 而ubuntu14.04是使用<strong>Upstart</strong>来初始化守护进程, 但为了照顾使用从<strong>init</strong>过来(如centos6等)的人才创建的. 而真正的启动脚本(应该说配置)是放在<code>/etc/init</code>这个文件夹下的</p>
+<p><code>/etc/init</code>文件夹下有很多的以<strong>.conf</strong>结尾的文件，这些就是正统的管理自启程序的配置文件.</p>
+<p>随便打开一个文件, 有一行<strong>start on runlevel [234]</strong>, 这就说明在runlevel为234的情况下启动</p>
+<pre><code class="bash">[yaxin@/etc/init]$head ssh.conf
+# ssh - OpenBSD Secure Shell server
+#
+# The OpenSSH server provides secure shell access to the system.
+
+description &quot;OpenSSH server&quot;
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+</code></pre>
+<p>如上，ssh将在runlevel为2 3 4 5的时候开机启动, 而启动的具体命令在配置文件后面.</p>
+<p>当然，如果你想关闭自启，那么删除但钱runlevel即可，或则直接删除该配置文件.</p>
+<p>所以，如果你有一个开机自启的程序，当你使用前面的方法删除以后，程序还是自启，那么问题肯定出在这一步.</p>
+
+    </div> <!-- .post-content -->
+    <div class="post-footer">
+      <div class="entry-meta article-entry-meta clearfix">
+        <div class="entry-date date published updated pull-left mr-10">
+          <i class="icon-clock"></i><time datetime="2015-05-13T12:28:30.000Z" itemprop="datePublished">2015-05-13</time>
+        </div>
+        <div class="entry-tags pull-left clearfix">
+          
+            <i class="icon-tags"></i>
+            <a class="article-tag-link" href="/tags/Linux/">Linux</a>
+          
+        </div>
+      </div><!-- .entry-meta -->
+    </div> <!-- .post-footer -->
+  </div>
+</article>
+
+
+
+  </div> <!-- #site-main -->
+  <footer id="site-footer">
+  <div class="copyright">
+    <span>&copy; 2014 yaxin</span>
+  </div>
+  <div class="site-script">
+    <script>
+      window.headerBg = '//yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,//yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
+    </script>
+    <script src="/assets/app.js"></script>
+<script src="/assets/pace.min.js"></script>
+<script src="/assets/highlight.pack.js"></script>
+
+    <script>
+      // var site_header = document.getElementById('site-header');
+      // var img_urls = site_header.getAttribute('data-bg-images');
+      // var header_bg_array = img_urls.split(',');
+      // var header_bg_len = header_bg_array.length;
+      // var random_num = parseInt(Math.random() * header_bg_len);
+      // site_header.style.backgroundImage = 'url("' + header_bg_array[random_num] + '")';
+      hljs.initHighlightingOnLoad();
+    </script>
+  </div>
+  <div id="tongji" style="display: none">
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5926023'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/stat.php%3Fid%3D5926023' type='text/javascript'%3E%3C/script%3E"));</script>
+  </div>
+</footer> <!-- #site-footer -->
+
+</body>
+</html>
