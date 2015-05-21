@@ -2,13 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://yaxin-cn.github.io/about.html</loc>
-    <lastmod>2015-05-13T09:52:27.018Z</lastmod>
+    <loc>http://yaxin-cn.github.io/Linux/add-root-certificate-in-ubuntu.html</loc>
+    <lastmod>2015-05-21T04:35:46.302Z</lastmod>
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Python/understand-python-string-objects-are-immutable.html</loc>
-    <lastmod>2015-05-13T09:52:06.326Z</lastmod>
+    <loc>http://yaxin-cn.github.io/about.html</loc>
+    <lastmod>2015-05-13T09:52:27.018Z</lastmod>
   </url>
   
   <url>
@@ -62,13 +62,13 @@
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Docker/how-to-delete-a-docker-image.html</loc>
+    <loc>http://yaxin-cn.github.io/Python/understand-python-string-objects-are-immutable.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/PHP/class-datetime-in-php.html</loc>
-    <lastmod>2015-05-13T09:52:06.322Z</lastmod>
+    <loc>http://yaxin-cn.github.io/Docker/how-to-delete-a-docker-image.html</loc>
+    <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
   <url>
@@ -78,6 +78,11 @@
   
   <url>
     <loc>http://yaxin-cn.github.io/Linux/change-locale-and-timezone-of-ubuntu.html</loc>
+    <lastmod>2015-05-13T09:52:06.322Z</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://yaxin-cn.github.io/PHP/class-datetime-in-php.html</loc>
     <lastmod>2015-05-13T09:52:06.322Z</lastmod>
   </url>
   

@@ -7,8 +7,40 @@
     <link>http://yaxin-cn.github.io/</link>
     <atom:link href="/rss.xml" rel="self" type="application/rss+xml"/>
     <description><![CDATA[为梦想添砖加瓦]]></description>
-    <pubDate>Wed, 13 May 2015 09:52:06 GMT</pubDate>
+    <pubDate>Thu, 21 May 2015 04:35:46 GMT</pubDate>
     <generator>http://hexo.io/</generator>
+    
+    <item>
+      <title><![CDATA[Ubuntu添加可信任根证书]]></title>
+      <link>http://yaxin-cn.github.io/Linux/add-root-certificate-in-ubuntu.html</link>
+      <guid>http://yaxin-cn.github.io/Linux/add-root-certificate-in-ubuntu.html</guid>
+      <pubDate>Thu, 21 May 2015 03:58:45 GMT</pubDate>
+      <description>
+      <![CDATA[<h2 id="添加">添加</h2><p>Ubuntu下添加根证书非常简单, 只要将证书(扩展名为crt)复制到<strong>/usr/local/share/ca-certificates</strong>文件夹然后运行<code>update-ca-certificate]]>
+      </description>
+      <content:encoded><![CDATA[<h2 id="添加">添加</h2><p>Ubuntu下添加根证书非常简单, 只要将证书(扩展名为crt)复制到<strong>/usr/local/share/ca-certificates</strong>文件夹然后运行<code>update-ca-certificates</code>即可</p>
+<pre><code class="bash">[yaxin@ubox ~]$sudo cp xinmu.crt /usr/local/share/ca-certificates
+[yaxin@ubox ~]$sudo update-ca-certificates
+Updating certificates in /etc/ssl/certs... 1 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d....done.
+</code></pre>
+<h2 id="删除">删除</h2><p>直接将<strong>/usr/local/share/ca-certificates</strong>对应的证书删除，然后执行<code>update-ca-certificates</code></p>
+<pre><code class="bash">[yaxin@ubox ~]$sudo rm -f /usr/local/share/ca-certificates/xinmu.crt
+[yaxin@ubox ~]$sudo update-ca-certificates
+Updating certificates in /etc/ssl/certs... 0 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d....done.
+</code></pre>
+<p><strong>注意: 这时候并不会提示1 removed, 但证书是已经被删除了的</strong></p>
+<h2 id="原理">原理</h2><p>其实<code>update-ca-certificates</code>是一个shell脚本, 使用<code>which</code>找出<code>update-ca-certificates</code>的绝对路径，然后打开就可以查看其源码</p>
+<pre><code class="bash">[yaxin@ubox ~]$which update-ca-certificates
+/usr/sbin/update-ca-certificates
+[yaxin@ubox ~]$file /usr/sbin/update-ca-certificates
+/usr/sbin/update-ca-certificates: POSIX shell script, ASCII text executable
+</code></pre>
+<p>通过阅读源码可以看出, <code>update-ca-certificates</code>命令的本质其实是将PEM格式的根证书内容附加到<em>/etc/ssl/certs/ca-certificates.crt</em>, 而<em>/etc/ssl/certs/ca-certificates.crt</em>中本身就包含了系统自带的各种可信根证书.</p>
+]]></content:encoded>
+      <comments>http://yaxin-cn.github.io/Linux/add-root-certificate-in-ubuntu.html#disqus_comments</comments>
+    </item>
     
     <item>
       <title><![CDATA[管理ubuntu server自启程序]]></title>

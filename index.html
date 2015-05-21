@@ -52,6 +52,46 @@
 </header> <!-- #site-header -->
   <div id="site-main">
     
+  <article id="post-1432180725" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
+    <header class="entry-header">
+      <div class="entry-meta">
+        <span class="entry-date date published updated">
+          <time datetime="2015-05-21T03:58:45.000Z" itemprop="datePublished"><a href="/Linux/add-root-certificate-in-ubuntu.html"><i class="icon-clock"></i>2015-05-21</a></time>
+        </span>
+        <span>•</span>
+        <span class="entry-comments">
+          <a href="/Linux/add-root-certificate-in-ubuntu.html#comments"><i class="icon-chat"></i>评论</a>
+        </span>
+      </div><!-- .entry-meta -->
+      <h1 class="entry-title" itemprop="name">
+        <a href="http://yaxin-cn.github.io/Linux/add-root-certificate-in-ubuntu.html" rel="bookmark" title="Ubuntu添加可信任根证书" itemprop="url">Ubuntu添加可信任根证书</a>
+      </h1> <!-- .entry-title -->
+    </header>
+    <div class="entry-content" itemprop="description">
+        <h2 id="添加">添加</h2><p>Ubuntu下添加根证书非常简单, 只要将证书(扩展名为crt)复制到<strong>/usr/local/share/ca-certificates</strong>文件夹然后运行<code>update-ca-certificates</code>即可</p>
+<pre><code class="bash">[yaxin@ubox ~]$sudo cp xinmu.crt /usr/local/share/ca-certificates
+[yaxin@ubox ~]$sudo update-ca-certificates
+Updating certificates in /etc/ssl/certs... 1 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d....done.
+</code></pre>
+<h2 id="删除">删除</h2><p>直接将<strong>/usr/local/share/ca-certificates</strong>对应的证书删除，然后执行<code>update-ca-certificates</code></p>
+<pre><code class="bash">[yaxin@ubox ~]$sudo rm -f /usr/local/share/ca-certificates/xinmu.crt
+[yaxin@ubox ~]$sudo update-ca-certificates
+Updating certificates in /etc/ssl/certs... 0 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d....done.
+</code></pre>
+<p><strong>注意: 这时候并不会提示1 removed, 但证书是已经被删除了的</strong></p>
+<h2 id="原理">原理</h2><p>其实<code>update-ca-certificates</code>是一个shell脚本, 使用<code>which</code>找出<code>update-ca-certificates</code>的绝对路径，然后打开就可以查看其源码</p>
+<pre><code class="bash">[yaxin@ubox ~]$which update-ca-certificates
+/usr/sbin/update-ca-certificates
+[yaxin@ubox ~]$file /usr/sbin/update-ca-certificates
+/usr/sbin/update-ca-certificates: POSIX shell script, ASCII text executable
+</code></pre>
+<p>通过阅读源码可以看出, <code>update-ca-certificates</code>命令的本质其实是将PEM格式的根证书内容附加到<em>/etc/ssl/certs/ca-certificates.crt</em>, 而<em>/etc/ssl/certs/ca-certificates.crt</em>中本身就包含了系统自带的各种可信根证书.</p>
+
+    </div> <!-- .entry-content -->
+  </article>
+
   <article id="post-1431520110" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
     <header class="entry-header">
       <div class="entry-meta">
@@ -820,54 +860,6 @@ root@c2518b7cf928:~#
     # 返回的是十进制整数
     return s
 </code></pre>
-
-    </div> <!-- .entry-content -->
-  </article>
-
-  <article id="post-1400505092" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
-    <header class="entry-header">
-      <div class="entry-meta">
-        <span class="entry-date date published updated">
-          <time datetime="2014-05-19T13:11:32.000Z" itemprop="datePublished"><a href="/Python/understand-python-string-objects-are-immutable.html"><i class="icon-clock"></i>2014-05-19</a></time>
-        </span>
-        <span>•</span>
-        <span class="entry-comments">
-          <a href="/Python/understand-python-string-objects-are-immutable.html#comments"><i class="icon-chat"></i>评论</a>
-        </span>
-      </div><!-- .entry-meta -->
-      <h1 class="entry-title" itemprop="name">
-        <a href="http://yaxin-cn.github.io/Python/understand-python-string-objects-are-immutable.html" rel="bookmark" title="理解Python中数值和字符串对象是不可变化的" itemprop="url">理解Python中数值和字符串对象是不可变化的</a>
-      </h1> <!-- .entry-title -->
-    </header>
-    <div class="entry-content" itemprop="description">
-        <p>在Python中数值和字符串对象是不可以改变的，但对于新手的我们很难理解，于是乎会有下面的代码:</p>
-<pre><code class="python">x = &#39;Hello World&#39;
-print x
-x = &#39;Hello Hello&#39;
-print x
-</code></pre>
-<p>上面的代码明显的说明了变量<code>x</code>是可以改变的。其实变量<code>x</code>的改变伴随着<code>x</code>内存地址的变化，也就是说系统重新创建了一个名为<strong>x</strong>的变量用于保存新字符串。想要证明这个需要用到Python的<code>id</code>函数。</p>
-<p>id函数返回一个数字，这个数字跟该对象的分配内存地址密切相关。也可以近似认为这个数值就是该对象（变量）的所在内存地址。</p>
-<blockquote>
-<p>python中id函数的说明<br>Help on built-in function id in module <strong>builtin</strong>:</p>
-<p>id(…)<br>   id(object) -&gt; integer</p>
-<p>   Return the identity of an object.  This is guaranteed to be unique among<br>    simultaneously existing objects.  (Hint: it’s the object’s memory address.)</p>
-</blockquote>
-<p>现在再来看下面的代码：</p>
-<pre><code class="python">x = &#39;Hello World&#39;
-print id(x)
-x = &#39;Hello Hello&#39;
-print id(x)
-y = [&#39;a&#39;, &#39;b&#39;]
-print id(y)
-y.append(&#39;c&#39;)
-print id(y)
-</code></pre>
-<p>你运行结果如下：</p>
-<blockquote>
-<p>21908576<br>21906752<br>23032176<br>23032176</p>
-</blockquote>
-<p>可以看出前两个<code>id</code>的结果并不相同，而后面的两个（python中列表、字典对象是可变的）结果却是一样的，这说明字符串对象在python中是不可变的，即使重新对变量赋值，也只是重新生成相同变量的字符串而并不是直接改变当前的字符串变量。</p>
 
     </div> <!-- .entry-content -->
   </article>
