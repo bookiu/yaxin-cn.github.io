@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yaxin-cn.github.io/Docker/docker-container-use-static-IP.html</loc>
+    <lastmod>2015-06-29T00:31:15.874Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://yaxin-cn.github.io/Linux/add-root-certificate-in-ubuntu.html</loc>
     <lastmod>2015-05-21T04:35:46.302Z</lastmod>
   </url>
@@ -9,11 +14,6 @@
   <url>
     <loc>http://yaxin-cn.github.io/about.html</loc>
     <lastmod>2015-05-13T09:52:27.018Z</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://yaxin-cn.github.io/Docker/setup-development-enviroment-in-docker-1.html</loc>
-    <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
   <url>
@@ -52,7 +52,7 @@
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Docker/docker-container-use-static-IP.html</loc>
+    <loc>http://yaxin-cn.github.io/Python/understand-python-string-objects-are-immutable.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
@@ -62,7 +62,7 @@
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Python/understand-python-string-objects-are-immutable.html</loc>
+    <loc>http://yaxin-cn.github.io/Docker/setup-development-enviroment-in-docker-1.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
