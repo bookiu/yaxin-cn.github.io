@@ -343,7 +343,7 @@ container_gw=`ip addr show docker0 | grep &quot;inet\b&quot; | awk &#39;{print $
 
 bridge_name=&quot;veth_$container_minid&quot;
 container_ip=$bind_ip/$container_netmask
-pid=`docker inspect -f '{{.State.Pid}}' salt-master 2&gt; /dev/null`
+pid=`docker inspect -f '{{.State.Pid}}' $container_name 2&gt; /dev/null`
 if [ ! $pid ];then
     echo &quot;获取容器$container_name的id失败&quot;
     exit 4
