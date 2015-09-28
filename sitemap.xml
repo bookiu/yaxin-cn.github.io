@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yaxin-cn.github.io/Python/issue-when-install-python-cffi.html</loc>
+    <lastmod>2015-09-28T05:11:48.236Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://yaxin-cn.github.io/Docker/docker-container-use-static-IP.html</loc>
     <lastmod>2015-06-29T00:42:59.739Z</lastmod>
   </url>
@@ -17,11 +22,6 @@
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Linux/replace-password-with-stars-under-shell.html</loc>
-    <lastmod>2015-05-13T09:52:06.326Z</lastmod>
-  </url>
-  
-  <url>
     <loc>http://yaxin-cn.github.io/Python/matrix-addition-in-python.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
@@ -33,6 +33,11 @@
   
   <url>
     <loc>http://yaxin-cn.github.io/front-end/make-element-vertical-center-with-css.html</loc>
+    <lastmod>2015-05-13T09:52:06.326Z</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://yaxin-cn.github.io/Python/understand-python-string-objects-are-immutable.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
@@ -52,7 +57,7 @@
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Python/understand-python-string-objects-are-immutable.html</loc>
+    <loc>http://yaxin-cn.github.io/Docker/setup-development-enviroment-in-docker-1.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
@@ -62,7 +67,7 @@
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Docker/setup-development-enviroment-in-docker-1.html</loc>
+    <loc>http://yaxin-cn.github.io/Linux/replace-password-with-stars-under-shell.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   

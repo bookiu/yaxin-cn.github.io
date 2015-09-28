@@ -15,8 +15,6 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
-  
   
   <link rel="icon" href="/assets/favicon.ico">
   <link rel="stylesheet" href="/assets/app.css">
@@ -52,6 +50,65 @@
 </header> <!-- #site-header -->
   <div id="site-main">
     
+  <article id="post-1443417045" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
+    <header class="entry-header">
+      <div class="entry-meta">
+        <span class="entry-date date published updated">
+          <time datetime="2015-09-28T05:10:45.000Z" itemprop="datePublished"><a href="/Python/issue-when-install-python-cffi.html"><i class="icon-clock"></i>2015-09-28</a></time>
+        </span>
+        <span>•</span>
+        <span class="entry-comments">
+          <a href="/Python/issue-when-install-python-cffi.html#comments"><i class="icon-chat"></i>评论</a>
+        </span>
+      </div><!-- .entry-meta -->
+      <h1 class="entry-title" itemprop="name">
+        <a href="http://yaxin-cn.github.io/Python/issue-when-install-python-cffi.html" rel="bookmark" title="python安装cffi模块的一个问题" itemprop="url">python安装cffi模块的一个问题</a>
+      </h1> <!-- .entry-title -->
+    </header>
+    <div class="entry-content" itemprop="description">
+        <p>系统自带的python有点老（2.6）于是下载python2.7.8的源码手动编译安装(编译参数<code>./configure --enable-shared --disable-ipv6 --prefix=/usr/local/python27</code>)</p>
+<p>安装后将系统的python替换(<code>ln -svf /usr/local/python27/bin/* /usr/bin/</code>), 安装<a href="https://bootstrap.pypa.io/ez_setup.py" target="_blank" rel="external">easy_install</a>和pip(<code>easy_install pip</code>), 之后开始安装<em>pyopenssl</em>, 但是在安装依赖<em>cffi</em>的时候报错<strong>/usr/bin/ld: cannot find -lpython2.7</strong>.</p>
+<p>首先需要说明的是出现类似<strong>/usr/bin/ld: cannot find -lxx</strong>的原因主要是gcc没有找到libxx.so的文件</p>
+<pre><code class="bash">[root@ubox ~]# echo &#39;/usr/local/python27/lib&#39; &gt; /etc/ld.so.conf.d/python-2.7.8.conf
+[root@ubox ~]# ldconfig -v
+</code></pre>
+<p><code>ldconfig</code>命令为重建动态链接库的缓存.然后重新执行<code>pip install cffi</code>, 但是还是报错, 使用<code>gcc -lpython2.7 --verbose</code>查看gcc查找库的路径</p>
+<pre><code class="bash">[root@ubox lib]# gcc -lpython2.7 --verbose
+Using built-in specs.
+Target: x86_64-redhat-linux
+Configured with: ../configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-languages=c,c++,objc,obj-c++,java,fortran,ada --enable-java-awt=gtk --disable-dssi --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre --enable-libgcj-multifile --enable-java-maintainer-mode --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --disable-libjava-multilib --with-ppl --with-cloog --with-tune=generic --with-arch_32=i686 --build=x86_64-redhat-linux
+Thread model: posix
+gcc version 4.4.7 20120313 (Red Hat 4.4.7-16) (GCC) 
+COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS=&#39;-v&#39; &#39;-mtune=generic&#39;
+ /usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2 --eh-frame-hdr --build-id -m elf_x86_64 --hash-style=gnu -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../.. -lpython2.7 -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtend.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crtn.o
+/usr/bin/ld: cannot find -lpython2.7
+collect2: ld returned 1 exit status
+</code></pre>
+<p>可以看到<strong>/usr/local/python27/lib</strong>并不在上面的路径, google一下找到了这个答案<a href="http://stackoverflow.com/questions/8400272/usr-bin-ld-cannot-find-lpython2-7" target="_blank" rel="external">http://stackoverflow.com/questions/8400272/usr-bin-ld-cannot-find-lpython2-7</a>, 然后</p>
+<pre><code class="bash">[root@micaopan-dev lib]# locate libpython2.7.a
+/usr/local/python27/lib/python2.7/config/libpython2.7.a
+/usr/local/src/Python-2.7.8/libpython2.7.a
+[root@micaopan-dev lib]# ln -s /usr/local/python27/lib/python2.7/config/libpython2.7.a /usr/lib
+[root@micaopan-dev lib]# gcc -lpython2.7 --verbose
+...
+(.text+0x20): undefined reference to &#39;main&#39;
+collect2: ld returned 1 exit status
+</code></pre>
+<p>这个gcc找到了动态链接库, 报错根据<a href="http://stackoverflow.com/questions/15905119/c-linking-error-undefined-reference-to-main" target="_blank" rel="external">http://stackoverflow.com/questions/15905119/c-linking-error-undefined-reference-to-main</a>应该并没有什么大碍</p>
+<p>然后执行<code>pip install cffi</code>成功.</p>
+<p>PS: 参考</p>
+<ol>
+<li><a href="http://navyaijm.blog.51cto.com/4647068/809424" target="_blank" rel="external">/usr/bin/ld: cannot find -l* 错误的解决方法……</a></li>
+<li><a href="http://eminzhang.blog.51cto.com/5292425/1285705" target="_blank" rel="external">关于usr/bin/ld: cannot find -lxxx问题总结</a></li>
+<li><a href="http://stackoverflow.com/questions/8400272/usr-bin-ld-cannot-find-lpython2-7" target="_blank" rel="external">/usr/bin/ld: cannot find -lpython2.7</a></li>
+<li><a href="http://stackoverflow.com/questions/15905119/c-linking-error-undefined-reference-to-main" target="_blank" rel="external">C Linking Error: undefined reference to ‘main’</a></li>
+</ol>
+
+    </div> <!-- .entry-content -->
+  </article>
+
   <article id="post-1432180725" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
     <header class="entry-header">
       <div class="entry-meta">
@@ -796,68 +853,6 @@ root@c2518b7cf928:~#
     </div> <!-- .entry-content -->
   </article>
 
-  <article id="post-1401431041" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
-    <header class="entry-header">
-      <div class="entry-meta">
-        <span class="entry-date date published updated">
-          <time datetime="2014-05-30T06:24:01.000Z" itemprop="datePublished"><a href="/Python/icmp-packet-checksum-with-python.html"><i class="icon-clock"></i>2014-05-30</a></time>
-        </span>
-        <span>•</span>
-        <span class="entry-comments">
-          <a href="/Python/icmp-packet-checksum-with-python.html#comments"><i class="icon-chat"></i>评论</a>
-        </span>
-      </div><!-- .entry-meta -->
-      <h1 class="entry-title" itemprop="name">
-        <a href="http://yaxin-cn.github.io/Python/icmp-packet-checksum-with-python.html" rel="bookmark" title="icmp包检验和计算方法及python实现" itemprop="url">icmp包检验和计算方法及python实现</a>
-      </h1> <!-- .entry-title -->
-    </header>
-    <div class="entry-content" itemprop="description">
-        <p>发送icmp包时，需要计算icmp包的校验和，与ip包不同的是，icmp包需要连通头部信息加数据本身一起进行校验（ip包只需要校验头部信息）</p>
-<p>校验方法如下：</p>
-<ol>
-<li>把校验和字段置为0</li>
-<li>将icmp包（包括header和data）以16bit（2个字节）为一组，并将所有组相加（二进制求和）</li>
-<li>若高16bit不为0，则将高16bit与低16bit反复相加，直到高16bit的值为0，从而获得一个只有16bit长度的值</li>
-<li>将此16bit值进行按位求反操作，将所得值替换到校验和字段</li>
-</ol>
-<p><strong>注意</strong>: 第四步中的<em>按位求反</em>值C语言的的<em>按位求反</em>（即~操作符），不是python中的<em>按位求反</em></p>
-<p>例如下图中的icmp包：</p>
-<p><img src="//cube2x-blog.qiniudn.com/blog-img/icmp_data.png" alt="icmp抓包截图"></p>
-<p>其中icmp包的内容为：</p>
-<blockquote>
-<p>08 00 F9 CE 7C E2 01 00 20 28 20 52 64 77 6A 6D 58 67 65 42 5A 2A 61 64 52 41 44 78 75 40 35 28 6F 76 20 43 56 76 59 20 4E 4F 64 20 20 6B 75 64 40 72 31 4A 50 20 20 33 67 20 2B 31 2A 51 20 52 70</p>
-</blockquote>
-<p>校验字段为<strong>F9 CE</strong></p>
-<p>将校验字段置为0，然后以16bit为一组将全部字段二进制相加，即：</p>
-<p>0800 + 0000 + 7CE2 + 0100 + 2028 + 2052 + 6477 + 6A6D + 5867 + 6542 + 5A2A + 6164 + 5241 + 4478 + 7540 + 3528 + 6F76 + 2043 + 5676 + 5920 + 4E4F + 6420 + 206B + 7564 + 4072 + 314A + 5020 + 2033 + 6720 + 2B31 + 2A51 + 2052 + 70 = 930fd</p>
-<p><strong>注意该数据的长度并不是16bit的整数倍，计算方式一样，只不过将最后8bit直接与之前相加</strong></p>
-<p>然后将结果的高16bit和低16bit继续相加：</p>
-<p>0009 + 30fd = 3106</p>
-<p>然后对结果（3106）进行c语言的<em>按位求反</em>操作（C语言的按位求反）：</p>
-<p>~3106 =&gt; CEF9</p>
-<p><strong>C语言的<em>按位求反</em>是让操作数的二进制位上的1变为0，0变为1， 而python的<em>按位求反</em>这是将操作数加一然后乘以负一（~5 == -6），两者之所以出现不同就在于操作数是否是unsigned</strong></p>
-<p>附上最后的程序（注意一下如何将python的<em>按位求反</em>转为C语言的<em>按位求反</em>）</p>
-<pre><code class="python">def checksum(data):
-    length = len(data)
-    s = 0
-    n = length % 2
-    # 分割数据每两比特(16bit)为一组
-    for i in range(0, length - n, 2):
-        s += ord(data[i]) + (ord(data[i+1]) &lt;&lt; 8)
-    # 如果数据长度为基数,则将最后一位单独相加
-    if n:
-        s += ord(data[-1])
-    # 重复将高16位与低16位相加直到高16位为0
-    while (s &gt;&gt; 16):
-        s = (s &amp; 0xFFFF) + (s &gt;&gt; 16)
-    s = ~s &amp; 0xffff
-    # 返回的是十进制整数
-    return s
-</code></pre>
-
-    </div> <!-- .entry-content -->
-  </article>
-
 
 
   <nav id="page-nav" class="pagination clearfix">
@@ -871,7 +866,7 @@ root@c2518b7cf928:~#
   </div>
   <div class="site-script">
     <script>
-      window.headerBg = '//yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,//yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
+      window.headerBg = 'undefined';
     </script>
     <script src="/assets/app.js"></script>
 <script src="/assets/pace.min.js"></script>

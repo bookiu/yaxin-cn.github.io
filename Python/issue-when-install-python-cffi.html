@@ -1,0 +1,160 @@
+<!--
+                  _         _                      _ _                 _
+ _   _  __ ___  _(_)_ __   | | _____   _____    __| (_)_ __   __ _  __| | __ _ _ __   __ _
+| | | |/ _` \ \/ / | '_ \  | |/ _ \ \ / / _ \  / _` | | '_ \ / _` |/ _` |/ _` | '_ \ / _` |
+| |_| | (_| |>  <| | | | | | | (_) \ V /  __/ | (_| | | | | | (_| | (_| | (_| | | | | (_| |
+ \__, |\__,_/_/\_\_|_| |_| |_|\___/ \_/ \___|  \__,_|_|_| |_|\__, |\__,_|\__,_|_| |_|\__, |
+ |___/                                                       |___/                   |___/
+-->
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+  <meta charset="utf-8">
+  
+  <title>python安装cffi模块的一个问题 | 馨木</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  <link rel="icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/assets/app.css">
+<link rel="stylesheet" href="/assets/highlight-default.css">
+<link rel="stylesheet" href="/assets/pace-theme-flash.css">
+
+  <!-- <script src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script> -->
+  <!--[if lt IE 9]>
+    <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+  <![endif]-->
+</head>
+
+
+<body id="sinle-post">
+  <header id="site-header">
+  <div id="site-nav">
+    <nav class="site-nav">
+      <ul>
+        <li ><a href="/">所有文章</a></li>
+        <li ><a href="/about.html">关于我</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div id="site-title">
+	
+  </div>
+</header> <!-- #site-header -->
+  <div id="site-main">
+    <article id="post-1443417045" class="article article-type-post">
+  <header class="post-header">
+    <div class="post-header-wrap">
+      <h1 class="post-title" itemprop="name"><a href="http://yaxin-cn.github.io/Python/issue-when-install-python-cffi.html" rel="bookmark" title="python安装cffi模块的一个问题" itemprop="url">python安装cffi模块的一个问题</a></h1>
+      <h2>2015-09-28</h2>
+    </div><!-- .post-header-wrap -->
+  </header>
+  <div class="section-box">
+    <div class="post-content">
+      <p>系统自带的python有点老（2.6）于是下载python2.7.8的源码手动编译安装(编译参数<code>./configure --enable-shared --disable-ipv6 --prefix=/usr/local/python27</code>)</p>
+<p>安装后将系统的python替换(<code>ln -svf /usr/local/python27/bin/* /usr/bin/</code>), 安装<a href="https://bootstrap.pypa.io/ez_setup.py" target="_blank" rel="external">easy_install</a>和pip(<code>easy_install pip</code>), 之后开始安装<em>pyopenssl</em>, 但是在安装依赖<em>cffi</em>的时候报错<strong>/usr/bin/ld: cannot find -lpython2.7</strong>.</p>
+<p>首先需要说明的是出现类似<strong>/usr/bin/ld: cannot find -lxx</strong>的原因主要是gcc没有找到libxx.so的文件</p>
+<pre><code class="bash">[root@ubox ~]# echo &#39;/usr/local/python27/lib&#39; &gt; /etc/ld.so.conf.d/python-2.7.8.conf
+[root@ubox ~]# ldconfig -v
+</code></pre>
+<p><code>ldconfig</code>命令为重建动态链接库的缓存.然后重新执行<code>pip install cffi</code>, 但是还是报错, 使用<code>gcc -lpython2.7 --verbose</code>查看gcc查找库的路径</p>
+<pre><code class="bash">[root@ubox lib]# gcc -lpython2.7 --verbose
+Using built-in specs.
+Target: x86_64-redhat-linux
+Configured with: ../configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-languages=c,c++,objc,obj-c++,java,fortran,ada --enable-java-awt=gtk --disable-dssi --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre --enable-libgcj-multifile --enable-java-maintainer-mode --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --disable-libjava-multilib --with-ppl --with-cloog --with-tune=generic --with-arch_32=i686 --build=x86_64-redhat-linux
+Thread model: posix
+gcc version 4.4.7 20120313 (Red Hat 4.4.7-16) (GCC) 
+COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS=&#39;-v&#39; &#39;-mtune=generic&#39;
+ /usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2 --eh-frame-hdr --build-id -m elf_x86_64 --hash-style=gnu -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../.. -lpython2.7 -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtend.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crtn.o
+/usr/bin/ld: cannot find -lpython2.7
+collect2: ld returned 1 exit status
+</code></pre>
+<p>可以看到<strong>/usr/local/python27/lib</strong>并不在上面的路径, google一下找到了这个答案<a href="http://stackoverflow.com/questions/8400272/usr-bin-ld-cannot-find-lpython2-7" target="_blank" rel="external">http://stackoverflow.com/questions/8400272/usr-bin-ld-cannot-find-lpython2-7</a>, 然后</p>
+<pre><code class="bash">[root@micaopan-dev lib]# locate libpython2.7.a
+/usr/local/python27/lib/python2.7/config/libpython2.7.a
+/usr/local/src/Python-2.7.8/libpython2.7.a
+[root@micaopan-dev lib]# ln -s /usr/local/python27/lib/python2.7/config/libpython2.7.a /usr/lib
+[root@micaopan-dev lib]# gcc -lpython2.7 --verbose
+...
+(.text+0x20): undefined reference to &#39;main&#39;
+collect2: ld returned 1 exit status
+</code></pre>
+<p>这个gcc找到了动态链接库, 报错根据<a href="http://stackoverflow.com/questions/15905119/c-linking-error-undefined-reference-to-main" target="_blank" rel="external">http://stackoverflow.com/questions/15905119/c-linking-error-undefined-reference-to-main</a>应该并没有什么大碍</p>
+<p>然后执行<code>pip install cffi</code>成功.</p>
+<p>PS: 参考</p>
+<ol>
+<li><a href="http://navyaijm.blog.51cto.com/4647068/809424" target="_blank" rel="external">/usr/bin/ld: cannot find -l* 错误的解决方法……</a></li>
+<li><a href="http://eminzhang.blog.51cto.com/5292425/1285705" target="_blank" rel="external">关于usr/bin/ld: cannot find -lxxx问题总结</a></li>
+<li><a href="http://stackoverflow.com/questions/8400272/usr-bin-ld-cannot-find-lpython2-7" target="_blank" rel="external">/usr/bin/ld: cannot find -lpython2.7</a></li>
+<li><a href="http://stackoverflow.com/questions/15905119/c-linking-error-undefined-reference-to-main" target="_blank" rel="external">C Linking Error: undefined reference to ‘main’</a></li>
+</ol>
+
+    </div> <!-- .post-content -->
+    <div class="post-footer">
+      <div class="entry-meta article-entry-meta clearfix">
+        <div class="entry-date date published updated pull-left mr-10">
+          <i class="icon-clock"></i><time datetime="2015-09-28T05:10:45.000Z" itemprop="datePublished">2015-09-28</time>
+        </div>
+        <div class="entry-tags pull-left clearfix">
+          
+            <i class="icon-tags"></i>
+            <a class="article-tag-link" href="/tags/Python/">Python</a>
+          
+        </div>
+      </div><!-- .entry-meta -->
+    </div> <!-- .post-footer -->
+  </div>
+</article>
+
+
+<div id="comments" class="section-box">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'yaxin-cn'; // required: replace example with your forum shortname
+
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+
+  </div> <!-- #site-main -->
+  <footer id="site-footer">
+  <div class="copyright">
+    <span>&copy; 2014 yaxin</span>
+  </div>
+  <div class="site-script">
+    <script>
+      window.headerBg = 'undefined';
+    </script>
+    <script src="/assets/app.js"></script>
+<script src="/assets/pace.min.js"></script>
+<script src="/assets/highlight.pack.js"></script>
+
+    <script>
+      // var site_header = document.getElementById('site-header');
+      // var img_urls = site_header.getAttribute('data-bg-images');
+      // var header_bg_array = img_urls.split(',');
+      // var header_bg_len = header_bg_array.length;
+      // var random_num = parseInt(Math.random() * header_bg_len);
+      // site_header.style.backgroundImage = 'url("' + header_bg_array[random_num] + '")';
+      hljs.initHighlightingOnLoad();
+    </script>
+  </div>
+  <div id="tongji" style="display: none">
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5926023'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/stat.php%3Fid%3D5926023' type='text/javascript'%3E%3C/script%3E"));</script>
+  </div>
+</footer> <!-- #site-footer -->
+
+</body>
+</html>
