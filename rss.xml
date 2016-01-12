@@ -7,20 +7,8 @@
     <link>http://yaxin-cn.github.io/</link>
     <atom:link href="/rss.xml" rel="self" type="application/rss+xml"/>
     <description><![CDATA[为梦想添砖加瓦]]></description>
-    <pubDate>Thu, 26 Nov 2015 02:07:53 GMT</pubDate>
+    <pubDate>Tue, 27 Oct 2015 01:34:09 GMT</pubDate>
     <generator>http://hexo.io/</generator>
-    
-    <item>
-      <title><![CDATA[Nginx下禅道的伪静态(rewrite)规则]]></title>
-      <link>http://yaxin-cn.github.io/Nginx/configure-static-access-for-zentao-under-nginx.html</link>
-      <guid>http://yaxin-cn.github.io/Nginx/configure-static-access-for-zentao-under-nginx.html</guid>
-      <pubDate>Thu, 26 Nov 2015 02:06:52 GMT</pubDate>
-      <description>
-      
-      </description>
-      <content:encoded></content:encoded>
-      <comments>http://yaxin-cn.github.io/Nginx/configure-static-access-for-zentao-under-nginx.html#disqus_comments</comments>
-    </item>
     
     <item>
       <title><![CDATA[python安装cffi模块的一个问题]]></title>

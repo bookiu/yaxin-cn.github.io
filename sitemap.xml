@@ -2,11 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://yaxin-cn.github.io/Nginx/configure-static-access-for-zentao-under-nginx.html</loc>
-    <lastmod>2015-11-26T02:07:53.006Z</lastmod>
-  </url>
-  
-  <url>
     <loc>http://yaxin-cn.github.io/Python/issue-when-install-python-cffi.html</loc>
     <lastmod>2015-10-27T01:34:09.646Z</lastmod>
   </url>
@@ -24,6 +19,11 @@
   <url>
     <loc>http://yaxin-cn.github.io/about.html</loc>
     <lastmod>2015-05-13T09:52:27.018Z</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://yaxin-cn.github.io/Python/matrix-addition-in-python.html</loc>
+    <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
   <url>
@@ -62,17 +62,12 @@
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Linux/replace-password-with-stars-under-shell.html</loc>
-    <lastmod>2015-05-13T09:52:06.326Z</lastmod>
-  </url>
-  
-  <url>
     <loc>http://yaxin-cn.github.io/Python/classmethod-and-staticmethod-in-python.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Python/matrix-addition-in-python.html</loc>
+    <loc>http://yaxin-cn.github.io/Linux/replace-password-with-stars-under-shell.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
