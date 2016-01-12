@@ -15,6 +15,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
+    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
+  
   
   <link rel="icon" href="/assets/favicon.ico">
   <link rel="stylesheet" href="/assets/app.css">
@@ -50,6 +52,26 @@
 </header> <!-- #site-header -->
   <div id="site-main">
     
+  <article id="post-1448503612" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
+    <header class="entry-header">
+      <div class="entry-meta">
+        <span class="entry-date date published updated">
+          <time datetime="2015-11-26T02:06:52.000Z" itemprop="datePublished"><a href="/Nginx/configure-static-access-for-zentao-under-nginx.html"><i class="icon-clock"></i>2015-11-26</a></time>
+        </span>
+        <span>•</span>
+        <span class="entry-comments">
+          <a href="/Nginx/configure-static-access-for-zentao-under-nginx.html#comments"><i class="icon-chat"></i>评论</a>
+        </span>
+      </div><!-- .entry-meta -->
+      <h1 class="entry-title" itemprop="name">
+        <a href="http://yaxin-cn.github.io/Nginx/configure-static-access-for-zentao-under-nginx.html" rel="bookmark" title="Nginx下禅道的伪静态(rewrite)规则" itemprop="url">Nginx下禅道的伪静态(rewrite)规则</a>
+      </h1> <!-- .entry-title -->
+    </header>
+    <div class="entry-content" itemprop="description">
+        
+    </div> <!-- .entry-content -->
+  </article>
+
   <article id="post-1443417045" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
     <header class="entry-header">
       <div class="entry-meta">
@@ -66,34 +88,34 @@
       </h1> <!-- .entry-title -->
     </header>
     <div class="entry-content" itemprop="description">
-        <p>系统自带的python有点老（2.6）于是下载python2.7.8的源码手动编译安装(编译参数<code>./configure --enable-shared --disable-ipv6 --prefix=/usr/local/python27</code>)</p>
-<p>安装后将系统的python替换(<code>ln -svf /usr/local/python27/bin/* /usr/bin/</code>), 安装<a href="https://bootstrap.pypa.io/ez_setup.py" target="_blank" rel="external">easy_install</a>和pip(<code>easy_install pip</code>), 之后开始安装<em>pyopenssl</em>, 但是在安装依赖<em>cffi</em>的时候报错<strong>/usr/bin/ld: cannot find -lpython2.7</strong>.</p>
-<p>首先需要说明的是出现类似<strong>/usr/bin/ld: cannot find -lxx</strong>的原因主要是gcc没有找到libxx.so的文件</p>
-<pre><code class="bash">[root@ubox ~]# echo &#39;/usr/local/python27/lib&#39; &gt; /etc/ld.so.conf.d/python-2.7.8.conf
+        <p>系统自带的python有点老（2.6）于是下载python2.7.8的源码手动编译安装(编译参数<code>./configure --enable-shared --disable-ipv6 --prefix=/usr/local/python27 --enable-unicode=ucs4</code>)</p>
+<p>安装后将系统的python替换(<code>ln -svf /usr/local/python27/bin/* /usr/bin/</code>), 安装<a href="https://bootstrap.pypa.io/ez_setup.py" target="_blank" rel="external">easy_install</a>和pip(<code>easy_install pip</code>), 之后开始安装<em>pyopenssl</em>, 但是在安装依赖<em>cffi</em>的时候报错**/usr/bin/ld: cannot find -lpython2.7**.</p>
+<p>首先需要说明的是出现类似**/usr/bin/ld: cannot find -lxx**的原因主要是gcc没有找到libxx.so的文件</p>
+<pre><code class="language-bash">[root@ubox ~]# echo '/usr/local/python27/lib' &gt; /etc/ld.so.conf.d/python-2.7.8.conf
 [root@ubox ~]# ldconfig -v
 </code></pre>
 <p><code>ldconfig</code>命令为重建动态链接库的缓存.然后重新执行<code>pip install cffi</code>, 但是还是报错, 使用<code>gcc -lpython2.7 --verbose</code>查看gcc查找库的路径</p>
-<pre><code class="bash">[root@ubox lib]# gcc -lpython2.7 --verbose
+<pre><code class="language-bash">[root@ubox lib]# gcc -lpython2.7 --verbose
 Using built-in specs.
 Target: x86_64-redhat-linux
 Configured with: ../configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-languages=c,c++,objc,obj-c++,java,fortran,ada --enable-java-awt=gtk --disable-dssi --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre --enable-libgcj-multifile --enable-java-maintainer-mode --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --disable-libjava-multilib --with-ppl --with-cloog --with-tune=generic --with-arch_32=i686 --build=x86_64-redhat-linux
 Thread model: posix
-gcc version 4.4.7 20120313 (Red Hat 4.4.7-16) (GCC) 
+gcc version 4.4.7 20120313 (Red Hat 4.4.7-16) (GCC)
 COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS=&#39;-v&#39; &#39;-mtune=generic&#39;
+COLLECT_GCC_OPTIONS='-v' '-mtune=generic'
  /usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2 --eh-frame-hdr --build-id -m elf_x86_64 --hash-style=gnu -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../.. -lpython2.7 -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtend.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crtn.o
 /usr/bin/ld: cannot find -lpython2.7
 collect2: ld returned 1 exit status
 </code></pre>
-<p>可以看到<strong>/usr/local/python27/lib</strong>并不在上面的路径, google一下找到了这个答案<a href="http://stackoverflow.com/questions/8400272/usr-bin-ld-cannot-find-lpython2-7" target="_blank" rel="external">http://stackoverflow.com/questions/8400272/usr-bin-ld-cannot-find-lpython2-7</a>, 然后</p>
-<pre><code class="bash">[root@micaopan-dev lib]# locate libpython2.7.a
+<p>可以看到**/usr/local/python27/lib**并不在上面的路径, google一下找到了这个答案<a href="http://stackoverflow.com/questions/8400272/usr-bin-ld-cannot-find-lpython2-7" target="_blank" rel="external">http://stackoverflow.com/questions/8400272/usr-bin-ld-cannot-find-lpython2-7</a>, 然后</p>
+<pre><code class="language-bash">[root@micaopan-dev lib]# locate libpython2.7.a
 /usr/local/python27/lib/python2.7/config/libpython2.7.a
 /usr/local/src/Python-2.7.8/libpython2.7.a
 [root@micaopan-dev lib]# ln -s /usr/local/python27/lib/python2.7/config/libpython2.7.a /usr/lib
 [root@micaopan-dev lib]# gcc -lpython2.7 --verbose
 ...
-(.text+0x20): undefined reference to &#39;main&#39;
+(.text+0x20): undefined reference to 'main'
 collect2: ld returned 1 exit status
 </code></pre>
 <p>这个gcc找到了动态链接库, 报错根据<a href="http://stackoverflow.com/questions/15905119/c-linking-error-undefined-reference-to-main" target="_blank" rel="external">http://stackoverflow.com/questions/15905119/c-linking-error-undefined-reference-to-main</a>应该并没有什么大碍</p>
@@ -103,7 +125,7 @@ collect2: ld returned 1 exit status
 <li><a href="http://navyaijm.blog.51cto.com/4647068/809424" target="_blank" rel="external">/usr/bin/ld: cannot find -l* 错误的解决方法……</a></li>
 <li><a href="http://eminzhang.blog.51cto.com/5292425/1285705" target="_blank" rel="external">关于usr/bin/ld: cannot find -lxxx问题总结</a></li>
 <li><a href="http://stackoverflow.com/questions/8400272/usr-bin-ld-cannot-find-lpython2-7" target="_blank" rel="external">/usr/bin/ld: cannot find -lpython2.7</a></li>
-<li><a href="http://stackoverflow.com/questions/15905119/c-linking-error-undefined-reference-to-main" target="_blank" rel="external">C Linking Error: undefined reference to ‘main’</a></li>
+<li><a href="http://stackoverflow.com/questions/15905119/c-linking-error-undefined-reference-to-main" target="_blank" rel="external">C Linking Error: undefined reference to 'main'</a></li>
 </ol>
 
     </div> <!-- .entry-content -->
@@ -125,26 +147,29 @@ collect2: ld returned 1 exit status
       </h1> <!-- .entry-title -->
     </header>
     <div class="entry-content" itemprop="description">
-        <h2 id="添加">添加</h2><p>Ubuntu下添加根证书非常简单, 只要将证书(扩展名为crt)复制到<strong>/usr/local/share/ca-certificates</strong>文件夹然后运行<code>update-ca-certificates</code>即可</p>
-<pre><code class="bash">[yaxin@ubox ~]$sudo cp xinmu.crt /usr/local/share/ca-certificates
+        <h2>添加</h2>
+<p>Ubuntu下添加根证书非常简单, 只要将证书(扩展名为crt)复制到**/usr/local/share/ca-certificates**文件夹然后运行<code>update-ca-certificates</code>即可</p>
+<pre><code class="language-bash">[yaxin@ubox ~]$sudo cp xinmu.crt /usr/local/share/ca-certificates
 [yaxin@ubox ~]$sudo update-ca-certificates
 Updating certificates in /etc/ssl/certs... 1 added, 0 removed; done.
 Running hooks in /etc/ca-certificates/update.d....done.
 </code></pre>
-<h2 id="删除">删除</h2><p>直接将<strong>/usr/local/share/ca-certificates</strong>对应的证书删除，然后执行<code>update-ca-certificates</code></p>
-<pre><code class="bash">[yaxin@ubox ~]$sudo rm -f /usr/local/share/ca-certificates/xinmu.crt
+<h2>删除</h2>
+<p>直接将**/usr/local/share/ca-certificates**对应的证书删除，然后执行<code>update-ca-certificates</code></p>
+<pre><code class="language-bash">[yaxin@ubox ~]$sudo rm -f /usr/local/share/ca-certificates/xinmu.crt
 [yaxin@ubox ~]$sudo update-ca-certificates
 Updating certificates in /etc/ssl/certs... 0 added, 0 removed; done.
 Running hooks in /etc/ca-certificates/update.d....done.
 </code></pre>
 <p><strong>注意: 这时候并不会提示1 removed, 但证书是已经被删除了的</strong></p>
-<h2 id="原理">原理</h2><p>其实<code>update-ca-certificates</code>是一个shell脚本, 使用<code>which</code>找出<code>update-ca-certificates</code>的绝对路径，然后打开就可以查看其源码</p>
-<pre><code class="bash">[yaxin@ubox ~]$which update-ca-certificates
+<h2>原理</h2>
+<p>其实<code>update-ca-certificates</code>是一个shell脚本, 使用<code>which</code>找出<code>update-ca-certificates</code>的绝对路径，然后打开就可以查看其源码</p>
+<pre><code class="language-bash">[yaxin@ubox ~]$which update-ca-certificates
 /usr/sbin/update-ca-certificates
 [yaxin@ubox ~]$file /usr/sbin/update-ca-certificates
 /usr/sbin/update-ca-certificates: POSIX shell script, ASCII text executable
 </code></pre>
-<p>通过阅读源码可以看出, <code>update-ca-certificates</code>命令的本质其实是将PEM格式的根证书内容附加到<em>/etc/ssl/certs/ca-certificates.crt</em>, 而<em>/etc/ssl/certs/ca-certificates.crt</em>中本身就包含了系统自带的各种可信根证书.</p>
+<p>通过阅读源码可以看出, <code>update-ca-certificates</code>命令的本质其实是将PEM格式的根证书内容附加到*/etc/ssl/certs/ca-certificates.crt*, 而*/etc/ssl/certs/ca-certificates.crt*中本身就包含了系统自带的各种可信根证书.</p>
 
     </div> <!-- .entry-content -->
   </article>
@@ -166,40 +191,44 @@ Running hooks in /etc/ca-certificates/update.d....done.
     </header>
     <div class="entry-content" itemprop="description">
         <p>本文所使用的环境为ubuntu14.04，ubuntu15.04使用systemd，可能会有很大的不同</p>
-<h2 id="方法一">方法一</h2><p>使用类图形的<code>sysv-rc-conf</code>命令，你需要首先安装<code>sysv-rc-conf</code></p>
-<pre><code class="bash">[yaxin@~]$sudo apt-get install sysv-rc-conf
+<h2>方法一</h2>
+<p>使用类图形的<code>sysv-rc-conf</code>命令，你需要首先安装<code>sysv-rc-conf</code></p>
+<pre><code class="language-bash">[yaxin@~]$sudo apt-get install sysv-rc-conf
 [yaxin@~]$sudo sysv-rc-conf
 </code></pre>
 <p>运行之后会有一个类图形的界面, 这个操作起来相当简单, 也容易懂，这里就不多介绍</p>
-<h2 id="方法二">方法二</h2><p>首先使用<code>runlevel</code>命令获取系统运行在哪个<strong>level</strong>下（ubuntu server一般是2），如下：</p>
-<pre><code class="bash">[yaxin@~]$runlevel
+<h2>方法二</h2>
+<p>首先使用<code>runlevel</code>命令获取系统运行在哪个<strong>level</strong>下（ubuntu server一般是2），如下：</p>
+<pre><code class="language-bash">[yaxin@~]$runlevel
 N 2
 [yaxin@~]$
 </code></pre>
 <p>然后将启动脚本放到<code>/etc/rcX.d</code> 其中X为运行级别，如<code>/etc/rc2.d</code>, 注意脚本要以大写<strong>S</strong>开头, 后面接一个两位数的数字，表示启动顺序，数字越小表示越先启动</p>
 <p>一般<code>/etc/rc2.d</code>中会有很多软链接到<code>/etc/init.d</code>下的启动脚本, 这样的好处是集中管理，很方便, 并且可以使用<code>service</code>这个程序对进程进行重启等操作.</p>
 <p>如，编译安装完php后，将<code>sapi/fpm</code>文件夹下的<code>init.d.php-fpm</code>文件复制到<code>/etc/init.d</code>文件夹下，然后在<code>/etc/rc2.d</code>下创建一个软链接</p>
-<pre><code class="bash">[yaxin@php-5.6.8]$sudo cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+<pre><code class="language-bash">[yaxin@php-5.6.8]$sudo cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
 [yaxin@php-5.6.8]$sudo chmod +x /etc/init.d/php-fpm
 [yaxin@php-5.6.8]$sudo ln -s /etc/init.d/php-fpm /etc/rc2.d/S20php-fpm
 [yaxin@php-5.6.8]$service php-fpm start
 </code></pre>
 <p>当然，如果你想关闭一个自启的程序，直接将对应的<code>/etc/rcX.d</code>下的启动脚本删除即可</p>
-<pre><code class="bash">[yaxin@~]$sudo rm /etc/rc2.d/S20php-fpm
+<pre><code class="language-bash">[yaxin@~]$sudo rm /etc/rc2.d/S20php-fpm
 </code></pre>
 <p>或则</p>
-<pre><code class="bash">[yaxin@~]$sudo unlink /etc/rc2.d/S20php-fpm
+<pre><code class="language-bash">[yaxin@~]$sudo unlink /etc/rc2.d/S20php-fpm
 </code></pre>
 <p><strong>注意</strong>: <code>sysv-rc-conf</code>命令就是使用这个方法来实现程序自启和禁止自启的.</p>
-<h2 id="方法三">方法三</h2><p>直接将需要启动的程序添加到<code>/etc/rc.local</code>文件中</p>
+<h2>方法三</h2>
+<p>直接将需要启动的程序添加到<code>/etc/rc.local</code>文件中</p>
 <p>如你需要开机启动nginx，那么可以这样</p>
-<pre><code class="bash">[root@~]$echo &quot;/etc/nginx/sbin/nginx&quot; &gt;&gt; /etc/rc.local
+<pre><code class="language-bash">[root@~]$echo &quot;/etc/nginx/sbin/nginx&quot; &gt;&gt; /etc/rc.local
 </code></pre>
 <p>其实这个就是方法二的快捷操作，如果你查看<code>/etc/rc2.d</code>文件夹下面的文件会发现有一个<code>S99rc.local</code>的软链接，它链接到<code>/etc/init.d/rc.local</code>, 而<code>/etc/init.d/rc.local</code>这个脚本中又会执行<code>/etc/rc.local</code>这个脚本</p>
-<h3 id="方法四">方法四</h3><p>其实前几种方式并不是正统的自启管理方式, 使用<code>rcX.d</code>是<strong>传统init</strong>的方式, 而ubuntu14.04是使用<strong>Upstart</strong>来初始化守护进程, 但为了照顾使用从<strong>init</strong>过来(如centos6等)的人才创建的. 而真正的启动脚本(应该说配置)是放在<code>/etc/init</code>这个文件夹下的</p>
-<p><code>/etc/init</code>文件夹下有很多的以<strong>.conf</strong>结尾的文件，这些就是正统的管理自启程序的配置文件.</p>
+<h3>方法四</h3>
+<p>其实前几种方式并不是正统的自启管理方式, 使用<code>rcX.d</code>是<strong>传统init</strong>的方式, 而ubuntu14.04是使用<strong>Upstart</strong>来初始化守护进程, 但为了照顾使用从<strong>init</strong>过来(如centos6等)的人才创建的. 而真正的启动脚本(应该说配置)是放在<code>/etc/init</code>这个文件夹下的</p>
+<p><code>/etc/init</code>文件夹下有很多的以**.conf**结尾的文件，这些就是正统的管理自启程序的配置文件.</p>
 <p>随便打开一个文件, 有一行<strong>start on runlevel [234]</strong>, 这就说明在runlevel为234的情况下启动</p>
-<pre><code class="bash">[yaxin@/etc/init]$head ssh.conf
+<pre><code class="language-bash">[yaxin@/etc/init]$head ssh.conf
 # ssh - OpenBSD Secure Shell server
 #
 # The OpenSSH server provides secure shell access to the system.
@@ -233,8 +262,9 @@ stop on runlevel [!2345]
     </header>
     <div class="entry-content" itemprop="description">
         <p>Python类中有两个特殊的修饰符@classmethod和@staticmethod(即类方法和静态方法), 想要理解需要先理解类属性和实例属性的感念</p>
-<h2 id="类属性和实例属性">类属性和实例属性</h2><p>看下面的代码</p>
-<pre><code class="python">&gt;&gt;&gt; class TestProperty(object):
+<h2>类属性和实例属性</h2>
+<p>看下面的代码</p>
+<pre><code class="language-python">&gt;&gt;&gt; class TestProperty(object):
 ...     class_property = &quot;class property&quot;
 ...     
 ...     def __init__(self):
@@ -253,7 +283,7 @@ class property
 &gt;&gt;&gt; print TestProperty.instance_property
 Traceback (most recent call last):
   File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
-AttributeError: type object &#39;TestProperty&#39; has no attribute &#39;instance_property&#39;
+AttributeError: type object 'TestProperty' has no attribute 'instance_property'
 &gt;&gt;&gt; # 注意下面的报错
 &gt;&gt;&gt; del test_property.class_property
 Traceback (most recent call last):
@@ -269,7 +299,8 @@ AttributeError: class_property
 <li>类属性其实就是其它语言中的静态变量(变量前加static)</li>
 <li>为什么要有类属性, 一句话<strong>命名空间</strong></li>
 </ol>
-<h2 id="类方法和静态方法">类方法和静态方法</h2><pre><code class="python">&gt;&gt;&gt; class TestMethod(object):
+<h2>类方法和静态方法</h2>
+<pre><code class="language-python">&gt;&gt;&gt; class TestMethod(object):
 ...     class_property = &quot;class property&quot;
 ...     def __init__(self):
 ...         self.instance_property = &quot;instance property&quot;
@@ -293,11 +324,11 @@ instance property:  instance property
 &gt;&gt;&gt; # 执行类方法
 &gt;&gt;&gt; # 通过实例访问, 打印出类本身和类属性
 &gt;&gt;&gt; test_method.class_method(&quot;Hello&quot;)
-class_method(&lt;class &#39;__main__.TestMethod&#39;&gt;, Hello)
+class_method(&lt;class '__main__.TestMethod'&gt;, Hello)
 class property:  class property
 &gt;&gt;&gt; # 通过类直接访问, 同上
 &gt;&gt;&gt; TestMethod.class_method(&quot;Hello&quot;)
-class_method(&lt;class &#39;__main__.TestMethod&#39;&gt;, Hello)
+class_method(&lt;class '__main__.TestMethod'&gt;, Hello)
 class property:  class property
 &gt;&gt;&gt; # 执行静态方法
 &gt;&gt;&gt; # 通过实例访问, 打印出静态方法本身
@@ -308,7 +339,7 @@ static_method(Hello)
 static_method(Hello)
 </code></pre>
 <p>可以看出类方法中<code>cls</code>代表的是类本身, 如果将类方法中的访问类属性的cls去掉, 则会报出<em>NameError</em>的错误</p>
-<pre><code class="python">&gt;&gt;&gt; class TestMethod(object):
+<pre><code class="language-python">&gt;&gt;&gt; class TestMethod(object):
 ...     class_property = &quot;class property&quot;
 ...     @classmethod
 ...     def class_method(cls, arvg):
@@ -319,7 +350,7 @@ class property:
 Traceback (most recent call last):
   File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
   File &quot;&lt;stdin&gt;&quot;, line 5, in class_method
-NameError: global name &#39;class_property&#39; is not defined
+NameError: global name 'class_property' is not defined
 </code></pre>
 <ol>
 <li><strong>类方法是为了访问类属性更加方便</strong></li>
@@ -327,7 +358,7 @@ NameError: global name &#39;class_property&#39; is not defined
 <li>静态方法跟普通函数没有什么区别</li>
 </ol>
 <p>可以通过在实例方法中直接通过<code>TestMethod.class_property</code>来访问, 但是这样不方便也不好维护(如果类名称改了,就会出错), 也可以使用<code>self.class_property</code>来访问, 但注意, 实例本身获取的并不应该是类属性即<code>TestMethod.class_property</code>, 只是因为实例中并没有<code>class_property</code>这个变量, 而是通过查找类属性,发现有同名变量,然后打印出来,通过上面无法实例无法删除类属性是可以看出来的. 当然,如果不信,可以看下面的例子</p>
-<pre><code class="python">&gt;&gt;&gt; class TestMethod(object):
+<pre><code class="language-python">&gt;&gt;&gt; class TestMethod(object):
 ...     class_property = &quot;class property&quot;
 ...     def __init__(self):
 ...         pass
@@ -372,11 +403,15 @@ class property
         <p>默认情况下启动一个container，其会自动获取一个跟<code>docker0</code>同网段的IP，而且重启container其IP一般会发生变化，但有时候我们会需要固定的IP。要实现这个并不困难。</p>
 <p><a href="https://docs.docker.com/reference/commandline/cli/#run" target="_blank" rel="external"><code>docker run</code></a>启动一个container的命令有一个<code>--net</code>的参数用于指定container的网络类型</p>
 <blockquote>
-<p>--net=”bridge”  Set the Network mode for the container<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;’bridge’: creates a new network stack for the container on the docker bridge<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;’none’: no networking for this container<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;’container:&lt;name|id&gt;’: reuses another container network stack<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;’host’: use the host network stack inside the container.  Note: the host mode gives the container full access to local system services such as D-bus and is therefore considered insecure. </p>
+<p>--net=&quot;bridge&quot;  Set the Network mode for the container
+     'bridge': creates a new network stack for the container on the docker bridge
+     'none': no networking for this container
+     'container:&lt;name|id&gt;': reuses another container network stack
+     'host': use the host network stack inside the container.  Note: the host mode gives the container full access to local system services such as D-bus and is therefore considered insecure.</p>
 </blockquote>
-<p>docker默认使用’bridge’来设置container的网络模式（即从与docker0同网段的未使用的IP中取一个作为container的IP），我们这里使用’<strong>none</strong>‘来实现自己手动配置container的网络。</p>
-<p>首先我们以<strong><code>--net=&#39;none&#39;</code></strong>的方式启动一个container</p>
-<pre><code class="shell">[yaxin@cube2x ~]$docker run -i -t --rm --net=&#39;none&#39; ubuntu /bin/bash
+<p>docker默认使用'bridge'来设置container的网络模式（即从与docker0同网段的未使用的IP中取一个作为container的IP），我们这里使用'<strong>none</strong>'来实现自己手动配置container的网络。</p>
+<p>首先我们以**<code>--net='none'</code>**的方式启动一个container</p>
+<pre><code class="language-shell">[yaxin@cube2x ~]$docker run -i -t --rm --net='none' ubuntu /bin/bash
 root@db84e747c362:/# ifconfig -a
 lo        Link encap:Local Loopback
           inet addr:127.0.0.1  Mask:255.0.0.0
@@ -389,9 +424,9 @@ lo        Link encap:Local Loopback
 
 root@db84e747c362:/#
 </code></pre>
-<p>可以看到，由于我们使用’none’模式，container中没有获取到IP，甚至连网卡都没有，下面我们开始给container配置IP</p>
+<p>可以看到，由于我们使用'none'模式，container中没有获取到IP，甚至连网卡都没有，下面我们开始给container配置IP</p>
 <p>首先获取container的pid（我们需要通过pid获取file descriptor）</p>
-<pre><code class="bash">[yaxin@cube2x ~]$docker ps
+<pre><code class="language-bash">[yaxin@cube2x ~]$docker ps
 CONTAINER ID        IMAGE                            COMMAND             CREATED             STATUS              PORTS               NAMES
 db84e747c362        docker.cn/docker/ubuntu:latest   &quot;/bin/bash&quot;         4 minutes ago       Up 4 minutes                            sharp_kirch
 [yaxin@cube2x ~]$docker inspect -f "{{.State.Pid}}" sharp_kirch
@@ -402,16 +437,16 @@ db84e747c362        docker.cn/docker/ubuntu:latest   &quot;/bin/bash&quot;      
 <p>By convention a named network namespace is an object at /var/run/netns/NAME that can be opened.  The file descriptor resulting from opening/var/run/netns/NAME refers to the specified network namespace</p>
 </blockquote>
 <p>因而我们需要创建一个链接</p>
-<pre><code class="shell">[yaxin@cube2x ~]$sudo ln -s /proc/23090/ns/net /var/run/netns/23090
+<pre><code class="language-shell">[yaxin@cube2x ~]$sudo ln -s /proc/23090/ns/net /var/run/netns/23090
 </code></pre>
 <p>然后创建一对端到端的网卡，将<code>veth_db84e747c3</code>绑定到docker0网桥，并启动。将另一块网卡<code>X</code>放到container内部</p>
-<pre><code class="shell">[yaxin@cube2x ~]$sudo ip link add veth_db84e747c3 type veth peer name X
+<pre><code class="language-shell">[yaxin@cube2x ~]$sudo ip link add veth_db84e747c3 type veth peer name X
 [yaxin@cube2x ~]$sudo brctl addif docker0 veth_db84e747c3
 [yaxin@cube2x ~]$sudo ip link set veth_db84e747c3 up
 [yaxin@cube2x ~]$sudo ip link set X netns 23090
 </code></pre>
 <p>这时查看container的IP，会发现多了一个名为<code>X</code>的网卡</p>
-<pre><code class="shell">root@db84e747c362:/# ifconfig  -a
+<pre><code class="language-shell">root@db84e747c362:/# ifconfig  -a
 X         Link encap:Ethernet  HWaddr 5a:7e:4d:ba:63:1c  
           BROADCAST MULTICAST  MTU:1500  Metric:1
           RX packets:0 errors:0 dropped:0 overruns:0 frame:0
@@ -435,13 +470,14 @@ root@db84e747c362:/#
 [yaxin@cube2x ~]$sudo ip netns exec 23090 ip link set eth0 up
 [yaxin@cube2x ~]$sudo ip netns exec 23090 ip addr add 172.17.111.10/16 dev eth0
 [yaxin@cube2x ~]$sudo ip netns exec 23090 ip route add default via 172.17.42.1
-</code></pre><p><strong>注意: 指定给container的IP必须跟docker0在同一网段,且给container的网关应该为docker0的IP</strong></p>
+</code></pre>
+<p><strong>注意: 指定给container的IP必须跟docker0在同一网段,且给container的网关应该为docker0的IP</strong></p>
 <p>最后，写成shell脚本如下:</p>
-<pre><code class="shell">#!/usr/bin/env bash
+<pre><code class="language-shell">#!/usr/bin/env bash
 # filename: bind_addr.sh
 
 if [ `id -u` -ne 0 ];then
-    echo &#39;必须使用root权限&#39;
+    echo '必须使用root权限'
     exit
 fi
 
@@ -458,15 +494,15 @@ if [ ! $container_id ];then
     echo &quot;容器不存在&quot;
     exit 2
 fi
-bind_ip=`echo $bind_ip | egrep &#39;^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$&#39;`
+bind_ip=`echo $bind_ip | egrep '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'`
 if [ ! $bind_ip ];then
     echo &quot;IP地址格式不正确&quot;
     exit 3
 fi
 
 container_minid=`echo $container_id | cut -c 1-10`
-container_netmask=`ip addr show docker0 | grep &quot;inet\b&quot; | awk &#39;{print $2}&#39; | cut -d / -f2`
-container_gw=`ip addr show docker0 | grep &quot;inet\b&quot; | awk &#39;{print $2}&#39; | cut -d / -f1`
+container_netmask=`ip addr show docker0 | grep &quot;inet\b&quot; | awk '{print $2}' | cut -d / -f2`
+container_gw=`ip addr show docker0 | grep &quot;inet\b&quot; | awk '{print $2}' | cut -d / -f1`
 
 bridge_name=&quot;veth_$container_minid&quot;
 container_ip=$bind_ip/$container_netmask
@@ -512,7 +548,7 @@ ip netns exec $pid ip route add default via $container_gw
     </header>
     <div class="entry-content" itemprop="description">
         <p>写一个数据分析的程序，中间要处理一个2x3矩阵的相加，遂写出了下面的代码</p>
-<pre><code class="python">def add(x, y):
+<pre><code class="language-python">def add(x, y):
     return x + y
 
 
@@ -527,7 +563,7 @@ def matrix_add(matrix_list):
     return reduce(two_matrix_add, matrix_list)
 </code></pre>
 <p>下面测试一下：</p>
-<pre><code class="python">&gt;&gt;&gt; matrix_1 = [
+<pre><code class="language-python">&gt;&gt;&gt; matrix_1 = [
 ...     [0, 1, 2, 3],
 ...     [4, 5, 6, 7],
 ...     [8, 9, 10, 11]
@@ -567,20 +603,24 @@ def matrix_add(matrix_list):
       </h1> <!-- .entry-title -->
     </header>
     <div class="entry-content" itemprop="description">
-        <h2 id="一、修改时区">一、修改时区</h2><h3 id="1-_交互式修改">1. 交互式修改</h3><p>ubuntu提供了一个交互式的选择时区的命令<code>dpkg-reconfigure tzdata</code>，直接在命令行中输入此命令，然后选择自己的时区即可</p>
-<h3 id="2-_直接修改">2. 直接修改</h3><p>另外一种方法相对简单，即直接复制相应的时区文件覆盖当前系统的时区文件</p>
-<pre><code class="bash">[yaxin@ubox:~]$ cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+        <h2>一、修改时区</h2>
+<h3>1. 交互式修改</h3>
+<p>ubuntu提供了一个交互式的选择时区的命令<code>dpkg-reconfigure tzdata</code>，直接在命令行中输入此命令，然后选择自己的时区即可</p>
+<h3>2. 直接修改</h3>
+<p>另外一种方法相对简单，即直接复制相应的时区文件覆盖当前系统的时区文件</p>
+<pre><code class="language-bash">[yaxin@ubox:~]$ cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 [yaxin@ubox:~]$ date
 Tue Nov  4 16:18:55 CST 2014
 </code></pre>
 <p>修改是立即生效的。</p>
-<h2 id="二、修改语系">二、修改语系</h2><p>首先你需要使用<code>locale-gen</code>编译locale定义文件，直接在命令后面指定要编译的locale（可以查看/usr/share/i18n/SUPPORTED来获取locale的格式）</p>
-<pre><code class="bash">[yaxin@ubox:~]$ sudo locale-gen zh_CN.UTF-8 en_US.UTF-8
+<h2>二、修改语系</h2>
+<p>首先你需要使用<code>locale-gen</code>编译locale定义文件，直接在命令后面指定要编译的locale（可以查看/usr/share/i18n/SUPPORTED来获取locale的格式）</p>
+<pre><code class="language-bash">[yaxin@ubox:~]$ sudo locale-gen zh_CN.UTF-8 en_US.UTF-8
 Generating locales...
   en_US.UTF-8... up-to-date
   zh_CN.UTF-8... up-to-date
 Generation complete.
-[yaxin@ubox:~]$ echo &#39;LANG=&quot;en_US.UTF-8&quot;&#39; &gt; /etc/default/locale
+[yaxin@ubox:~]$ echo 'LANG=&quot;en_US.UTF-8&quot;' &gt; /etc/default/locale
 </code></pre>
 <p>语系的修改并不是立即生效的，你需要重启机器才能生效。</p>
 
@@ -605,55 +645,66 @@ Generation complete.
     <div class="entry-content" itemprop="description">
         <p><a href="http://php.net/manual/zh/class.datetime.php" target="_blank" rel="external"><code>DataTime</code></a>类跟<code>date()</code>,<code>strtotime()</code>,<code>gmdate()</code>等函数有相同的作用，都是用来处理日期和时间的，但<code>DateTime</code>类更加直观、方便, 所以在PHP5.2.0以后推荐使用<code>DateTime</code>类而不是相应的函数。</p>
 <p>下面来看一下<code>DateTime</code>类的用法。</p>
-<h2 id="1-_获取当前系统时间并打印">1. 获取当前系统时间并打印</h2><pre><code class="php">&lt;?php
+<h2>1. 获取当前系统时间并打印</h2>
+<pre><code class="language-php">&lt;?php
 $date = new DateTime();
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo $date-&gt;format('Y-m-d H:i:s');
 ?&gt;
 </code></pre>
 <blockquote>
 <p>执行结果为：2014-08-25 12:58:29</p>
 </blockquote>
-<h2 id="2-_获取特定时间并打印">2. 获取特定时间并打印</h2><pre><code class="php">&lt;?php
-$date = new DateTime(&#39;2014-05-04&#39;);
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+<h2>2. 获取特定时间并打印</h2>
+<pre><code class="language-php">&lt;?php
+$date = new DateTime('2014-05-04');
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
-$date2 = new DateTime(&#39;tomorrow&#39;);
-echo $date2-&gt;format(&#39;Y-m-d H:i:s&#39;);
+$date2 = new DateTime('tomorrow');
+echo $date2-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
-$date2 = new DateTime(&#39;+2 days&#39;);
-echo $date2-&gt;format(&#39;Y-m-d H:i:s&#39;);
+$date2 = new DateTime('+2 days');
+echo $date2-&gt;format('Y-m-d H:i:s');
 ?&gt;
 </code></pre>
 <blockquote>
-<p>执行结果为：<br>2014-05-04 00:00:00<br>2014-08-26 00:00:00<br>2014-08-27 13:13:34</p>
+<p>执行结果为：
+2014-05-04 00:00:00
+2014-08-26 00:00:00
+2014-08-27 13:13:34</p>
 </blockquote>
 <p>或则通过DateTime的其他方法</p>
-<pre><code class="php">&lt;?php
+<pre><code class="language-php">&lt;?php
 $date = new DateTime();
 // add方法
-$date-&gt;add(new DateInterval(&#39;P1D&#39;));
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+$date-&gt;add(new DateInterval('P1D'));
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
 // modify方法
-$date-&gt;modify(&#39;+1 day&#39;);
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+$date-&gt;modify('+1 day');
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
 // setDate方法
-$date-&gt;setDate(&#39;1989-11-10&#39;);
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+$date-&gt;setDate('1989-11-10');
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
 // setTime方法
-$date-&gt;setTime(&#39;11:10:10&#39;);
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+$date-&gt;setTime('11:10:10');
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
 ?&gt;
 </code></pre>
 <blockquote>
-<p>执行结果分别为：<br>2014-08-26 15:02:57<br>2014-08-27 15:02:57<br>1989-11-10 15:02:57<br>1989-11-10 11:10:10 </p>
+<p>执行结果分别为：
+2014-08-26 15:02:57
+2014-08-27 15:02:57
+1989-11-10 15:02:57
+1989-11-10 11:10:10</p>
 </blockquote>
-<h2 id="3-_unix时间戳的转换">3. unix时间戳的转换</h2><h3 id="获取当前时间的时间戳">获取当前时间的时间戳</h3><pre><code class="php">&lt;?php
+<h2>3. unix时间戳的转换</h2>
+<h3>获取当前时间的时间戳</h3>
+<pre><code class="language-php">&lt;?php
 $date = new DateTime();
-echo $date-&gt;format(&#39;U&#39;);
+echo $date-&gt;format('U');
 echo &quot;\n&quot;;
 ?&gt;
 </code></pre>
@@ -661,16 +712,17 @@ echo &quot;\n&quot;;
 <p>执行结果为：1408950651</p>
 </blockquote>
 <p>或者</p>
-<pre><code class="php">&lt;?php
+<pre><code class="language-php">&lt;?php
 $date = new DateTime();
 echo $date-&gt;getTimestamp();
 echo &quot;\n&quot;;
 ?&gt;
 </code></pre>
-<h3 id="将时间戳转换为可读时间">将时间戳转换为可读时间</h3><pre><code class="php">&lt;?php
-$date = new DateTime(&#39;@1408950651&#39;);
-$date-&gt;setTimezone(new DateTimeZone(&#39;Asia/Shanghai&#39;));
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+<h3>将时间戳转换为可读时间</h3>
+<pre><code class="language-php">&lt;?php
+$date = new DateTime('@1408950651');
+$date-&gt;setTimezone(new DateTimeZone('Asia/Shanghai'));
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
 ?&gt;
 </code></pre>
@@ -678,37 +730,58 @@ echo &quot;\n&quot;;
 <p>执行结果为：2014-08-25 15:10:51</p>
 </blockquote>
 <p>或者</p>
-<pre><code class="php">&lt;?php
+<pre><code class="language-php">&lt;?php
 $date = new DateTime();
 $date-&gt;setTimestamp(1408950651);
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
 ?&gt;
 </code></pre>
-<h2 id="4-_日期的比较">4. 日期的比较</h2><h3 id="日期大小比较">日期大小比较</h3><pre><code class="php">&lt;?php
+<h2>4. 日期的比较</h2>
+<h3>日期大小比较</h3>
+<pre><code class="language-php">&lt;?php
 $date1 = new DateTime();
-$date2 = new DateTime(&#39;2014-09-15&#39;);
+$date2 = new DateTime('2014-09-15');
 
 if($date1 &lt; $date2) {
-    echo $date2-&gt;format(&#39;Y-m-d H:i:s&#39;) . &#39; is in the future&#39;;
+    echo $date2-&gt;format('Y-m-d H:i:s') . ' is in the future';
 }
 ?&gt;
 </code></pre>
-<h3 id="日期间隔">日期间隔</h3><pre><code class="php">&lt;?php
+<h3>日期间隔</h3>
+<pre><code class="language-php">&lt;?php
 $date1 = new DateTime();
-$date2 = new DateTime(&#39;2014-09-15&#39;);
+$date2 = new DateTime('2014-09-15');
 
 $diff = $date1-&gt;diff($date2);
 print_r($diff);
 ?&gt;
 </code></pre>
 <blockquote>
-<p>执行结果为:<br>DateInterval Object<br>(<br>    [y] =&gt; 0<br>    [m] =&gt; 0<br>    [d] =&gt; 20<br>    [h] =&gt; 7<br>    [i] =&gt; 35<br>    [s] =&gt; 50<br>    [weekday] =&gt; 0<br>    [weekday_behavior] =&gt; 0<br>    [first_last_day_of] =&gt; 0<br>    [invert] =&gt; 0<br>    [days] =&gt; 20<br>    [special_type] =&gt; 0<br>    [special_amount] =&gt; 0<br>    [have_weekday_relative] =&gt; 0<br>    [have_special_relative] =&gt; 0<br>)</p>
+<p>执行结果为:
+DateInterval Object
+(
+[y] =&gt; 0
+[m] =&gt; 0
+[d] =&gt; 20
+[h] =&gt; 7
+[i] =&gt; 35
+[s] =&gt; 50
+[weekday] =&gt; 0
+[weekday_behavior] =&gt; 0
+[first_last_day_of] =&gt; 0
+[invert] =&gt; 0
+[days] =&gt; 20
+[special_type] =&gt; 0
+[special_amount] =&gt; 0
+[have_weekday_relative] =&gt; 0
+[have_special_relative] =&gt; 0
+)</p>
 </blockquote>
 <p>将返回的对象格式化输出</p>
-<pre><code class="php">&lt;?php
+<pre><code class="language-php">&lt;?php
 $date1 = new DateTime();
-$date2 = new DateTime(&#39;2014-09-15&#39;);
+$date2 = new DateTime('2014-09-15');
 
 $diff = $date1-&gt;diff($date2);
 echo $diff-&gt;format(&quot;The future will come in %Y years %m months and %d days&quot;);
@@ -739,14 +812,14 @@ echo $diff-&gt;format(&quot;The future will come in %Y years %m months and %d da
     <div class="entry-content" itemprop="description">
         <p>ssh到ubuntu14.04卡的要死，google一下无非是修改<strong>sshd_config</strong>文件中的<code>GSSAPIAuthentication</code>和<code>UseDNS</code>选项，但依然无济于事。</p>
 <p>使用<code>-v</code>参数（可以输出ssh详细过程）ssh发现卡顿是发生在输入密码之后的</p>
-<pre><code class="bash">yaxin@192.168.1.1&#39;s password:
+<pre><code class="language-bash">yaxin@192.168.1.1's password:
 debug1: Authentication succeeded (password).
 debug1: channel 0: new [client-session]
 debug1: Requesting no-more-sessions@openssh.com
 debug1: Entering interactive session. # 卡一段时间
 </code></pre>
 <p>这说明进入交互式终端的时候卡了，再来看登录后</p>
-<pre><code class="bash">Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
+<pre><code class="language-bash">Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
 ......
 62 packages can be updated.
 43 updates are security updates.
@@ -755,100 +828,10 @@ Last login: Tue Jul  8 20:29:20 2014 from 192.168.1.5
 </code></pre>
 <p>上面的内容在其它版本中为<code>/etc/motd</code>中的内容，但ubuntu是动态生成该内容，生成脚本在<code>/etc/update-motd.d</code>目录下，查看脚本可以是联网检测系统更新等情况。呵呵，如何禁用。</p>
 <p>修改<code>/etc/pam.d/sshd</code>和<code>/etc/pam.d/login</code>文件中的有<strong>pam_motd.so</strong>的行注释掉</p>
-<pre><code class="bash">#session    optional     pam_motd.so  motd=/run/motd.dynamic noupdate
+<pre><code class="language-bash">#session    optional     pam_motd.so  motd=/run/motd.dynamic noupdate
 #session    optional     pam_motd.so # [1]
 </code></pre>
 <p>再次ssh，这次没有了上面的update等信息了，但ssh也不卡顿了。</p>
-
-    </div> <!-- .entry-content -->
-  </article>
-
-  <article id="post-1404450418" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
-    <header class="entry-header">
-      <div class="entry-meta">
-        <span class="entry-date date published updated">
-          <time datetime="2014-07-04T05:06:58.000Z" itemprop="datePublished"><a href="/Docker/setup-development-enviroment-in-docker-1.html"><i class="icon-clock"></i>2014-07-04</a></time>
-        </span>
-        <span>•</span>
-        <span class="entry-comments">
-          <a href="/Docker/setup-development-enviroment-in-docker-1.html#comments"><i class="icon-chat"></i>评论</a>
-        </span>
-      </div><!-- .entry-meta -->
-      <h1 class="entry-title" itemprop="name">
-        <a href="http://yaxin-cn.github.io/Docker/setup-development-enviroment-in-docker-1.html" rel="bookmark" title="Docker中搭建开发环境1" itemprop="url">Docker中搭建开发环境1</a>
-      </h1> <!-- .entry-title -->
-    </header>
-    <div class="entry-content" itemprop="description">
-        <p>由于docker有很好的隔离性，所以开发使用最适合不过。windows下配合<strong><a href="https://github.com/boot2docker/windows-installer/releases" target="_blank" rel="external">boot2docker</a></strong>轻松击败重量级虚拟机。</p>
-<p>由于是开发环境，我们首先需要将docker container开启ssh服务，以便随时登录到上面查看修改配置，之后再去搭建真正的开发环境。所以我们可以先创建一个开启了ssh服务的image来作为base image，然后在它的基础之上搭建不通的开发环境。</p>
-<p>创建镜像需要使用到Dockerfile，Dockerfile的具体语法可以到<a href="http://docker-docs.qiniudn.com/reference/builder/" title="Dockerfile文档" target="_blank" rel="external">官网</a>去查看，这里不详细介绍。</p>
-<p>先上<em>Dockerfile</em>内容：</p>
-<pre><code class="bash"># sshd
-# VERSION 1.0.0
-
-FROM ubuntu:14.04
-MAINTAINER yaxin &lt;yaxin.me@gmail.com&gt;
-
-# make sure the package repository is up to date
-RUN sed -i &quot;s/archive.ubuntu.com/mirrors.aliyun.com/g&quot; /etc/apt/sources.list
-RUN apt-get update
-RUN apt-get install -y openssh-server
-# Config ssh server
-RUN mkdir -p /var/run/sshd
-RUN sed -i &quot;s/^PermitRootLogin without-password/PermitRootLogin yes/g&quot; /etc/ssh/sshd_config
-RUN sed -i &quot;s/^#GSSAPIAuthentication no/GSSAPIAuthentication no/g&quot; /etc/ssh/sshd_config
-RUN echo &quot;UseDNS no&quot; &gt;&gt; /etc/ssh/sshd_config
-RUN echo &#39;root:root&#39; | chpasswd
-
-EXPOSE 22
-CMD [&quot;/usr/sbin/sshd&quot;, &quot;-D&quot;]
-</code></pre>
-<p>新建文件夹并将上面的代码保存为以<strong>Dockerfile</strong>命名的文本文件。</p>
-<p>然后执行</p>
-<pre><code class="bash">[yaxin@ubox sshd]$ls
-Dockerfile
-[yaxin@ubox sshd]$docker build -t ubuntu:base .
-</code></pre>
-<p>来创建镜像。下面来稍微解释一下Dockerfile的内容</p>
-<h3 id="FROM">FROM</h3><p>必须是Dockerfile的第一句，之后的操作都是在这个镜像之上进行的。如果你没有，那要先下载，<code>docker pull ubuntu</code>，如果无法下载，翻墙吧。如果你有国外vps，那么你可以在vps上<code>docker pull ubuntu</code>下载该镜像然后<code>docker save ubuntu:14.04 | bzip2 -9 -c &gt; ubuntu_14.04.tar.bz2</code>，然后下载ubuntu_14.04.tar.bz2到本机，运行<code>bzip2 -d -c &lt; ubuntu_14.04.tar.bz2 | docker load</code>导入镜像，我就是这么干的。</p>
-<h3 id="RUN">RUN</h3><p>执行shell命令。</p>
-<h3 id="ADD">ADD</h3><p>将外部文件导入到镜像中。</p>
-<h3 id="EXPOSE">EXPOSE</h3><p>将22端口‘暴漏’出来，以便在外部访问该端口。没有的话，将无法从外部（非运行docker的主机）ssh。</p>
-<h3 id="CMD">CMD</h3><p>跟<code>RUN</code>一样，也是执行shell命令，不同的是<code>RUN</code>是在创建镜像的时候执行，而<code>CMD</code>是在每次执行<code>docker run image</code>的时候执行。</p>
-<p>build完镜像后，我们执行<code>docker images</code>会发现多了一个镜像</p>
-<pre><code class="bash">[yaxin@ubox sshd]$docker images
-REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
-ubuntu              base                615ea4d4c1e0        2 weeks ago         396.4 MB
-ubuntu              14.04               ad892dd21d60        4 weeks ago         275.5 MB
-</code></pre>
-<p>然后启动镜像</p>
-<pre><code class="bash">[yaxin@ubox sshd]$docker run -d -P --name=&quot;sshd&quot; ubuntu:base
-c2518b7cf9289567c258171e93462bdb7fffe873bf2251d7086cd97e03e3ee57
-[yaxin@ubox sshd]$docker ps
-CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                   NAMES
-c2518b7cf928        ubuntu:base         /usr/sbin/sshd -D      4 seconds ago       Up 3 seconds        0.0.0.0:49153-&gt;22/tcp   sshd
-</code></pre>
-<p>然后ssh 49153端口</p>
-<pre><code class="bash">[yaxin@ubox sshd]$ssh root@localhost -p 49153
-The authenticity of host &#39;[localhost]:49153 ([::1]:49153)&#39; can&#39;t be established.
-ECDSA key fingerprint is c4:a5:26:07:8b:72:97:40:f2:42:fa:35:9a:7c:d0:79.
-Are you sure you want to continue connecting (yes/no)? yes
-Warning: Permanently added &#39;[localhost]:49153&#39; (ECDSA) to the list of known hosts.
-root@localhost&#39;s password: 
-Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.2.0-58-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com/
-
-The programs included with the Ubuntu system are free software;
-the exact distribution terms for each program are described in the
-individual files in /usr/share/doc/*/copyright.
-
-Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
-applicable law.
-
-root@c2518b7cf928:~#
-</code></pre>
-<p>自此，一个装有ssh服务的可以运行的base image就创建成功了。</p>
 
     </div> <!-- .entry-content -->
   </article>
@@ -866,7 +849,7 @@ root@c2518b7cf928:~#
   </div>
   <div class="site-script">
     <script>
-      window.headerBg = 'undefined';
+      window.headerBg = 'http://yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,http://yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
     </script>
     <script src="/assets/app.js"></script>
 <script src="/assets/pace.min.js"></script>

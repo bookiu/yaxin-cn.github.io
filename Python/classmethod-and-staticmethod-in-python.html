@@ -15,6 +15,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
+    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
+  
   
   <link rel="icon" href="/assets/favicon.ico">
   <link rel="stylesheet" href="/assets/app.css">
@@ -53,8 +55,9 @@
   <div class="section-box">
     <div class="post-content">
       <p>Python类中有两个特殊的修饰符@classmethod和@staticmethod(即类方法和静态方法), 想要理解需要先理解类属性和实例属性的感念</p>
-<h2 id="类属性和实例属性">类属性和实例属性</h2><p>看下面的代码</p>
-<pre><code class="python">&gt;&gt;&gt; class TestProperty(object):
+<h2>类属性和实例属性</h2>
+<p>看下面的代码</p>
+<pre><code class="language-python">&gt;&gt;&gt; class TestProperty(object):
 ...     class_property = &quot;class property&quot;
 ...     
 ...     def __init__(self):
@@ -73,7 +76,7 @@ class property
 &gt;&gt;&gt; print TestProperty.instance_property
 Traceback (most recent call last):
   File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
-AttributeError: type object &#39;TestProperty&#39; has no attribute &#39;instance_property&#39;
+AttributeError: type object 'TestProperty' has no attribute 'instance_property'
 &gt;&gt;&gt; # 注意下面的报错
 &gt;&gt;&gt; del test_property.class_property
 Traceback (most recent call last):
@@ -89,7 +92,8 @@ AttributeError: class_property
 <li>类属性其实就是其它语言中的静态变量(变量前加static)</li>
 <li>为什么要有类属性, 一句话<strong>命名空间</strong></li>
 </ol>
-<h2 id="类方法和静态方法">类方法和静态方法</h2><pre><code class="python">&gt;&gt;&gt; class TestMethod(object):
+<h2>类方法和静态方法</h2>
+<pre><code class="language-python">&gt;&gt;&gt; class TestMethod(object):
 ...     class_property = &quot;class property&quot;
 ...     def __init__(self):
 ...         self.instance_property = &quot;instance property&quot;
@@ -113,11 +117,11 @@ instance property:  instance property
 &gt;&gt;&gt; # 执行类方法
 &gt;&gt;&gt; # 通过实例访问, 打印出类本身和类属性
 &gt;&gt;&gt; test_method.class_method(&quot;Hello&quot;)
-class_method(&lt;class &#39;__main__.TestMethod&#39;&gt;, Hello)
+class_method(&lt;class '__main__.TestMethod'&gt;, Hello)
 class property:  class property
 &gt;&gt;&gt; # 通过类直接访问, 同上
 &gt;&gt;&gt; TestMethod.class_method(&quot;Hello&quot;)
-class_method(&lt;class &#39;__main__.TestMethod&#39;&gt;, Hello)
+class_method(&lt;class '__main__.TestMethod'&gt;, Hello)
 class property:  class property
 &gt;&gt;&gt; # 执行静态方法
 &gt;&gt;&gt; # 通过实例访问, 打印出静态方法本身
@@ -128,7 +132,7 @@ static_method(Hello)
 static_method(Hello)
 </code></pre>
 <p>可以看出类方法中<code>cls</code>代表的是类本身, 如果将类方法中的访问类属性的cls去掉, 则会报出<em>NameError</em>的错误</p>
-<pre><code class="python">&gt;&gt;&gt; class TestMethod(object):
+<pre><code class="language-python">&gt;&gt;&gt; class TestMethod(object):
 ...     class_property = &quot;class property&quot;
 ...     @classmethod
 ...     def class_method(cls, arvg):
@@ -139,7 +143,7 @@ class property:
 Traceback (most recent call last):
   File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
   File &quot;&lt;stdin&gt;&quot;, line 5, in class_method
-NameError: global name &#39;class_property&#39; is not defined
+NameError: global name 'class_property' is not defined
 </code></pre>
 <ol>
 <li><strong>类方法是为了访问类属性更加方便</strong></li>
@@ -147,7 +151,7 @@ NameError: global name &#39;class_property&#39; is not defined
 <li>静态方法跟普通函数没有什么区别</li>
 </ol>
 <p>可以通过在实例方法中直接通过<code>TestMethod.class_property</code>来访问, 但是这样不方便也不好维护(如果类名称改了,就会出错), 也可以使用<code>self.class_property</code>来访问, 但注意, 实例本身获取的并不应该是类属性即<code>TestMethod.class_property</code>, 只是因为实例中并没有<code>class_property</code>这个变量, 而是通过查找类属性,发现有同名变量,然后打印出来,通过上面无法实例无法删除类属性是可以看出来的. 当然,如果不信,可以看下面的例子</p>
-<pre><code class="python">&gt;&gt;&gt; class TestMethod(object):
+<pre><code class="language-python">&gt;&gt;&gt; class TestMethod(object):
 ...     class_property = &quot;class property&quot;
 ...     def __init__(self):
 ...         pass
@@ -213,7 +217,7 @@ class property
   </div>
   <div class="site-script">
     <script>
-      window.headerBg = 'undefined';
+      window.headerBg = 'http://yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,http://yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
     </script>
     <script src="/assets/app.js"></script>
 <script src="/assets/pace.min.js"></script>

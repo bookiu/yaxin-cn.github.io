@@ -15,6 +15,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
+    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
+  
   
   <link rel="icon" href="/assets/favicon.ico">
   <link rel="stylesheet" href="/assets/app.css">
@@ -52,8 +54,9 @@
   </header>
   <div class="section-box">
     <div class="post-content">
-      <h2 id="方法一：使用ifconfig命令">方法一：使用ifconfig命令</h2><p>直接在命令行中ifconfig，即可看到所有已连接网线（已经激活的网卡）的网卡信息</p>
-<pre><code class="bash">[yaxin@oishi ~]$ifconfig
+      <h2>方法一：使用ifconfig命令</h2>
+<p>直接在命令行中ifconfig，即可看到所有已连接网线（已经激活的网卡）的网卡信息</p>
+<pre><code class="language-bash">[yaxin@oishi ~]$ifconfig
 eth0      Link encap:Ethernet  HWaddr 00:50:56:AC:57:30  
           inet addr:10.10.8.110  Bcast:10.10.8.255  Mask:255.255.255.0
           UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
@@ -74,12 +77,13 @@ lo        Link encap:Local Loopback
           collisions:0 txqueuelen:0 
           RX bytes:710416 (693.7 KiB)  TX bytes:710416 (693.7 KiB)
 </code></pre>
-<h2 id="方法二：使用/sys目录">方法二：使用/sys目录</h2><p>使用cd命令进入/sys/class/net/目录，然后ls查看目录下的文件，你会惊奇的发现里面有以网卡名命名的文件夹，</p>
-<pre><code class="bash">[yaxin@oishi net]$ls
+<h2>方法二：使用/sys目录</h2>
+<p>使用cd命令进入/sys/class/net/目录，然后ls查看目录下的文件，你会惊奇的发现里面有以网卡名命名的文件夹，</p>
+<pre><code class="language-bash">[yaxin@oishi net]$ls
 eth0  lo
 </code></pre>
 <p>这些文件夹便是你电脑中所有网卡，包括激活和未激活的（lo是本地回环网卡，并不是真实的网卡），cd进入任何一个目录（不是lo），然后，该网卡的所有信息便包含在里面(包括网卡的MAC地址信息)。</p>
-<pre><code class="bash">[yaxin@oishi net]$ls
+<pre><code class="language-bash">[yaxin@oishi net]$ls
 eth0  lo
 [yaxin@oishi net]$cd eth0/
 [yaxin@oishi eth0]$ls
@@ -89,7 +93,7 @@ addr_len          device     duplex   ifalias   link_mode  power      statistics
 [yaxin@oishi eth0]$
 </code></pre>
 <p>然后使用cat命令查看一下address文件，显示的便是该网卡的MAC地址</p>
-<pre><code class="bash">[yaxin@oishi eth0]$cat address 
+<pre><code class="language-bash">[yaxin@oishi eth0]$cat address 
 00:50:56:ac:57:30
 [yaxin@oishi eth0]$
 </code></pre>
@@ -137,7 +141,7 @@ addr_len          device     duplex   ifalias   link_mode  power      statistics
   </div>
   <div class="site-script">
     <script>
-      window.headerBg = 'undefined';
+      window.headerBg = 'http://yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,http://yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
     </script>
     <script src="/assets/app.js"></script>
 <script src="/assets/pace.min.js"></script>

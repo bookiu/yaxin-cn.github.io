@@ -15,6 +15,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
+    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
+  
   
   <link rel="icon" href="/assets/favicon.ico">
   <link rel="stylesheet" href="/assets/app.css">
@@ -53,27 +55,54 @@
   <div class="section-box">
     <div class="post-content">
       <p>打包与解压缩命令属于Linux下最常用的命令之一。打包是指将一大堆文件或文件夹变成一个文件，压缩则是将一个大的文件通过一些压缩算法变成一个小文件。这跟Windows下使用WinRAR的打包不通，因为WinRAR打包后的文件也进行了压缩。下面就给出解压缩与打包的命令。</p>
-<h2 id="一、基础篇">一、基础篇</h2><p>我将本文分为两个部分：基础篇和提升篇。这部分是基础篇，主要介绍一些常用的打包和解压缩命令。学会使用这些命令，足够应付日常使用了。</p>
-<h3 id="1-_打包、压缩命令">1. 打包、压缩命令</h3><p>首先给出命令：</p>
+<h2>一、基础篇</h2>
+<p>我将本文分为两个部分：基础篇和提升篇。这部分是基础篇，主要介绍一些常用的打包和解压缩命令。学会使用这些命令，足够应付日常使用了。</p>
+<h3>1. 打包、压缩命令</h3>
+<p>首先给出命令：</p>
 <blockquote>
-<p>tar.gz格式:tar zcvf FileName.tar.gz DirName<br>tar.bz2格式:tar jcvf FileName.tar.bz2 DirName<br>zip格式:zip FileName.zip DirName</p>
+<p>tar.gz格式:tar zcvf FileName.tar.gz DirName
+tar.bz2格式:tar jcvf FileName.tar.bz2 DirName
+zip格式:zip FileName.zip DirName</p>
 </blockquote>
 <p>一般来说，打包要伴随着压缩，所以我这里只是给出了打包压缩一体命令，并未将打包和压缩命令分开。上面命令中“DirName”为你要打包的文件夹，“FileName.**”为打包压缩后的文件名。在Linux下，常见的压缩包格式为tar.gz、tar.bz2和zip，所以这里不再给出rar格式的打包命令。</p>
-<h3 id="2-_解压缩命令">2. 解压缩命令</h3><p>同样先给出命令：</p>
+<h3>2. 解压缩命令</h3>
+<p>同样先给出命令：</p>
 <blockquote>
-<p>tar.gz格式:tar zxvf FileName.tar.gz<br>tar.bz2格式:tar jxvf FileName.tar.bz2<br>zip格式:unzip FileName.zip</p>
+<p>tar.gz格式:tar zxvf FileName.tar.gz
+tar.bz2格式:tar jxvf FileName.tar.bz2
+zip格式:unzip FileName.zip</p>
 </blockquote>
 <p>其中“FileName.*”为你需要解包的文件。</p>
 <p>如果您只是想会解包打包，那么您可以就此停下来了，因为下面的都是上面命令的分析和补充。</p>
-<h2 id="二、提升篇">二、提升篇</h2><p>在Linux下打包和压缩命令是两个概念，各自的命令也不同，你可以只打包而不压缩或则只压缩而不打包。下面我们来看一下linux中的打包和压缩格式：</p>
+<h2>二、提升篇</h2>
+<p>在Linux下打包和压缩命令是两个概念，各自的命令也不同，你可以只打包而不压缩或则只压缩而不打包。下面我们来看一下linux中的打包和压缩格式：</p>
 <blockquote>
-<p>.tar打包格式：tar程序打包的数据，并没有压缩过<br>.Z格式：compress程序压缩的文件<br>.gz压缩格式：gzip程序压缩的文件<br>.bz2压缩格式：bzip2程序压缩的文件<br>.tar.gz打包压缩：tar程序打包的文件，其中并且经过 gzip 的压缩<br>.tar.bz2打包压缩：tar程序打包的文件，其中并且经过 bzip2 的压缩</p>
+<p>.tar打包格式：tar程序打包的数据，并没有压缩过
+.Z格式：compress程序压缩的文件
+.gz压缩格式：gzip程序压缩的文件
+.bz2压缩格式：bzip2程序压缩的文件
+.tar.gz打包压缩：tar程序打包的文件，其中并且经过 gzip 的压缩
+.tar.bz2打包压缩：tar程序打包的文件，其中并且经过 bzip2 的压缩</p>
 </blockquote>
 <p>在这些格式中，.Z（compress程序压缩的文件）已经几乎不见了，所以这里不再搭理。</p>
-<h3 id="1-打包">1.打包</h3><p>在Linux中，你会经常看到tar.gz或tar.bz2格式的源码包，其中的tar便是Linux下最常用的打包程序，使用tar程序打包过的文件一般称为tar包（格式为.tar）。下面我们就来看一下tar命令的基本使用方法：</p>
+<h3>1.打包</h3>
+<p>在Linux中，你会经常看到tar.gz或tar.bz2格式的源码包，其中的tar便是Linux下最常用的打包程序，使用tar程序打包过的文件一般称为tar包（格式为.tar）。下面我们就来看一下tar命令的基本使用方法：</p>
 <p>首先给出tar命令的参数</p>
 <blockquote>
-<p>-c：(create)建立打包文件，搭配-v可察看打包过程中被打包的文件<br>-t：查看打包文件的内容含有哪些文件名<br>-x：解包或解压缩的功能，搭配-C（大写）可以在特定目录解开<br>-j：通过bzip2的进行压缩/解压缩，此时文件名正常情况下为<em>.tar.bz2<br>-z：通过gzip的进行压缩/解压缩，此时文件名正常情况下为</em>.tar.gz<br>-v：在压缩/解压缩的过程中，将正在处理的文件显示出来<br>-f：-f后面要立刻接要被处理的文件名，不要再加参数。也可以把-f单独写一个选项<br>-C：这个选项用在解压缩，后面跟目录。目的就是把文件解压缩到指定的目录<br>-p：保留数据的原本权限与属性，常用于备份(-c)<br>-P：保留绝对路径，也就是说允许备份数据中含有根目录存在之意<br>-r：向打包文件里面追加文件。例如用户已经打包好文件，又发现还有一个目录或是一些文件忘记打包了，这时可以使用该选项，将忘记的目录或文件追加到打包的文件中<br>–exclude=FILE：在压缩的过程中，不要将FILE打包<br>-u：更新文件。就是说，用新增的文件取代原备份文件，如果在备份文件中找不到要更新的文件，则把它追加到备份文件的最后<br>-N：比后面接的日期(yyyy/mm/dd)还要新的才会被打包进新建的文件中</p>
+<p>-c：(create)建立打包文件，搭配-v可察看打包过程中被打包的文件
+-t：查看打包文件的内容含有哪些文件名
+-x：解包或解压缩的功能，搭配-C（大写）可以在特定目录解开
+-j：通过bzip2的进行压缩/解压缩，此时文件名正常情况下为*.tar.bz2
+-z：通过gzip的进行压缩/解压缩，此时文件名正常情况下为*.tar.gz
+-v：在压缩/解压缩的过程中，将正在处理的文件显示出来
+-f：-f后面要立刻接要被处理的文件名，不要再加参数。也可以把-f单独写一个选项
+-C：这个选项用在解压缩，后面跟目录。目的就是把文件解压缩到指定的目录
+-p：保留数据的原本权限与属性，常用于备份(-c)
+-P：保留绝对路径，也就是说允许备份数据中含有根目录存在之意
+-r：向打包文件里面追加文件。例如用户已经打包好文件，又发现还有一个目录或是一些文件忘记打包了，这时可以使用该选项，将忘记的目录或文件追加到打包的文件中
+–exclude=FILE：在压缩的过程中，不要将FILE打包
+-u：更新文件。就是说，用新增的文件取代原备份文件，如果在备份文件中找不到要更新的文件，则把它追加到备份文件的最后
+-N：比后面接的日期(yyyy/mm/dd)还要新的才会被打包进新建的文件中</p>
 </blockquote>
 <p>注意：-c, -t, -x参数不可同时出现。</p>
 <p>下面来举几个例子：</p>
@@ -83,9 +112,14 @@
 <p>tar -uf FileName.tar logo.gif：这条命令是更新原来tar包FileName.tar中logo.gif文件，-u是表示更新文件的意思；</p>
 <p>tar -tf FileName.tar：这条命令是列出FileName.tar包中所有文件，-t是列出文件的意思；</p>
 <p>tar -xf FileName.tar：这条命令是解出FileName.tar包中所有文件，-x是解开的意思。</p>
-<h3 id="2-压缩和解压">2.压缩和解压</h3><p>①首先列出gzip程序命令压缩解压的参数：</p>
+<h3>2.压缩和解压</h3>
+<p>①首先列出gzip程序命令压缩解压的参数：</p>
 <blockquote>
-<p>-c：将压缩的数据输出到屏幕上；<br>-d：解压缩 ；<br>-t：用来检验压缩文件有无错误；<br>-v：显示出原文件/压缩文件案的压缩比等信息；<br>-#：压缩等级，-1最快，但是压缩比最差。-9最慢，但是压缩比最好，预设是-6。</p>
+<p>-c：将压缩的数据输出到屏幕上；
+-d：解压缩 ；
+-t：用来检验压缩文件有无错误；
+-v：显示出原文件/压缩文件案的压缩比等信息；
+-#：压缩等级，-1最快，但是压缩比最差。-9最慢，但是压缩比最好，预设是-6。</p>
 </blockquote>
 <p>当你使用gzip进行压缩时，在默认的状态下原来的文件被压缩成为。gz文件的同时源文件也就不再存在了。</p>
 <p>下面给出使用gzip程序压缩解压的例子：</p>
@@ -94,20 +128,28 @@
 <p>gzip -d FileName.gz：此命令功能同上。</p>
 <p>②接下来给出bizp2程序命令的压缩解压参数：</p>
 <blockquote>
-<p>-c：将压缩的过程产生的数据输出到屏幕上<br>-d：解压缩<br>-k：保留源文件，而不会删除原始的文件<br>-z：压缩<br>-v：可以显示出原文件/压缩文件的压缩比等信息<br>-#：与gzip同样的，都是在计算压缩比的参数，-9最佳，-1最快</p>
+<p>-c：将压缩的过程产生的数据输出到屏幕上
+-d：解压缩
+-k：保留源文件，而不会删除原始的文件
+-z：压缩
+-v：可以显示出原文件/压缩文件的压缩比等信息
+-#：与gzip同样的，都是在计算压缩比的参数，-9最佳，-1最快</p>
 </blockquote>
 <p>同样，在默认的状态下原来的文件被压缩成.bz2的文件，而源文件也会不存在了。但可以用-k参数保留源文件。</p>
 <p>下面给出使用bzip2程序压缩解压的例子：</p>
 <p>bzip2 -z FileName：这条命令是压缩FileName文件；</p>
 <p>bzip2 -d FileName.bz2：解压FileName.bz2;</p>
 <p>bunzip2 FileName.bz2：功能同上。</p>
-<h3 id="3-打包和压缩解压命令合并">3.打包和压缩解压命令合并</h3><p>如果将打包和压缩命令分开的话，会无故增加一步操作，从而带来很多不便，好在在执行打包（解包）命令的同时可以调用压缩（解压）的命令。</p>
+<h3>3.打包和压缩解压命令合并</h3>
+<p>如果将打包和压缩命令分开的话，会无故增加一步操作，从而带来很多不便，好在在执行打包（解包）命令的同时可以调用压缩（解压）的命令。</p>
 <p>①tar调用gzip</p>
-<p>-z：tar中使用此参数来调用gzip。<br>下面举例说明：</p>
+<p>-z：tar中使用此参数来调用gzip。
+下面举例说明：</p>
 <p>tar -zcvf FileName.tar.gz *.jpg：将所有的jpg格式的图片打包并压缩成FileName.tar.gz文件；</p>
 <p>tar -zxvf FileName.tar.gz：将FileName.tar.gz文件解压。</p>
 <p>②tar调用bzip2</p>
-<p>-j：tar可以使用这个参数调用gzip。<br>下面举例说明：</p>
+<p>-j：tar可以使用这个参数调用gzip。
+下面举例说明：</p>
 <p>tar -jcvf FileName.tar.bz2 *.jpg：将所有的jpg格式的图片打包并压缩成FileName.tar.bz2文件；</p>
 <p>tar -jxvf FileName.tar.bz2：将FileName.tar.bz2文件解压。</p>
 
@@ -154,7 +196,7 @@
   </div>
   <div class="site-script">
     <script>
-      window.headerBg = 'undefined';
+      window.headerBg = 'http://yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,http://yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
     </script>
     <script src="/assets/app.js"></script>
 <script src="/assets/pace.min.js"></script>

@@ -15,6 +15,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
+    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
+  
   
   <link rel="icon" href="/assets/favicon.ico">
   <link rel="stylesheet" href="/assets/app.css">
@@ -54,55 +56,66 @@
     <div class="post-content">
       <p><a href="http://php.net/manual/zh/class.datetime.php" target="_blank" rel="external"><code>DataTime</code></a>类跟<code>date()</code>,<code>strtotime()</code>,<code>gmdate()</code>等函数有相同的作用，都是用来处理日期和时间的，但<code>DateTime</code>类更加直观、方便, 所以在PHP5.2.0以后推荐使用<code>DateTime</code>类而不是相应的函数。</p>
 <p>下面来看一下<code>DateTime</code>类的用法。</p>
-<h2 id="1-_获取当前系统时间并打印">1. 获取当前系统时间并打印</h2><pre><code class="php">&lt;?php
+<h2>1. 获取当前系统时间并打印</h2>
+<pre><code class="language-php">&lt;?php
 $date = new DateTime();
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo $date-&gt;format('Y-m-d H:i:s');
 ?&gt;
 </code></pre>
 <blockquote>
 <p>执行结果为：2014-08-25 12:58:29</p>
 </blockquote>
-<h2 id="2-_获取特定时间并打印">2. 获取特定时间并打印</h2><pre><code class="php">&lt;?php
-$date = new DateTime(&#39;2014-05-04&#39;);
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+<h2>2. 获取特定时间并打印</h2>
+<pre><code class="language-php">&lt;?php
+$date = new DateTime('2014-05-04');
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
-$date2 = new DateTime(&#39;tomorrow&#39;);
-echo $date2-&gt;format(&#39;Y-m-d H:i:s&#39;);
+$date2 = new DateTime('tomorrow');
+echo $date2-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
-$date2 = new DateTime(&#39;+2 days&#39;);
-echo $date2-&gt;format(&#39;Y-m-d H:i:s&#39;);
+$date2 = new DateTime('+2 days');
+echo $date2-&gt;format('Y-m-d H:i:s');
 ?&gt;
 </code></pre>
 <blockquote>
-<p>执行结果为：<br>2014-05-04 00:00:00<br>2014-08-26 00:00:00<br>2014-08-27 13:13:34</p>
+<p>执行结果为：
+2014-05-04 00:00:00
+2014-08-26 00:00:00
+2014-08-27 13:13:34</p>
 </blockquote>
 <p>或则通过DateTime的其他方法</p>
-<pre><code class="php">&lt;?php
+<pre><code class="language-php">&lt;?php
 $date = new DateTime();
 // add方法
-$date-&gt;add(new DateInterval(&#39;P1D&#39;));
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+$date-&gt;add(new DateInterval('P1D'));
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
 // modify方法
-$date-&gt;modify(&#39;+1 day&#39;);
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+$date-&gt;modify('+1 day');
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
 // setDate方法
-$date-&gt;setDate(&#39;1989-11-10&#39;);
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+$date-&gt;setDate('1989-11-10');
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
 // setTime方法
-$date-&gt;setTime(&#39;11:10:10&#39;);
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+$date-&gt;setTime('11:10:10');
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
 ?&gt;
 </code></pre>
 <blockquote>
-<p>执行结果分别为：<br>2014-08-26 15:02:57<br>2014-08-27 15:02:57<br>1989-11-10 15:02:57<br>1989-11-10 11:10:10 </p>
+<p>执行结果分别为：
+2014-08-26 15:02:57
+2014-08-27 15:02:57
+1989-11-10 15:02:57
+1989-11-10 11:10:10</p>
 </blockquote>
-<h2 id="3-_unix时间戳的转换">3. unix时间戳的转换</h2><h3 id="获取当前时间的时间戳">获取当前时间的时间戳</h3><pre><code class="php">&lt;?php
+<h2>3. unix时间戳的转换</h2>
+<h3>获取当前时间的时间戳</h3>
+<pre><code class="language-php">&lt;?php
 $date = new DateTime();
-echo $date-&gt;format(&#39;U&#39;);
+echo $date-&gt;format('U');
 echo &quot;\n&quot;;
 ?&gt;
 </code></pre>
@@ -110,16 +123,17 @@ echo &quot;\n&quot;;
 <p>执行结果为：1408950651</p>
 </blockquote>
 <p>或者</p>
-<pre><code class="php">&lt;?php
+<pre><code class="language-php">&lt;?php
 $date = new DateTime();
 echo $date-&gt;getTimestamp();
 echo &quot;\n&quot;;
 ?&gt;
 </code></pre>
-<h3 id="将时间戳转换为可读时间">将时间戳转换为可读时间</h3><pre><code class="php">&lt;?php
-$date = new DateTime(&#39;@1408950651&#39;);
-$date-&gt;setTimezone(new DateTimeZone(&#39;Asia/Shanghai&#39;));
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+<h3>将时间戳转换为可读时间</h3>
+<pre><code class="language-php">&lt;?php
+$date = new DateTime('@1408950651');
+$date-&gt;setTimezone(new DateTimeZone('Asia/Shanghai'));
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
 ?&gt;
 </code></pre>
@@ -127,37 +141,58 @@ echo &quot;\n&quot;;
 <p>执行结果为：2014-08-25 15:10:51</p>
 </blockquote>
 <p>或者</p>
-<pre><code class="php">&lt;?php
+<pre><code class="language-php">&lt;?php
 $date = new DateTime();
 $date-&gt;setTimestamp(1408950651);
-echo $date-&gt;format(&#39;Y-m-d H:i:s&#39;);
+echo $date-&gt;format('Y-m-d H:i:s');
 echo &quot;\n&quot;;
 ?&gt;
 </code></pre>
-<h2 id="4-_日期的比较">4. 日期的比较</h2><h3 id="日期大小比较">日期大小比较</h3><pre><code class="php">&lt;?php
+<h2>4. 日期的比较</h2>
+<h3>日期大小比较</h3>
+<pre><code class="language-php">&lt;?php
 $date1 = new DateTime();
-$date2 = new DateTime(&#39;2014-09-15&#39;);
+$date2 = new DateTime('2014-09-15');
 
 if($date1 &lt; $date2) {
-    echo $date2-&gt;format(&#39;Y-m-d H:i:s&#39;) . &#39; is in the future&#39;;
+    echo $date2-&gt;format('Y-m-d H:i:s') . ' is in the future';
 }
 ?&gt;
 </code></pre>
-<h3 id="日期间隔">日期间隔</h3><pre><code class="php">&lt;?php
+<h3>日期间隔</h3>
+<pre><code class="language-php">&lt;?php
 $date1 = new DateTime();
-$date2 = new DateTime(&#39;2014-09-15&#39;);
+$date2 = new DateTime('2014-09-15');
 
 $diff = $date1-&gt;diff($date2);
 print_r($diff);
 ?&gt;
 </code></pre>
 <blockquote>
-<p>执行结果为:<br>DateInterval Object<br>(<br>    [y] =&gt; 0<br>    [m] =&gt; 0<br>    [d] =&gt; 20<br>    [h] =&gt; 7<br>    [i] =&gt; 35<br>    [s] =&gt; 50<br>    [weekday] =&gt; 0<br>    [weekday_behavior] =&gt; 0<br>    [first_last_day_of] =&gt; 0<br>    [invert] =&gt; 0<br>    [days] =&gt; 20<br>    [special_type] =&gt; 0<br>    [special_amount] =&gt; 0<br>    [have_weekday_relative] =&gt; 0<br>    [have_special_relative] =&gt; 0<br>)</p>
+<p>执行结果为:
+DateInterval Object
+(
+[y] =&gt; 0
+[m] =&gt; 0
+[d] =&gt; 20
+[h] =&gt; 7
+[i] =&gt; 35
+[s] =&gt; 50
+[weekday] =&gt; 0
+[weekday_behavior] =&gt; 0
+[first_last_day_of] =&gt; 0
+[invert] =&gt; 0
+[days] =&gt; 20
+[special_type] =&gt; 0
+[special_amount] =&gt; 0
+[have_weekday_relative] =&gt; 0
+[have_special_relative] =&gt; 0
+)</p>
 </blockquote>
 <p>将返回的对象格式化输出</p>
-<pre><code class="php">&lt;?php
+<pre><code class="language-php">&lt;?php
 $date1 = new DateTime();
-$date2 = new DateTime(&#39;2014-09-15&#39;);
+$date2 = new DateTime('2014-09-15');
 
 $diff = $date1-&gt;diff($date2);
 echo $diff-&gt;format(&quot;The future will come in %Y years %m months and %d days&quot;);
@@ -210,7 +245,7 @@ echo $diff-&gt;format(&quot;The future will come in %Y years %m months and %d da
   </div>
   <div class="site-script">
     <script>
-      window.headerBg = 'undefined';
+      window.headerBg = 'http://yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,http://yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
     </script>
     <script src="/assets/app.js"></script>
 <script src="/assets/pace.min.js"></script>

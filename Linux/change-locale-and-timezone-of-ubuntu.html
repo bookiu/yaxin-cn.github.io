@@ -15,6 +15,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
+    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
+  
   
   <link rel="icon" href="/assets/favicon.ico">
   <link rel="stylesheet" href="/assets/app.css">
@@ -52,20 +54,24 @@
   </header>
   <div class="section-box">
     <div class="post-content">
-      <h2 id="一、修改时区">一、修改时区</h2><h3 id="1-_交互式修改">1. 交互式修改</h3><p>ubuntu提供了一个交互式的选择时区的命令<code>dpkg-reconfigure tzdata</code>，直接在命令行中输入此命令，然后选择自己的时区即可</p>
-<h3 id="2-_直接修改">2. 直接修改</h3><p>另外一种方法相对简单，即直接复制相应的时区文件覆盖当前系统的时区文件</p>
-<pre><code class="bash">[yaxin@ubox:~]$ cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+      <h2>一、修改时区</h2>
+<h3>1. 交互式修改</h3>
+<p>ubuntu提供了一个交互式的选择时区的命令<code>dpkg-reconfigure tzdata</code>，直接在命令行中输入此命令，然后选择自己的时区即可</p>
+<h3>2. 直接修改</h3>
+<p>另外一种方法相对简单，即直接复制相应的时区文件覆盖当前系统的时区文件</p>
+<pre><code class="language-bash">[yaxin@ubox:~]$ cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 [yaxin@ubox:~]$ date
 Tue Nov  4 16:18:55 CST 2014
 </code></pre>
 <p>修改是立即生效的。</p>
-<h2 id="二、修改语系">二、修改语系</h2><p>首先你需要使用<code>locale-gen</code>编译locale定义文件，直接在命令后面指定要编译的locale（可以查看/usr/share/i18n/SUPPORTED来获取locale的格式）</p>
-<pre><code class="bash">[yaxin@ubox:~]$ sudo locale-gen zh_CN.UTF-8 en_US.UTF-8
+<h2>二、修改语系</h2>
+<p>首先你需要使用<code>locale-gen</code>编译locale定义文件，直接在命令后面指定要编译的locale（可以查看/usr/share/i18n/SUPPORTED来获取locale的格式）</p>
+<pre><code class="language-bash">[yaxin@ubox:~]$ sudo locale-gen zh_CN.UTF-8 en_US.UTF-8
 Generating locales...
   en_US.UTF-8... up-to-date
   zh_CN.UTF-8... up-to-date
 Generation complete.
-[yaxin@ubox:~]$ echo &#39;LANG=&quot;en_US.UTF-8&quot;&#39; &gt; /etc/default/locale
+[yaxin@ubox:~]$ echo 'LANG=&quot;en_US.UTF-8&quot;' &gt; /etc/default/locale
 </code></pre>
 <p>语系的修改并不是立即生效的，你需要重启机器才能生效。</p>
 
@@ -112,7 +118,7 @@ Generation complete.
   </div>
   <div class="site-script">
     <script>
-      window.headerBg = 'undefined';
+      window.headerBg = 'http://yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,http://yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
     </script>
     <script src="/assets/app.js"></script>
 <script src="/assets/pace.min.js"></script>

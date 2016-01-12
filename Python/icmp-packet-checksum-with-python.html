@@ -15,6 +15,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
+    <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
+  
   
   <link rel="icon" href="/assets/favicon.ico">
   <link rel="stylesheet" href="/assets/app.css">
@@ -75,9 +77,9 @@
 <p>0009 + 30fd = 3106</p>
 <p>然后对结果（3106）进行c语言的<em>按位求反</em>操作（C语言的按位求反）：</p>
 <p>~3106 =&gt; CEF9</p>
-<p><strong>C语言的<em>按位求反</em>是让操作数的二进制位上的1变为0，0变为1， 而python的<em>按位求反</em>这是将操作数加一然后乘以负一（~5 == -6），两者之所以出现不同就在于操作数是否是unsigned</strong></p>
+<p><em><em>C语言的</em>按位求反</em>是让操作数的二进制位上的1变为0，0变为1， 而python的<em>按位求反</em>这是将操作数加一然后乘以负一（~5 == -6），两者之所以出现不同就在于操作数是否是unsigned**</p>
 <p>附上最后的程序（注意一下如何将python的<em>按位求反</em>转为C语言的<em>按位求反</em>）</p>
-<pre><code class="python">def checksum(data):
+<pre><code class="language-python">def checksum(data):
     length = len(data)
     s = 0
     n = length % 2
@@ -138,7 +140,7 @@
   </div>
   <div class="site-script">
     <script>
-      window.headerBg = 'undefined';
+      window.headerBg = 'http://yaxin-cn.qiniudn.com/@/blog/IMG_1568-low.jpg,http://yaxin-cn.qiniudn.com/@/blog/IMG_0262.jpg';
     </script>
     <script src="/assets/app.js"></script>
 <script src="/assets/pace.min.js"></script>
