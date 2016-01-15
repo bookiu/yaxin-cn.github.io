@@ -7,7 +7,7 @@
     <link>http://yaxin-cn.github.io/</link>
     <atom:link href="/rss.xml" rel="self" type="application/rss+xml"/>
     <description><![CDATA[为梦想添砖加瓦]]></description>
-    <pubDate>Fri, 15 Jan 2016 09:58:24 GMT</pubDate>
+    <pubDate>Fri, 15 Jan 2016 10:00:41 GMT</pubDate>
     <generator>http://hexo.io/</generator>
     
     <item>
@@ -88,7 +88,7 @@ Array
 <p>对比一下，发现不同了吧。nginx少了<code>PATH_INFO</code>，而且<code>PHP_SELF</code>也是不一样的，至于<code>REDIRECT_URL</code>和<code>PATH_TRANSLATED</code>这些变量都是apache自己加的，禅道并不会用到。</p>
 <p>回想一下禅道的配置文件<code>config/config.php</code>和<code>config/my.php</code>中有一项<code>$config-&gt;requestType</code>配置，如果配置为**<code>GET</code><strong>的话，就会禁用伪静态，而通过query string的方式，如果配置成</strong><code>PATH_INFO</code>**的话就需要nginx或apache配置伪静态规则，也就是说禅道通过解析PATH_INFO来实现伪静态的。</p>
 <p>那么PATH_INFO又是什么东东，根据<a href="http://php.net/manual/zh/reserved.variables.server.php" target="_blank" rel="external">PHP官方文档</a>的解释，如果我访问http://www.example.com/php/path_info.php/some/stuff?foo=bar这个url，那个PATH_INFO就应该等于/some/stuff，也就是所<code>PATH_INFO</code>等于url中跟在真实脚本名称之后并且在查询语句（query string）之前的字符串，你可能会说，我访问的url中根本没有filename.php啊，那是因为nginx帮你添加了，记得配置中的<code>try_files $uri /index.php$uri</code>吧，这个内部跳转就是干这个事情的。</p>
-<p>找到了原因就开始解决，Nginx和PHP是通过cgi协议传递数据的，可以通过nginx开启<a href="http://nginx.org/en/docs/debugging_log.html" target="_blank" rel="external">debug</a><a href="http://nginx.org/en/docs/debugging_log.html" target="_blank" rel="external">http://nginx.org/en/docs/debugging_log.html</a>来查看传递nginx和php交换的数据。</p>
+<p>找到了原因就开始解决，Nginx和PHP是通过cgi协议传递数据的，可以通过nginx开启<a href="http://nginx.org/en/docs/debugging_log.html" target="_blank" rel="external">debug</a> (<a href="http://nginx.org/en/docs/debugging_log.html" target="_blank" rel="external">http://nginx.org/en/docs/debugging_log.html</a>)来查看传递nginx和php交换的数据。</p>
 <p>这里不给出详细debug log了，反正开启log后发现nginx并没有传递PATH_INFO给php，于是在解析php的location中添加一行</p>
 <pre><code class="language-nginx">    location ~ \.php$ {
         fastcgi_pass unix:/var/run/php-fpm.sock;
