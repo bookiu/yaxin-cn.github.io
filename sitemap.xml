@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yaxin-cn.github.io/googlee16e317884a67617.html</loc>
+    <lastmod>2016-01-16T07:53:32.512Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://yaxin-cn.github.io/Nginx/configure-static-access-for-zentao-under-nginx.html</loc>
     <lastmod>2016-01-15T10:00:41.211Z</lastmod>
   </url>
@@ -27,11 +32,6 @@
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Linux/manage-startup-program-on-ubuntu-server.html</loc>
-    <lastmod>2015-05-13T09:52:06.326Z</lastmod>
-  </url>
-  
-  <url>
     <loc>http://yaxin-cn.github.io/front-end/make-element-vertical-center-with-css.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
@@ -47,12 +47,12 @@
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Linux/solve-ssh-slow-to-ubuntu.html</loc>
+    <loc>http://yaxin-cn.github.io/Docker/how-to-delete-a-docker-image.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Linux/file-compress-cmd-under-linux.html</loc>
+    <loc>http://yaxin-cn.github.io/Linux/solve-ssh-slow-to-ubuntu.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
@@ -77,17 +77,22 @@
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Docker/how-to-delete-a-docker-image.html</loc>
+    <loc>http://yaxin-cn.github.io/Linux/manage-startup-program-on-ubuntu-server.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
   <url>
-    <loc>http://yaxin-cn.github.io/Linux/check-mac-address-under-linux.html</loc>
-    <lastmod>2015-05-13T09:52:06.322Z</lastmod>
+    <loc>http://yaxin-cn.github.io/Linux/file-compress-cmd-under-linux.html</loc>
+    <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
   <url>
     <loc>http://yaxin-cn.github.io/Linux/change-locale-and-timezone-of-ubuntu.html</loc>
+    <lastmod>2015-05-13T09:52:06.322Z</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://yaxin-cn.github.io/Linux/check-mac-address-under-linux.html</loc>
     <lastmod>2015-05-13T09:52:06.322Z</lastmod>
   </url>
   

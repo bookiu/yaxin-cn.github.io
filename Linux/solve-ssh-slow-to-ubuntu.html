@@ -13,7 +13,6 @@
   
   <title>解决ssh到ubuntu server卡顿 | 馨木</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="google-site-verification" content="Nxw6WRJ-adPqmdMqTscJ63cV-odYhd0QCuIg_MpHeGA">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
@@ -57,25 +56,12 @@
     <div class="post-content">
       <p>ssh到ubuntu14.04卡的要死，google一下无非是修改<strong>sshd_config</strong>文件中的<code>GSSAPIAuthentication</code>和<code>UseDNS</code>选项，但依然无济于事。</p>
 <p>使用<code>-v</code>参数（可以输出ssh详细过程）ssh发现卡顿是发生在输入密码之后的</p>
-<pre><code class="language-bash">yaxin@192.168.1.1's password:
-debug1: Authentication succeeded (password).
-debug1: channel 0: new [client-session]
-debug1: Requesting no-more-sessions@openssh.com
-debug1: Entering interactive session. # 卡一段时间
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yaxin@<span class="number">192.168</span>.<span class="number">1.1</span><span class="string">'s password:</span><br><span class="line">debug1: Authentication succeeded (password).</span><br><span class="line">debug1: channel 0: new [client-session]</span><br><span class="line">debug1: Requesting no-more-sessions@openssh.com</span><br><span class="line">debug1: Entering interactive session. # 卡一段时间</span></span><br></pre></td></tr></table></figure></p>
 <p>这说明进入交互式终端的时候卡了，再来看登录后</p>
-<pre><code class="language-bash">Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
-......
-62 packages can be updated.
-43 updates are security updates.
-
-Last login: Tue Jul  8 20:29:20 2014 from 192.168.1.5
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Welcome to Ubuntu <span class="number">14.04</span> LTS (GNU/Linux <span class="number">3.13</span>.<span class="number">0</span>-<span class="number">24</span>-generic x86_64)</span><br><span class="line">......</span><br><span class="line"><span class="number">62</span> packages can be updated.</span><br><span class="line"><span class="number">43</span> updates are security updates.</span><br><span class="line"></span><br><span class="line">Last login: Tue Jul  <span class="number">8</span> <span class="number">20</span>:<span class="number">29</span>:<span class="number">20</span> <span class="number">2014</span> from <span class="number">192.168</span>.<span class="number">1.5</span></span><br></pre></td></tr></table></figure></p>
 <p>上面的内容在其它版本中为<code>/etc/motd</code>中的内容，但ubuntu是动态生成该内容，生成脚本在<code>/etc/update-motd.d</code>目录下，查看脚本可以是联网检测系统更新等情况。呵呵，如何禁用。</p>
 <p>修改<code>/etc/pam.d/sshd</code>和<code>/etc/pam.d/login</code>文件中的有<strong>pam_motd.so</strong>的行注释掉</p>
-<pre><code class="language-bash">#session    optional     pam_motd.so  motd=/run/motd.dynamic noupdate
-#session    optional     pam_motd.so # [1]
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#session    optional     pam_motd.so  motd=/run/motd.dynamic noupdate</span></span><br><span class="line"><span class="comment">#session    optional     pam_motd.so # [1]</span></span><br></pre></td></tr></table></figure></p>
 <p>再次ssh，这次没有了上面的update等信息了，但ssh也不卡顿了。</p>
 
     </div> <!-- .post-content -->

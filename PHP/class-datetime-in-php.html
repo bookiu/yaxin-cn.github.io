@@ -13,7 +13,6 @@
   
   <title>PHP中的DateTime类 | 馨木</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="google-site-verification" content="Nxw6WRJ-adPqmdMqTscJ63cV-odYhd0QCuIg_MpHeGA">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
@@ -58,26 +57,12 @@
       <p><a href="http://php.net/manual/zh/class.datetime.php" target="_blank" rel="external"><code>DataTime</code></a>类跟<code>date()</code>,<code>strtotime()</code>,<code>gmdate()</code>等函数有相同的作用，都是用来处理日期和时间的，但<code>DateTime</code>类更加直观、方便, 所以在PHP5.2.0以后推荐使用<code>DateTime</code>类而不是相应的函数。</p>
 <p>下面来看一下<code>DateTime</code>类的用法。</p>
 <h2>1. 获取当前系统时间并打印</h2>
-<pre><code class="language-php">&lt;?php
-$date = new DateTime();
-echo $date-&gt;format('Y-m-d H:i:s');
-?&gt;
-</code></pre>
+<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
 <blockquote>
 <p>执行结果为：2014-08-25 12:58:29</p>
 </blockquote>
 <h2>2. 获取特定时间并打印</h2>
-<pre><code class="language-php">&lt;?php
-$date = new DateTime('2014-05-04');
-echo $date-&gt;format('Y-m-d H:i:s');
-echo &quot;\n&quot;;
-$date2 = new DateTime('tomorrow');
-echo $date2-&gt;format('Y-m-d H:i:s');
-echo &quot;\n&quot;;
-$date2 = new DateTime('+2 days');
-echo $date2-&gt;format('Y-m-d H:i:s');
-?&gt;
-</code></pre>
+<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime(<span class="string">'2014-05-04'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="variable">$date2</span> = <span class="keyword">new</span> DateTime(<span class="string">'tomorrow'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date2</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="variable">$date2</span> = <span class="keyword">new</span> DateTime(<span class="string">'+2 days'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date2</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
 <blockquote>
 <p>执行结果为：
 2014-05-04 00:00:00
@@ -85,26 +70,7 @@ echo $date2-&gt;format('Y-m-d H:i:s');
 2014-08-27 13:13:34</p>
 </blockquote>
 <p>或则通过DateTime的其他方法</p>
-<pre><code class="language-php">&lt;?php
-$date = new DateTime();
-// add方法
-$date-&gt;add(new DateInterval('P1D'));
-echo $date-&gt;format('Y-m-d H:i:s');
-echo &quot;\n&quot;;
-// modify方法
-$date-&gt;modify('+1 day');
-echo $date-&gt;format('Y-m-d H:i:s');
-echo &quot;\n&quot;;
-// setDate方法
-$date-&gt;setDate('1989-11-10');
-echo $date-&gt;format('Y-m-d H:i:s');
-echo &quot;\n&quot;;
-// setTime方法
-$date-&gt;setTime('11:10:10');
-echo $date-&gt;format('Y-m-d H:i:s');
-echo &quot;\n&quot;;
-?&gt;
-</code></pre>
+<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="comment">// add方法</span></span><br><span class="line"><span class="variable">$date</span>-&gt;add(<span class="keyword">new</span> DateInterval(<span class="string">'P1D'</span>));</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="comment">// modify方法</span></span><br><span class="line"><span class="variable">$date</span>-&gt;modify(<span class="string">'+1 day'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="comment">// setDate方法</span></span><br><span class="line"><span class="variable">$date</span>-&gt;setDate(<span class="string">'1989-11-10'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="comment">// setTime方法</span></span><br><span class="line"><span class="variable">$date</span>-&gt;setTime(<span class="string">'11:10:10'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
 <blockquote>
 <p>执行结果分别为：
 2014-08-26 15:02:57
@@ -114,61 +80,24 @@ echo &quot;\n&quot;;
 </blockquote>
 <h2>3. unix时间戳的转换</h2>
 <h3>获取当前时间的时间戳</h3>
-<pre><code class="language-php">&lt;?php
-$date = new DateTime();
-echo $date-&gt;format('U');
-echo &quot;\n&quot;;
-?&gt;
-</code></pre>
+<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'U'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
 <blockquote>
 <p>执行结果为：1408950651</p>
 </blockquote>
 <p>或者</p>
-<pre><code class="language-php">&lt;?php
-$date = new DateTime();
-echo $date-&gt;getTimestamp();
-echo &quot;\n&quot;;
-?&gt;
-</code></pre>
+<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;getTimestamp();</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
 <h3>将时间戳转换为可读时间</h3>
-<pre><code class="language-php">&lt;?php
-$date = new DateTime('@1408950651');
-$date-&gt;setTimezone(new DateTimeZone('Asia/Shanghai'));
-echo $date-&gt;format('Y-m-d H:i:s');
-echo &quot;\n&quot;;
-?&gt;
-</code></pre>
+<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime(<span class="string">'@1408950651'</span>);</span><br><span class="line"><span class="variable">$date</span>-&gt;setTimezone(<span class="keyword">new</span> DateTimeZone(<span class="string">'Asia/Shanghai'</span>));</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
 <blockquote>
 <p>执行结果为：2014-08-25 15:10:51</p>
 </blockquote>
 <p>或者</p>
-<pre><code class="language-php">&lt;?php
-$date = new DateTime();
-$date-&gt;setTimestamp(1408950651);
-echo $date-&gt;format('Y-m-d H:i:s');
-echo &quot;\n&quot;;
-?&gt;
-</code></pre>
+<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="variable">$date</span>-&gt;setTimestamp(<span class="number">1408950651</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
 <h2>4. 日期的比较</h2>
 <h3>日期大小比较</h3>
-<pre><code class="language-php">&lt;?php
-$date1 = new DateTime();
-$date2 = new DateTime('2014-09-15');
-
-if($date1 &lt; $date2) {
-    echo $date2-&gt;format('Y-m-d H:i:s') . ' is in the future';
-}
-?&gt;
-</code></pre>
+<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date1</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="variable">$date2</span> = <span class="keyword">new</span> DateTime(<span class="string">'2014-09-15'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="variable">$date1</span> &lt; <span class="variable">$date2</span>) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="variable">$date2</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>) . <span class="string">' is in the future'</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
 <h3>日期间隔</h3>
-<pre><code class="language-php">&lt;?php
-$date1 = new DateTime();
-$date2 = new DateTime('2014-09-15');
-
-$diff = $date1-&gt;diff($date2);
-print_r($diff);
-?&gt;
-</code></pre>
+<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date1</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="variable">$date2</span> = <span class="keyword">new</span> DateTime(<span class="string">'2014-09-15'</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$diff</span> = <span class="variable">$date1</span>-&gt;diff(<span class="variable">$date2</span>);</span><br><span class="line">print_r(<span class="variable">$diff</span>);</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
 <blockquote>
 <p>执行结果为:
 DateInterval Object
@@ -191,14 +120,7 @@ DateInterval Object
 )</p>
 </blockquote>
 <p>将返回的对象格式化输出</p>
-<pre><code class="language-php">&lt;?php
-$date1 = new DateTime();
-$date2 = new DateTime('2014-09-15');
-
-$diff = $date1-&gt;diff($date2);
-echo $diff-&gt;format(&quot;The future will come in %Y years %m months and %d days&quot;);
-?&gt;
-</code></pre>
+<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date1</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="variable">$date2</span> = <span class="keyword">new</span> DateTime(<span class="string">'2014-09-15'</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$diff</span> = <span class="variable">$date1</span>-&gt;diff(<span class="variable">$date2</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$diff</span>-&gt;format(<span class="string">"The future will come in %Y years %m months and %d days"</span>);</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
 <blockquote>
 <p>输出结果为：The future will come in 00 years 0 months and 20 days</p>
 </blockquote>

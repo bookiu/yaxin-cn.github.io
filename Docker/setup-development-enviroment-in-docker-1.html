@@ -13,7 +13,6 @@
   
   <title>Docker中搭建开发环境1 | 馨木</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="google-site-verification" content="Nxw6WRJ-adPqmdMqTscJ63cV-odYhd0QCuIg_MpHeGA">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
@@ -59,32 +58,10 @@
 <p>由于是开发环境，我们首先需要将docker container开启ssh服务，以便随时登录到上面查看修改配置，之后再去搭建真正的开发环境。所以我们可以先创建一个开启了ssh服务的image来作为base image，然后在它的基础之上搭建不通的开发环境。</p>
 <p>创建镜像需要使用到Dockerfile，Dockerfile的具体语法可以到<a href="http://docker-docs.qiniudn.com/reference/builder/" title="Dockerfile文档" target="_blank" rel="external">官网</a>去查看，这里不详细介绍。</p>
 <p>先上<em>Dockerfile</em>内容：</p>
-<pre><code class="language-bash"># sshd
-# VERSION 1.0.0
-
-FROM ubuntu:14.04
-MAINTAINER yaxin &lt;yaxin.me@gmail.com&gt;
-
-# make sure the package repository is up to date
-RUN sed -i &quot;s/archive.ubuntu.com/mirrors.aliyun.com/g&quot; /etc/apt/sources.list
-RUN apt-get update
-RUN apt-get install -y openssh-server
-# Config ssh server
-RUN mkdir -p /var/run/sshd
-RUN sed -i &quot;s/^PermitRootLogin without-password/PermitRootLogin yes/g&quot; /etc/ssh/sshd_config
-RUN sed -i &quot;s/^#GSSAPIAuthentication no/GSSAPIAuthentication no/g&quot; /etc/ssh/sshd_config
-RUN echo &quot;UseDNS no&quot; &gt;&gt; /etc/ssh/sshd_config
-RUN echo 'root:root' | chpasswd
-
-EXPOSE 22
-CMD [&quot;/usr/sbin/sshd&quot;, &quot;-D&quot;]
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># sshd</span></span><br><span class="line"><span class="comment"># VERSION 1.0.0</span></span><br><span class="line"></span><br><span class="line">FROM ubuntu:<span class="number">14.04</span></span><br><span class="line">MAINTAINER yaxin &lt;yaxin.me@gmail.com&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># make sure the package repository is up to date</span></span><br><span class="line">RUN sed -i <span class="string">"s/archive.ubuntu.com/mirrors.aliyun.com/g"</span> /etc/apt/sources.list</span><br><span class="line">RUN apt-get update</span><br><span class="line">RUN apt-get install -y openssh-server</span><br><span class="line"><span class="comment"># Config ssh server</span></span><br><span class="line">RUN mkdir -p /var/run/sshd</span><br><span class="line">RUN sed -i <span class="string">"s/^PermitRootLogin without-password/PermitRootLogin yes/g"</span> /etc/ssh/sshd_config</span><br><span class="line">RUN sed -i <span class="string">"s/^#GSSAPIAuthentication no/GSSAPIAuthentication no/g"</span> /etc/ssh/sshd_config</span><br><span class="line">RUN <span class="built_in">echo</span> <span class="string">"UseDNS no"</span> &gt;&gt; /etc/ssh/sshd_config</span><br><span class="line">RUN <span class="built_in">echo</span> <span class="string">'root:root'</span> | chpasswd</span><br><span class="line"></span><br><span class="line">EXPOSE <span class="number">22</span></span><br><span class="line">CMD [<span class="string">"/usr/sbin/sshd"</span>, <span class="string">"-D"</span>]</span><br></pre></td></tr></table></figure></p>
 <p>新建文件夹并将上面的代码保存为以<strong>Dockerfile</strong>命名的文本文件。</p>
 <p>然后执行</p>
-<pre><code class="language-bash">[yaxin@ubox sshd]$ls
-Dockerfile
-[yaxin@ubox sshd]$docker build -t ubuntu:base .
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox sshd]<span class="variable">$ls</span></span><br><span class="line">Dockerfile</span><br><span class="line">[yaxin@ubox sshd]<span class="variable">$docker</span> build -t ubuntu:base .</span><br></pre></td></tr></table></figure></p>
 <p>来创建镜像。下面来稍微解释一下Dockerfile的内容</p>
 <h3>FROM</h3>
 <p>必须是Dockerfile的第一句，之后的操作都是在这个镜像之上进行的。如果你没有，那要先下载，<code>docker pull ubuntu</code>，如果无法下载，翻墙吧。如果你有国外vps，那么你可以在vps上<code>docker pull ubuntu</code>下载该镜像然后<code>docker save ubuntu:14.04 | bzip2 -9 -c &gt; ubuntu_14.04.tar.bz2</code>，然后下载ubuntu_14.04.tar.bz2到本机，运行<code>bzip2 -d -c &lt; ubuntu_14.04.tar.bz2 | docker load</code>导入镜像，我就是这么干的。</p>
@@ -97,38 +74,11 @@ Dockerfile
 <h3>CMD</h3>
 <p>跟<code>RUN</code>一样，也是执行shell命令，不同的是<code>RUN</code>是在创建镜像的时候执行，而<code>CMD</code>是在每次执行<code>docker run image</code>的时候执行。</p>
 <p>build完镜像后，我们执行<code>docker images</code>会发现多了一个镜像</p>
-<pre><code class="language-bash">[yaxin@ubox sshd]$docker images
-REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
-ubuntu              base                615ea4d4c1e0        2 weeks ago         396.4 MB
-ubuntu              14.04               ad892dd21d60        4 weeks ago         275.5 MB
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox sshd]<span class="variable">$docker</span> images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE</span><br><span class="line">ubuntu              base                <span class="number">615</span>ea4d4c1e0        <span class="number">2</span> weeks ago         <span class="number">396.4</span> MB</span><br><span class="line">ubuntu              <span class="number">14.04</span>               ad892dd21d60        <span class="number">4</span> weeks ago         <span class="number">275.5</span> MB</span><br></pre></td></tr></table></figure></p>
 <p>然后启动镜像</p>
-<pre><code class="language-bash">[yaxin@ubox sshd]$docker run -d -P --name=&quot;sshd&quot; ubuntu:base
-c2518b7cf9289567c258171e93462bdb7fffe873bf2251d7086cd97e03e3ee57
-[yaxin@ubox sshd]$docker ps
-CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                   NAMES
-c2518b7cf928        ubuntu:base         /usr/sbin/sshd -D      4 seconds ago       Up 3 seconds        0.0.0.0:49153-&gt;22/tcp   sshd
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox sshd]<span class="variable">$docker</span> run <span class="operator">-d</span> -P --name=<span class="string">"sshd"</span> ubuntu:base</span><br><span class="line">c2518b7cf9289567c258171e93462bdb7fffe873bf2251d7086<span class="built_in">cd</span>97e03e3ee57</span><br><span class="line">[yaxin@ubox sshd]<span class="variable">$docker</span> ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                   NAMES</span><br><span class="line">c2518b7cf928        ubuntu:base         /usr/sbin/sshd -D      <span class="number">4</span> seconds ago       Up <span class="number">3</span> seconds        <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">49153</span>-&gt;<span class="number">22</span>/tcp   sshd</span><br></pre></td></tr></table></figure></p>
 <p>然后ssh 49153端口</p>
-<pre><code class="language-bash">[yaxin@ubox sshd]$ssh root@localhost -p 49153
-The authenticity of host '[localhost]:49153 ([::1]:49153)' can't be established.
-ECDSA key fingerprint is c4:a5:26:07:8b:72:97:40:f2:42:fa:35:9a:7c:d0:79.
-Are you sure you want to continue connecting (yes/no)? yes
-Warning: Permanently added '[localhost]:49153' (ECDSA) to the list of known hosts.
-root@localhost's password: 
-Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.2.0-58-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com/
-
-The programs included with the Ubuntu system are free software;
-the exact distribution terms for each program are described in the
-individual files in /usr/share/doc/*/copyright.
-
-Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
-applicable law.
-
-root@c2518b7cf928:~# 
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox sshd]<span class="variable">$ssh</span> root@localhost -p <span class="number">49153</span></span><br><span class="line">The authenticity of host <span class="string">'[localhost]:49153 ([::1]:49153)'</span> can<span class="string">'t be established.</span><br><span class="line">ECDSA key fingerprint is c4:a5:26:07:8b:72:97:40:f2:42:fa:35:9a:7c:d0:79.</span><br><span class="line">Are you sure you want to continue connecting (yes/no)? yes</span><br><span class="line">Warning: Permanently added '</span>[localhost]:<span class="number">49153</span><span class="string">' (ECDSA) to the list of known hosts.</span><br><span class="line">root@localhost'</span>s password: </span><br><span class="line">Welcome to Ubuntu <span class="number">14.04</span> LTS (GNU/Linux <span class="number">3.2</span>.<span class="number">0</span>-<span class="number">58</span>-generic x86_64)</span><br><span class="line"></span><br><span class="line"> * Documentation:  https://help.ubuntu.com/</span><br><span class="line"></span><br><span class="line">The programs included with the Ubuntu system are free software;</span><br><span class="line">the exact distribution terms <span class="keyword">for</span> each program are described <span class="keyword">in</span> the</span><br><span class="line">individual files <span class="keyword">in</span> /usr/share/doc/*/copyright.</span><br><span class="line"></span><br><span class="line">Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by</span><br><span class="line">applicable law.</span><br><span class="line"></span><br><span class="line">root@c2518b7cf928:~<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
 <p>自此，一个装有ssh服务的可以运行的base image就创建成功了。</p>
 
     </div> <!-- .post-content -->
