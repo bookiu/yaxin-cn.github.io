@@ -55,7 +55,11 @@
   <div class="section-box">
     <div class="post-content">
       <p>在Python中数值和字符串对象是不可以改变的，但对于新手的我们很难理解，于是乎会有下面的代码:</p>
-<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">x = <span class="string">'Hello World'</span></span><br><span class="line"><span class="keyword">print</span> x</span><br><span class="line">x = <span class="string">'Hello Hello'</span></span><br><span class="line"><span class="keyword">print</span> x</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">x = 'Hello World'
+print x
+x = 'Hello Hello'
+print x
+</code></pre>
 <p>上面的代码明显的说明了变量<code>x</code>是可以改变的。其实变量<code>x</code>的改变伴随着<code>x</code>内存地址的变化，也就是说系统重新创建了一个名为<strong>x</strong>的变量用于保存新字符串。想要证明这个需要用到Python的<code>id</code>函数。</p>
 <p>id函数返回一个数字，这个数字跟该对象的分配内存地址密切相关。也可以近似认为这个数值就是该对象（变量）的所在内存地址。</p>
 <blockquote>
@@ -67,7 +71,15 @@ id(object) -&gt; integer</p>
 simultaneously existing objects.  (Hint: it's the object's memory address.)</p>
 </blockquote>
 <p>现在再来看下面的代码：</p>
-<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">x = <span class="string">'Hello World'</span></span><br><span class="line"><span class="keyword">print</span> id(x)</span><br><span class="line">x = <span class="string">'Hello Hello'</span></span><br><span class="line"><span class="keyword">print</span> id(x)</span><br><span class="line">y = [<span class="string">'a'</span>, <span class="string">'b'</span>]</span><br><span class="line"><span class="keyword">print</span> id(y)</span><br><span class="line">y.append(<span class="string">'c'</span>)</span><br><span class="line"><span class="keyword">print</span> id(y)</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">x = 'Hello World'
+print id(x)
+x = 'Hello Hello'
+print id(x)
+y = ['a', 'b']
+print id(y)
+y.append('c')
+print id(y)
+</code></pre>
 <p>你运行结果如下：</p>
 <blockquote>
 <p>21908576

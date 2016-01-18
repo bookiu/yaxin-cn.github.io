@@ -70,29 +70,109 @@
     <div class="entry-content" itemprop="description">
         <p>搭建了一个禅道的项目管理平台，但是Nginx下并不是伪静态的，URL看着不是很舒服，上网搜索配置规则，但是没有一个可以正常使用的，于是乎自己琢磨一下。</p>
 <p>先给出最终配置，有兴趣看原因的可以往下看</p>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">server &#123;&#10;    listen 80;&#10;    root /zentao/root/path/www;&#10;    index index.php index.html index.htm;&#10;    server_name domain_name;&#10;&#10;    location / &#123;&#10;        try_files $uri /index.php$uri;&#10;    &#125;&#10;&#10;    location ~ \.php(/.+)?$ &#123;&#10;        fastcgi_pass unix:/var/run/php-fpm.sock;&#10;        fastcgi_index index.php;&#10;        include fastcgi.conf;&#10;        fastcgi_split_path_info ^(.+\.php)(/.+)$;&#10;        fastcgi_param PATH_INFO $fastcgi_path_info;&#10;    &#125;&#10;    access_log off;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-conf">server {
+    listen 80;
+    root /zentao/root/path/www;
+    index index.php index.html index.htm;
+    server_name domain_name;
+
+    location / {
+        try_files $uri /index.php$uri;
+    }
+
+    location ~ \.php(/.+)?$ {
+        fastcgi_pass unix:/var/run/php-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+    access_log off;
+}
+</code></pre>
 <p>禅道给出了apache的伪静态规则，但是我尝试了半天也没有转换成可用的nginx伪静态规则，但是禅道是基于PHP的，而PHP伪静态一般基于<code>$_SERVER</code>变量中的一些变量来实现的，既然apache可以实现伪静态，那么就打印一下伪静态后的<code>$_SERVER</code>变量的值。</p>
 <p>修改禅道根目录下<code>www/index.php</code>文件，在最上面修改为如下代码:</p>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;pre&gt;"</span>;</span><br><span class="line">    print_r(<span class="variable">$_SERVER</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;/pre&gt;"</span>;</span><br><span class="line">    <span class="keyword">die</span>;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">&lt;?php
+    echo &quot;&lt;pre&gt;&quot;;
+    print_r($_SERVER);
+    echo &quot;&lt;/pre&gt;&quot;;
+    die;
+</code></pre>
 <p>然后访问http://domain/user-login-Lw==.html (此为禅道登陆url)</p>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 仅给出几个重要的变量</span></span><br><span class="line"><span class="keyword">Array</span></span><br><span class="line">(</span><br><span class="line">    [REDIRECT_URL] =&gt; /user-login-Lw==.html</span><br><span class="line">    [REQUEST_URI] =&gt; /user-login-Lw==.html</span><br><span class="line">    [SCRIPT_NAME] =&gt; /index.php</span><br><span class="line">    [PATH_INFO] =&gt; /user-login-Lw==.html</span><br><span class="line">    [PATH_TRANSLATED] =&gt; redirect:/index.php/user-login-Lw==.html</span><br><span class="line">    [PHP_SELF] =&gt; /index.php/user-login-Lw==.html</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">// 仅给出几个重要的变量
+Array
+(
+    [REDIRECT_URL] =&gt; /user-login-Lw==.html
+    [REQUEST_URI] =&gt; /user-login-Lw==.html
+    [SCRIPT_NAME] =&gt; /index.php
+    [PATH_INFO] =&gt; /user-login-Lw==.html
+    [PATH_TRANSLATED] =&gt; redirect:/index.php/user-login-Lw==.html
+    [PHP_SELF] =&gt; /index.php/user-login-Lw==.html
+)
+</code></pre>
 <p>对于未配置过的nginx做相同的操作:</p>
 <p><strong>未配置的nginx并不是什么都没配置，基本的还是要配置的</strong></p>
-<p><figure class="highlight nginx"><table><tr><td class="code"><pre><span class="line"><span class="title">location</span> / &#123;</span><br><span class="line">    <span class="title">try_files</span> <span class="variable">$uri</span> /index.php;</span><br><span class="line">&#125;</span><br><span class="line"><span class="title">location</span> <span class="regexp">~ \.php$</span> &#123;</span><br><span class="line">    <span class="comment"># With php5-fpm:</span></span><br><span class="line">    <span class="title">fastcgi_pass</span> <span class="url">unix:/var/run/php-fpm.sock</span>;</span><br><span class="line">    <span class="title">fastcgi_index</span> index.php;</span><br><span class="line">    <span class="title">include</span> fastcgi.conf;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-nginx">    location / {
+        try_files $uri /index.php;
+    }
+    location ~ \.php$ {
+        # With php5-fpm:
+        fastcgi_pass unix:/var/run/php-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+    }
+</code></pre>
 <p>如上，这两个location还是要有的，一个是将所有的请求重定向到<code>index.php</code>，一个是解析php文件的.</p>
 <p>这次，php返回的信息为</p>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 仅给出几个重要的变量</span></span><br><span class="line"><span class="keyword">Array</span></span><br><span class="line">(</span><br><span class="line">    [SCRIPT_NAME] =&gt; /index.php</span><br><span class="line">    [REQUEST_URI] =&gt; /user-login-Lw==.html</span><br><span class="line">    [DOCUMENT_URI] =&gt; /index.php</span><br><span class="line">    [PHP_SELF] =&gt; /index.php</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">// 仅给出几个重要的变量
+Array
+(
+    [SCRIPT_NAME] =&gt; /index.php
+    [REQUEST_URI] =&gt; /user-login-Lw==.html
+    [DOCUMENT_URI] =&gt; /index.php
+    [PHP_SELF] =&gt; /index.php
+)
+</code></pre>
 <p>对比一下，发现不同了吧。nginx少了<code>PATH_INFO</code>，而且<code>PHP_SELF</code>也是不一样的，至于<code>REDIRECT_URL</code>和<code>PATH_TRANSLATED</code>这些变量都是apache自己加的，禅道并不会用到。</p>
 <p>回想一下禅道的配置文件<code>config/config.php</code>和<code>config/my.php</code>中有一项<code>$config-&gt;requestType</code>配置，如果配置为**<code>GET</code><strong>的话，就会禁用伪静态，而通过query string的方式，如果配置成</strong><code>PATH_INFO</code>**的话就需要nginx或apache配置伪静态规则，也就是说禅道通过解析PATH_INFO来实现伪静态的。</p>
 <p>那么PATH_INFO又是什么东东，根据<a href="http://php.net/manual/zh/reserved.variables.server.php" target="_blank" rel="external">PHP官方文档</a>的解释，如果我访问http://www.example.com/php/path_info.php/some/stuff?foo=bar这个url，那个PATH_INFO就应该等于/some/stuff，也就是所<code>PATH_INFO</code>等于url中跟在真实脚本名称之后并且在查询语句（query string）之前的字符串，你可能会说，我访问的url中根本没有filename.php啊，那是因为nginx帮你添加了，记得配置中的<code>try_files $uri /index.php$uri</code>吧，这个内部跳转就是干这个事情的。</p>
 <p>找到了原因就开始解决，Nginx和PHP是通过cgi协议传递数据的，可以通过nginx开启<a href="http://nginx.org/en/docs/debugging_log.html" target="_blank" rel="external">debug</a> (<a href="http://nginx.org/en/docs/debugging_log.html" target="_blank" rel="external">http://nginx.org/en/docs/debugging_log.html</a>)来查看传递nginx和php交换的数据。</p>
 <p>这里不给出详细debug log了，反正开启log后发现nginx并没有传递PATH_INFO给php，于是在解析php的location中添加一行</p>
-<p><figure class="highlight nginx"><table><tr><td class="code"><pre><span class="line"><span class="title">location</span> <span class="regexp">~ \.php$</span> &#123;</span><br><span class="line">    <span class="title">fastcgi_pass</span> <span class="url">unix:/var/run/php-fpm.sock</span>;</span><br><span class="line">    <span class="title">fastcgi_index</span> index.php;</span><br><span class="line">    <span class="title">include</span> fastcgi.conf;</span><br><span class="line">    <span class="title">fastcgi_split_path_info</span><span class="regexp"> ^(.+\.php)(/.+)$</span>;</span><br><span class="line">    <span class="title">fastcgi_param</span> PATH_INFO <span class="variable">$fastcgi_path_info</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-nginx">    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+</code></pre>
 <p>但只有这个还是不行，因为此时nginx内部变量<code>$uri</code>(就相当于PHP_SELF的值)还是*/index.php*，需要再修改一个地方</p>
-<p><figure class="highlight nginx"><table><tr><td class="code"><pre><span class="line"><span class="title">location</span> / &#123;</span><br><span class="line">    <span class="title">try_files</span> <span class="variable">$uri</span> /index.php;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-nginx">    location / {
+        try_files $uri /index.php;
+    }
+</code></pre>
 <p>修改之后php那个location就没办法被识别了，需要修改为<code>\.php(/.+)?$</code></p>
 <p>最终的效果就是</p>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">server &#123;&#10;    listen 80;&#10;    root /zentao/root/path/www;&#10;    index index.php index.html index.htm;&#10;    server_name domain_name;&#10;&#10;    location / &#123;&#10;        try_files $uri /index.php$uri;&#10;    &#125;&#10;&#10;    location ~ \.php(/.+)?$ &#123;&#10;        fastcgi_pass unix:/var/run/php-fpm.sock;&#10;        fastcgi_index index.php;&#10;        include fastcgi.conf;&#10;        fastcgi_split_path_info ^(.+\.php)(/.+)$;&#10;        fastcgi_param PATH_INFO $fastcgi_path_info;&#10;    &#125;&#10;    access_log off;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-conf">server {
+    listen 80;
+    root /zentao/root/path/www;
+    index index.php index.html index.htm;
+    server_name domain_name;
+
+    location / {
+        try_files $uri /index.php$uri;
+    }
+
+    location ~ \.php(/.+)?$ {
+        fastcgi_pass unix:/var/run/php-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+    access_log off;
+}
+</code></pre>
 
     </div> <!-- .entry-content -->
   </article>
@@ -116,11 +196,33 @@
         <p>系统自带的python有点老（2.6）于是下载python2.7.8的源码手动编译安装(编译参数<code>./configure --enable-shared --disable-ipv6 --prefix=/usr/local/python27 --enable-unicode=ucs4</code>)</p>
 <p>安装后将系统的python替换(<code>ln -svf /usr/local/python27/bin/* /usr/bin/</code>), 安装<a href="https://bootstrap.pypa.io/ez_setup.py" target="_blank" rel="external">easy_install</a>和pip(<code>easy_install pip</code>), 之后开始安装<em>pyopenssl</em>, 但是在安装依赖<em>cffi</em>的时候报错**/usr/bin/ld: cannot find -lpython2.7**.</p>
 <p>首先需要说明的是出现类似**/usr/bin/ld: cannot find -lxx**的原因主要是gcc没有找到libxx.so的文件</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@ubox ~]<span class="comment"># echo '/usr/local/python27/lib' &gt; /etc/ld.so.conf.d/python-2.7.8.conf</span></span><br><span class="line">[root@ubox ~]<span class="comment"># ldconfig -v</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[root@ubox ~]# echo '/usr/local/python27/lib' &gt; /etc/ld.so.conf.d/python-2.7.8.conf
+[root@ubox ~]# ldconfig -v
+</code></pre>
 <p><code>ldconfig</code>命令为重建动态链接库的缓存.然后重新执行<code>pip install cffi</code>, 但是还是报错, 使用<code>gcc -lpython2.7 --verbose</code>查看gcc查找库的路径</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@ubox lib]<span class="comment"># gcc -lpython2.7 --verbose</span></span><br><span class="line">Using built-in specs.</span><br><span class="line">Target: x86_64-redhat-linux</span><br><span class="line">Configured with: ../configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-languages=c,c++,objc,obj-c++,java,fortran,ada --enable-java-awt=gtk --disable-dssi --with-java-home=/usr/lib/jvm/java-<span class="number">1.5</span>.<span class="number">0</span>-gcj-<span class="number">1.5</span>.<span class="number">0.0</span>/jre --enable-libgcj-multifile --enable-java-maintainer-mode --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --disable-libjava-multilib --with-ppl --with-cloog --with-tune=generic --with-arch_32=i686 --build=x86_64-redhat-linux</span><br><span class="line">Thread model: posix</span><br><span class="line">gcc version <span class="number">4.4</span>.<span class="number">7</span> <span class="number">20120313</span> (Red Hat <span class="number">4.4</span>.<span class="number">7</span>-<span class="number">16</span>) (GCC)</span><br><span class="line">COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/:/usr/libexec/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/:/usr/lib/gcc/x86_64-redhat-linux/:/usr/libexec/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/:/usr/lib/gcc/x86_64-redhat-linux/</span><br><span class="line">LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/:/usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/:/usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/../../../:/lib/:/usr/lib/</span><br><span class="line">COLLECT_GCC_OPTIONS=<span class="string">'-v'</span> <span class="string">'-mtune=generic'</span></span><br><span class="line"> /usr/libexec/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/collect2 --eh-frame-hdr --build-id -m elf_x86_64 --hash-style=gnu -dynamic-linker /lib64/ld-linux-x86-<span class="number">64</span>.so.<span class="number">2</span> /usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span> -L/usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span> -L/usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/../../.. -lpython2.<span class="number">7</span> -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/crtend.o /usr/lib/gcc/x86_64-redhat-linux/<span class="number">4.4</span>.<span class="number">7</span>/../../../../lib64/crtn.o</span><br><span class="line">/usr/bin/ld: cannot find -lpython2.<span class="number">7</span></span><br><span class="line">collect2: ld returned <span class="number">1</span> <span class="built_in">exit</span> status</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[root@ubox lib]# gcc -lpython2.7 --verbose
+Using built-in specs.
+Target: x86_64-redhat-linux
+Configured with: ../configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-languages=c,c++,objc,obj-c++,java,fortran,ada --enable-java-awt=gtk --disable-dssi --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre --enable-libgcj-multifile --enable-java-maintainer-mode --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --disable-libjava-multilib --with-ppl --with-cloog --with-tune=generic --with-arch_32=i686 --build=x86_64-redhat-linux
+Thread model: posix
+gcc version 4.4.7 20120313 (Red Hat 4.4.7-16) (GCC)
+COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-mtune=generic'
+ /usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2 --eh-frame-hdr --build-id -m elf_x86_64 --hash-style=gnu -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../.. -lpython2.7 -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtend.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crtn.o
+/usr/bin/ld: cannot find -lpython2.7
+collect2: ld returned 1 exit status
+</code></pre>
 <p>可以看到**/usr/local/python27/lib**并不在上面的路径, google一下找到了这个答案<a href="http://stackoverflow.com/questions/8400272/usr-bin-ld-cannot-find-lpython2-7" target="_blank" rel="external">http://stackoverflow.com/questions/8400272/usr-bin-ld-cannot-find-lpython2-7</a>, 然后</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@micaopan-dev lib]<span class="comment"># locate libpython2.7.a</span></span><br><span class="line">/usr/<span class="built_in">local</span>/python27/lib/python2.<span class="number">7</span>/config/libpython2.<span class="number">7</span>.a</span><br><span class="line">/usr/<span class="built_in">local</span>/src/Python-<span class="number">2.7</span>.<span class="number">8</span>/libpython2.<span class="number">7</span>.a</span><br><span class="line">[root@micaopan-dev lib]<span class="comment"># ln -s /usr/local/python27/lib/python2.7/config/libpython2.7.a /usr/lib</span></span><br><span class="line">[root@micaopan-dev lib]<span class="comment"># gcc -lpython2.7 --verbose</span></span><br><span class="line">...</span><br><span class="line">(.text+<span class="number">0</span>x20): undefined reference to <span class="string">'main'</span></span><br><span class="line">collect2: ld returned <span class="number">1</span> <span class="built_in">exit</span> status</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[root@micaopan-dev lib]# locate libpython2.7.a
+/usr/local/python27/lib/python2.7/config/libpython2.7.a
+/usr/local/src/Python-2.7.8/libpython2.7.a
+[root@micaopan-dev lib]# ln -s /usr/local/python27/lib/python2.7/config/libpython2.7.a /usr/lib
+[root@micaopan-dev lib]# gcc -lpython2.7 --verbose
+...
+(.text+0x20): undefined reference to 'main'
+collect2: ld returned 1 exit status
+</code></pre>
 <p>这个gcc找到了动态链接库, 报错根据<a href="http://stackoverflow.com/questions/15905119/c-linking-error-undefined-reference-to-main" target="_blank" rel="external">http://stackoverflow.com/questions/15905119/c-linking-error-undefined-reference-to-main</a>应该并没有什么大碍</p>
 <p>然后执行<code>pip install cffi</code>成功.</p>
 <p>PS: 参考</p>
@@ -152,14 +254,26 @@
     <div class="entry-content" itemprop="description">
         <h2>添加</h2>
 <p>Ubuntu下添加根证书非常简单, 只要将证书(扩展名为crt)复制到**/usr/local/share/ca-certificates**文件夹然后运行<code>update-ca-certificates</code>即可</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$sudo</span> cp xinmu.crt /usr/<span class="built_in">local</span>/share/ca-certificates</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$sudo</span> update-ca-certificates</span><br><span class="line">Updating certificates <span class="keyword">in</span> /etc/ssl/certs... <span class="number">1</span> added, <span class="number">0</span> removed; done.</span><br><span class="line">Running hooks <span class="keyword">in</span> /etc/ca-certificates/update.d....done.</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox ~]$sudo cp xinmu.crt /usr/local/share/ca-certificates
+[yaxin@ubox ~]$sudo update-ca-certificates
+Updating certificates in /etc/ssl/certs... 1 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d....done.
+</code></pre>
 <h2>删除</h2>
 <p>直接将**/usr/local/share/ca-certificates**对应的证书删除，然后执行<code>update-ca-certificates</code></p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$sudo</span> rm <span class="operator">-f</span> /usr/<span class="built_in">local</span>/share/ca-certificates/xinmu.crt</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$sudo</span> update-ca-certificates</span><br><span class="line">Updating certificates <span class="keyword">in</span> /etc/ssl/certs... <span class="number">0</span> added, <span class="number">0</span> removed; done.</span><br><span class="line">Running hooks <span class="keyword">in</span> /etc/ca-certificates/update.d....done.</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox ~]$sudo rm -f /usr/local/share/ca-certificates/xinmu.crt
+[yaxin@ubox ~]$sudo update-ca-certificates
+Updating certificates in /etc/ssl/certs... 0 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d....done.
+</code></pre>
 <p><strong>注意: 这时候并不会提示1 removed, 但证书是已经被删除了的</strong></p>
 <h2>原理</h2>
 <p>其实<code>update-ca-certificates</code>是一个shell脚本, 使用<code>which</code>找出<code>update-ca-certificates</code>的绝对路径，然后打开就可以查看其源码</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$which</span> update-ca-certificates</span><br><span class="line">/usr/sbin/update-ca-certificates</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$file</span> /usr/sbin/update-ca-certificates</span><br><span class="line">/usr/sbin/update-ca-certificates: POSIX shell script, ASCII text executable</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox ~]$which update-ca-certificates
+/usr/sbin/update-ca-certificates
+[yaxin@ubox ~]$file /usr/sbin/update-ca-certificates
+/usr/sbin/update-ca-certificates: POSIX shell script, ASCII text executable
+</code></pre>
 <p>通过阅读源码可以看出, <code>update-ca-certificates</code>命令的本质其实是将PEM格式的根证书内容附加到*/etc/ssl/certs/ca-certificates.crt*, 而*/etc/ssl/certs/ca-certificates.crt*中本身就包含了系统自带的各种可信根证书.</p>
 
     </div> <!-- .entry-content -->
@@ -184,30 +298,51 @@
         <p>本文所使用的环境为ubuntu14.04，ubuntu15.04使用systemd，可能会有很大的不同</p>
 <h2>方法一</h2>
 <p>使用类图形的<code>sysv-rc-conf</code>命令，你需要首先安装<code>sysv-rc-conf</code></p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@~]<span class="variable">$sudo</span> apt-get install sysv-rc-conf</span><br><span class="line">[yaxin@~]<span class="variable">$sudo</span> sysv-rc-conf</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@~]$sudo apt-get install sysv-rc-conf
+[yaxin@~]$sudo sysv-rc-conf
+</code></pre>
 <p>运行之后会有一个类图形的界面, 这个操作起来相当简单, 也容易懂，这里就不多介绍</p>
 <h2>方法二</h2>
 <p>首先使用<code>runlevel</code>命令获取系统运行在哪个<strong>level</strong>下（ubuntu server一般是2），如下：</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@~]<span class="variable">$runlevel</span></span><br><span class="line">N <span class="number">2</span></span><br><span class="line">[yaxin@~]$</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@~]$runlevel
+N 2
+[yaxin@~]$
+</code></pre>
 <p>然后将启动脚本放到<code>/etc/rcX.d</code> 其中X为运行级别，如<code>/etc/rc2.d</code>, 注意脚本要以大写<strong>S</strong>开头, 后面接一个两位数的数字，表示启动顺序，数字越小表示越先启动</p>
 <p>一般<code>/etc/rc2.d</code>中会有很多软链接到<code>/etc/init.d</code>下的启动脚本, 这样的好处是集中管理，很方便, 并且可以使用<code>service</code>这个程序对进程进行重启等操作.</p>
 <p>如，编译安装完php后，将<code>sapi/fpm</code>文件夹下的<code>init.d.php-fpm</code>文件复制到<code>/etc/init.d</code>文件夹下，然后在<code>/etc/rc2.d</code>下创建一个软链接</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@php-<span class="number">5.6</span>.<span class="number">8</span>]<span class="variable">$sudo</span> cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm</span><br><span class="line">[yaxin@php-<span class="number">5.6</span>.<span class="number">8</span>]<span class="variable">$sudo</span> chmod +x /etc/init.d/php-fpm</span><br><span class="line">[yaxin@php-<span class="number">5.6</span>.<span class="number">8</span>]<span class="variable">$sudo</span> ln <span class="operator">-s</span> /etc/init.d/php-fpm /etc/rc2.d/S20php-fpm</span><br><span class="line">[yaxin@php-<span class="number">5.6</span>.<span class="number">8</span>]<span class="variable">$service</span> php-fpm start</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@php-5.6.8]$sudo cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+[yaxin@php-5.6.8]$sudo chmod +x /etc/init.d/php-fpm
+[yaxin@php-5.6.8]$sudo ln -s /etc/init.d/php-fpm /etc/rc2.d/S20php-fpm
+[yaxin@php-5.6.8]$service php-fpm start
+</code></pre>
 <p>当然，如果你想关闭一个自启的程序，直接将对应的<code>/etc/rcX.d</code>下的启动脚本删除即可</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@~]<span class="variable">$sudo</span> rm /etc/rc2.d/S20php-fpm</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@~]$sudo rm /etc/rc2.d/S20php-fpm
+</code></pre>
 <p>或则</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@~]<span class="variable">$sudo</span> unlink /etc/rc2.d/S20php-fpm</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@~]$sudo unlink /etc/rc2.d/S20php-fpm
+</code></pre>
 <p><strong>注意</strong>: <code>sysv-rc-conf</code>命令就是使用这个方法来实现程序自启和禁止自启的.</p>
 <h2>方法三</h2>
 <p>直接将需要启动的程序添加到<code>/etc/rc.local</code>文件中</p>
 <p>如你需要开机启动nginx，那么可以这样</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@~]<span class="variable">$echo</span> <span class="string">"/etc/nginx/sbin/nginx"</span> &gt;&gt; /etc/rc.local</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[root@~]$echo &quot;/etc/nginx/sbin/nginx&quot; &gt;&gt; /etc/rc.local
+</code></pre>
 <p>其实这个就是方法二的快捷操作，如果你查看<code>/etc/rc2.d</code>文件夹下面的文件会发现有一个<code>S99rc.local</code>的软链接，它链接到<code>/etc/init.d/rc.local</code>, 而<code>/etc/init.d/rc.local</code>这个脚本中又会执行<code>/etc/rc.local</code>这个脚本</p>
 <h3>方法四</h3>
 <p>其实前几种方式并不是正统的自启管理方式, 使用<code>rcX.d</code>是<strong>传统init</strong>的方式, 而ubuntu14.04是使用<strong>Upstart</strong>来初始化守护进程, 但为了照顾使用从<strong>init</strong>过来(如centos6等)的人才创建的. 而真正的启动脚本(应该说配置)是放在<code>/etc/init</code>这个文件夹下的</p>
 <p><code>/etc/init</code>文件夹下有很多的以**.conf**结尾的文件，这些就是正统的管理自启程序的配置文件.</p>
 <p>随便打开一个文件, 有一行<strong>start on runlevel [234]</strong>, 这就说明在runlevel为234的情况下启动</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@/etc/init]<span class="variable">$head</span> ssh.conf</span><br><span class="line"><span class="comment"># ssh - OpenBSD Secure Shell server</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># The OpenSSH server provides secure shell access to the system.</span></span><br><span class="line"></span><br><span class="line">description <span class="string">"OpenSSH server"</span></span><br><span class="line"></span><br><span class="line">start on runlevel [<span class="number">2345</span>]</span><br><span class="line">stop on runlevel [!<span class="number">2345</span>]</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@/etc/init]$head ssh.conf
+# ssh - OpenBSD Secure Shell server
+#
+# The OpenSSH server provides secure shell access to the system.
+
+description &quot;OpenSSH server&quot;
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+</code></pre>
 <p>如上，ssh将在runlevel为2 3 4 5的时候开机启动, 而启动的具体命令在配置文件后面.</p>
 <p>当然，如果你想关闭自启，那么删除但钱runlevel即可，或则直接删除该配置文件.</p>
 <p>所以，如果你有一个开机自启的程序，当你使用前面的方法删除以后，程序还是自启，那么问题肯定出在这一步.</p>
@@ -234,7 +369,32 @@
         <p>Python类中有两个特殊的修饰符@classmethod和@staticmethod(即类方法和静态方法), 想要理解需要先理解类属性和实例属性的感念</p>
 <h2>类属性和实例属性</h2>
 <p>看下面的代码</p>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; class TestProperty(object):</span><br><span class="line">...     class_property = "class property"</span><br><span class="line">...     </span><br><span class="line">...     def __init__(self):</span><br><span class="line">...         self.instance_property = "instance property"</span><br><span class="line">&gt;&gt;&gt; </span><br><span class="line">&gt;&gt;&gt; test_property = TestProperty()</span><br><span class="line">&gt;&gt;&gt; # 实例可以访问实例属性和类属性</span><br><span class="line">&gt;&gt;&gt; print test_property.class_property</span><br><span class="line">class property</span><br><span class="line">&gt;&gt;&gt; print test_property.instance_property</span><br><span class="line">instance property</span><br><span class="line">&gt;&gt;&gt; # 类可以访问类属性</span><br><span class="line">&gt;&gt;&gt; print TestProperty.class_property</span><br><span class="line">class property</span><br><span class="line">&gt;&gt;&gt; # 但不可以访问实例属性</span><br><span class="line">&gt;&gt;&gt; print TestProperty.instance_property</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File "&lt;stdin&gt;", line 1, in &lt;module&gt;</span><br><span class="line">AttributeError: type object 'TestProperty' has no attribute 'instance_property'</span><br><span class="line">&gt;&gt;&gt; # 注意下面的报错</span><br><span class="line">&gt;&gt;&gt; del test_property.class_property</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File "&lt;stdin&gt;", line 1, in &lt;module&gt;</span><br><span class="line">AttributeError: class_property</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">&gt;&gt;&gt; class TestProperty(object):
+...     class_property = &quot;class property&quot;
+...     
+...     def __init__(self):
+...         self.instance_property = &quot;instance property&quot;
+&gt;&gt;&gt; 
+&gt;&gt;&gt; test_property = TestProperty()
+&gt;&gt;&gt; # 实例可以访问实例属性和类属性
+&gt;&gt;&gt; print test_property.class_property
+class property
+&gt;&gt;&gt; print test_property.instance_property
+instance property
+&gt;&gt;&gt; # 类可以访问类属性
+&gt;&gt;&gt; print TestProperty.class_property
+class property
+&gt;&gt;&gt; # 但不可以访问实例属性
+&gt;&gt;&gt; print TestProperty.instance_property
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+AttributeError: type object 'TestProperty' has no attribute 'instance_property'
+&gt;&gt;&gt; # 注意下面的报错
+&gt;&gt;&gt; del test_property.class_property
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+AttributeError: class_property
+</code></pre>
 <p>总结起来就是:</p>
 <ol>
 <li><strong>实例属性</strong>的初始化在<code>__init__</code>构造器方法中进行(当然也可以通过其它方法赋值)</li>
@@ -245,16 +405,86 @@
 <li>为什么要有类属性, 一句话<strong>命名空间</strong></li>
 </ol>
 <h2>类方法和静态方法</h2>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; class TestMethod(object):</span><br><span class="line">...     class_property = "class property"</span><br><span class="line">...     def __init__(self):</span><br><span class="line">...         self.instance_property = "instance property"</span><br><span class="line">...     def instance_method(self, arvg):</span><br><span class="line">...         print "instance_method(%s, %s)" % (self, arvg)</span><br><span class="line">...         print "instance property: ", self.instance_property</span><br><span class="line">...     @classmethod</span><br><span class="line">...     def class_method(cls, arvg):</span><br><span class="line">...         print "class_method(%s, %s)" % (cls, arvg)</span><br><span class="line">...         print "class property: ", cls.class_property</span><br><span class="line">...     @staticmethod</span><br><span class="line">...     def static_method(arvg):</span><br><span class="line">...         print "static_method(%s)" % arvg</span><br><span class="line">... </span><br><span class="line">&gt;&gt;&gt;</span><br><span class="line">&gt;&gt;&gt; test_method = TestMethod()</span><br><span class="line">&gt;&gt;&gt; # 执行普通方法, 打印出实例的内存地址和实例属性</span><br><span class="line">&gt;&gt;&gt; test_method.instance_method("Hello")</span><br><span class="line">instance_method(&lt;__main__.TestMethod object at 0x7fd8fc56eb90&gt;, Hello)</span><br><span class="line">instance property:  instance property</span><br><span class="line">&gt;&gt;&gt; # 执行类方法</span><br><span class="line">&gt;&gt;&gt; # 通过实例访问, 打印出类本身和类属性</span><br><span class="line">&gt;&gt;&gt; test_method.class_method("Hello")</span><br><span class="line">class_method(&lt;class '__main__.TestMethod'&gt;, Hello)</span><br><span class="line">class property:  class property</span><br><span class="line">&gt;&gt;&gt; # 通过类直接访问, 同上</span><br><span class="line">&gt;&gt;&gt; TestMethod.class_method("Hello")</span><br><span class="line">class_method(&lt;class '__main__.TestMethod'&gt;, Hello)</span><br><span class="line">class property:  class property</span><br><span class="line">&gt;&gt;&gt; # 执行静态方法</span><br><span class="line">&gt;&gt;&gt; # 通过实例访问, 打印出静态方法本身</span><br><span class="line">&gt;&gt;&gt; test_method.static_method("Hello")</span><br><span class="line">static_method(Hello)</span><br><span class="line">&gt;&gt;&gt; # 通过类直接访问, 同上</span><br><span class="line">&gt;&gt;&gt; TestMethod.static_method("Hello")</span><br><span class="line">static_method(Hello)</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">&gt;&gt;&gt; class TestMethod(object):
+...     class_property = &quot;class property&quot;
+...     def __init__(self):
+...         self.instance_property = &quot;instance property&quot;
+...     def instance_method(self, arvg):
+...         print &quot;instance_method(%s, %s)&quot; % (self, arvg)
+...         print &quot;instance property: &quot;, self.instance_property
+...     @classmethod
+...     def class_method(cls, arvg):
+...         print &quot;class_method(%s, %s)&quot; % (cls, arvg)
+...         print &quot;class property: &quot;, cls.class_property
+...     @staticmethod
+...     def static_method(arvg):
+...         print &quot;static_method(%s)&quot; % arvg
+... 
+&gt;&gt;&gt;
+&gt;&gt;&gt; test_method = TestMethod()
+&gt;&gt;&gt; # 执行普通方法, 打印出实例的内存地址和实例属性
+&gt;&gt;&gt; test_method.instance_method(&quot;Hello&quot;)
+instance_method(&lt;__main__.TestMethod object at 0x7fd8fc56eb90&gt;, Hello)
+instance property:  instance property
+&gt;&gt;&gt; # 执行类方法
+&gt;&gt;&gt; # 通过实例访问, 打印出类本身和类属性
+&gt;&gt;&gt; test_method.class_method(&quot;Hello&quot;)
+class_method(&lt;class '__main__.TestMethod'&gt;, Hello)
+class property:  class property
+&gt;&gt;&gt; # 通过类直接访问, 同上
+&gt;&gt;&gt; TestMethod.class_method(&quot;Hello&quot;)
+class_method(&lt;class '__main__.TestMethod'&gt;, Hello)
+class property:  class property
+&gt;&gt;&gt; # 执行静态方法
+&gt;&gt;&gt; # 通过实例访问, 打印出静态方法本身
+&gt;&gt;&gt; test_method.static_method(&quot;Hello&quot;)
+static_method(Hello)
+&gt;&gt;&gt; # 通过类直接访问, 同上
+&gt;&gt;&gt; TestMethod.static_method(&quot;Hello&quot;)
+static_method(Hello)
+</code></pre>
 <p>可以看出类方法中<code>cls</code>代表的是类本身, 如果将类方法中的访问类属性的cls去掉, 则会报出<em>NameError</em>的错误</p>
-<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="prompt">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">TestMethod</span><span class="params">(object)</span>:</span></span><br><span class="line"><span class="prompt">... </span>    class_property = <span class="string">"class property"</span></span><br><span class="line"><span class="prompt">... </span>    <span class="decorator">@classmethod</span></span><br><span class="line"><span class="prompt">... </span>    <span class="function"><span class="keyword">def</span> <span class="title">class_method</span><span class="params">(cls, arvg)</span>:</span></span><br><span class="line"><span class="prompt">... </span>        <span class="keyword">print</span> <span class="string">"class property: "</span>, cls.class_property</span><br><span class="line"><span class="prompt">... </span></span><br><span class="line"><span class="prompt">&gt;&gt;&gt; </span>TestMethod.class_method(<span class="string">"Hello"</span>)</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">property</span>:</span> </span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">5</span>, <span class="keyword">in</span> class_method</span><br><span class="line">NameError: <span class="keyword">global</span> name <span class="string">'class_property'</span> <span class="keyword">is</span> <span class="keyword">not</span> defined</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">&gt;&gt;&gt; class TestMethod(object):
+...     class_property = &quot;class property&quot;
+...     @classmethod
+...     def class_method(cls, arvg):
+...         print &quot;class property: &quot;, cls.class_property
+... 
+&gt;&gt;&gt; TestMethod.class_method(&quot;Hello&quot;)
+class property: 
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;stdin&gt;&quot;, line 5, in class_method
+NameError: global name 'class_property' is not defined
+</code></pre>
 <ol>
 <li><strong>类方法是为了访问类属性更加方便</strong></li>
 <li>类方法和静态方法可以通过类和实例来访问,效果是相同的</li>
 <li>静态方法跟普通函数没有什么区别</li>
 </ol>
 <p>可以通过在实例方法中直接通过<code>TestMethod.class_property</code>来访问, 但是这样不方便也不好维护(如果类名称改了,就会出错), 也可以使用<code>self.class_property</code>来访问, 但注意, 实例本身获取的并不应该是类属性即<code>TestMethod.class_property</code>, 只是因为实例中并没有<code>class_property</code>这个变量, 而是通过查找类属性,发现有同名变量,然后打印出来,通过上面无法实例无法删除类属性是可以看出来的. 当然,如果不信,可以看下面的例子</p>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; class TestMethod(object):</span><br><span class="line">...     class_property = "class property"</span><br><span class="line">...     def __init__(self):</span><br><span class="line">...         pass</span><br><span class="line">... </span><br><span class="line">&gt;&gt;&gt; test_method = TestMethod()</span><br><span class="line">&gt;&gt;&gt; id(test_method.class_property)</span><br><span class="line">140488040794968</span><br><span class="line">&gt;&gt;&gt; id(TestMethod.class_property)</span><br><span class="line">140488040794968</span><br><span class="line">&gt;&gt;&gt; print test_method.class_property</span><br><span class="line">class property</span><br><span class="line">&gt;&gt;&gt; test_method.class_property = test_method.class_property + "!!!"</span><br><span class="line">&gt;&gt;&gt; print test_method.class_property</span><br><span class="line">class property!!!</span><br><span class="line">&gt;&gt;&gt; print TestMethod.class_property</span><br><span class="line">class property</span><br><span class="line">&gt;&gt;&gt; id(test_method.class_property)</span><br><span class="line">140488040795080</span><br><span class="line">&gt;&gt;&gt; id(TestMethod.class_property)</span><br><span class="line">140488040794968</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">&gt;&gt;&gt; class TestMethod(object):
+...     class_property = &quot;class property&quot;
+...     def __init__(self):
+...         pass
+... 
+&gt;&gt;&gt; test_method = TestMethod()
+&gt;&gt;&gt; id(test_method.class_property)
+140488040794968
+&gt;&gt;&gt; id(TestMethod.class_property)
+140488040794968
+&gt;&gt;&gt; print test_method.class_property
+class property
+&gt;&gt;&gt; test_method.class_property = test_method.class_property + &quot;!!!&quot;
+&gt;&gt;&gt; print test_method.class_property
+class property!!!
+&gt;&gt;&gt; print TestMethod.class_property
+class property
+&gt;&gt;&gt; id(test_method.class_property)
+140488040795080
+&gt;&gt;&gt; id(TestMethod.class_property)
+140488040794968
+</code></pre>
 
     </div> <!-- .entry-content -->
   </article>
@@ -286,25 +516,122 @@
 </blockquote>
 <p>docker默认使用'bridge'来设置container的网络模式（即从与docker0同网段的未使用的IP中取一个作为container的IP），我们这里使用'<strong>none</strong>'来实现自己手动配置container的网络。</p>
 <p>首先我们以**<code>--net='none'</code>**的方式启动一个container</p>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">[yaxin@cube2x ~]$docker run -i -t --rm --net=&#39;none&#39; ubuntu /bin/bash&#10;root@db84e747c362:/# ifconfig -a&#10;lo        Link encap:Local Loopback&#10;          inet addr:127.0.0.1  Mask:255.0.0.0&#10;          inet6 addr: ::1/128 Scope:Host&#10;          UP LOOPBACK RUNNING  MTU:65536  Metric:1&#10;          RX packets:0 errors:0 dropped:0 overruns:0 frame:0&#10;          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0&#10;          collisions:0 txqueuelen:0&#10;          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)&#10;&#10;root@db84e747c362:/#</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-shell">[yaxin@cube2x ~]$docker run -i -t --rm --net='none' ubuntu /bin/bash
+root@db84e747c362:/# ifconfig -a
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+root@db84e747c362:/#
+</code></pre>
 <p>可以看到，由于我们使用'none'模式，container中没有获取到IP，甚至连网卡都没有，下面我们开始给container配置IP</p>
 <p>首先获取container的pid（我们需要通过pid获取file descriptor）</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@cube2x ~]<span class="variable">$docker</span> ps</span><br><span class="line">CONTAINER ID        IMAGE                            COMMAND             CREATED             STATUS              PORTS               NAMES</span><br><span class="line">db84e747c362        docker.cn/docker/ubuntu:latest   <span class="string">"/bin/bash"</span>         <span class="number">4</span> minutes ago       Up <span class="number">4</span> minutes                            sharp_kirch</span><br><span class="line">[yaxin@cube2x ~]<span class="variable">$docker</span> inspect <span class="operator">-f</span> &#123;% raw %&#125;<span class="string">"&#123;&#123;.State.Pid&#125;&#125;"</span>&#123;% endraw %&#125; sharp_kirch</span><br><span class="line"><span class="number">23090</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@cube2x ~]$docker ps
+CONTAINER ID        IMAGE                            COMMAND             CREATED             STATUS              PORTS               NAMES
+db84e747c362        docker.cn/docker/ubuntu:latest   &quot;/bin/bash&quot;         4 minutes ago       Up 4 minutes                            sharp_kirch
+[yaxin@cube2x ~]$docker inspect -f "{{.State.Pid}}" sharp_kirch
+23090
+</code></pre>
 <p>ip-netns的man page中有这样一句</p>
 <blockquote>
 <p>By convention a named network namespace is an object at /var/run/netns/NAME that can be opened.  The file descriptor resulting from opening/var/run/netns/NAME refers to the specified network namespace</p>
 </blockquote>
 <p>因而我们需要创建一个链接</p>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">[yaxin@cube2x ~]$sudo ln -s /proc/23090/ns/net /var/run/netns/23090</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-shell">[yaxin@cube2x ~]$sudo ln -s /proc/23090/ns/net /var/run/netns/23090
+</code></pre>
 <p>然后创建一对端到端的网卡，将<code>veth_db84e747c3</code>绑定到docker0网桥，并启动。将另一块网卡<code>X</code>放到container内部</p>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">[yaxin@cube2x ~]$sudo ip link add veth_db84e747c3 type veth peer name X&#10;[yaxin@cube2x ~]$sudo brctl addif docker0 veth_db84e747c3&#10;[yaxin@cube2x ~]$sudo ip link set veth_db84e747c3 up&#10;[yaxin@cube2x ~]$sudo ip link set X netns 23090</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-shell">[yaxin@cube2x ~]$sudo ip link add veth_db84e747c3 type veth peer name X
+[yaxin@cube2x ~]$sudo brctl addif docker0 veth_db84e747c3
+[yaxin@cube2x ~]$sudo ip link set veth_db84e747c3 up
+[yaxin@cube2x ~]$sudo ip link set X netns 23090
+</code></pre>
 <p>这时查看container的IP，会发现多了一个名为<code>X</code>的网卡</p>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">root@db84e747c362:/# ifconfig  -a&#10;X         Link encap:Ethernet  HWaddr 5a:7e:4d:ba:63:1c  &#10;          BROADCAST MULTICAST  MTU:1500  Metric:1&#10;          RX packets:0 errors:0 dropped:0 overruns:0 frame:0&#10;          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0&#10;          collisions:0 txqueuelen:1000 &#10;          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)&#10;&#10;lo        Link encap:Local Loopback  &#10;          inet addr:127.0.0.1  Mask:255.0.0.0&#10;          inet6 addr: ::1/128 Scope:Host&#10;          UP LOOPBACK RUNNING  MTU:65536  Metric:1&#10;          RX packets:0 errors:0 dropped:0 overruns:0 frame:0&#10;          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0&#10;          collisions:0 txqueuelen:0 &#10;          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)&#10;&#10;root@db84e747c362:/#</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-shell">root@db84e747c362:/# ifconfig  -a
+X         Link encap:Ethernet  HWaddr 5a:7e:4d:ba:63:1c  
+          BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+root@db84e747c362:/#
+</code></pre>
 <p>然后对container内部新添加的网卡进行配置（可以通过<code>man ip-netns</code>更详细查看）</p>
-<p><figure class="highlight puppet"><table><tr><td class="code"><pre><span class="line">[yaxin@cube2x ~]$sudo <span class="literal">ip</span> netns <span class="keyword">exec</span> <span class="number">23090</span> <span class="literal">ip</span> <span class="literal">link</span> set dev <span class="constant">X</span> <span class="literal">name</span> eth<span class="number">0</span></span><br><span class="line">[yaxin@cube2x ~]$sudo <span class="literal">ip</span> netns <span class="keyword">exec</span> <span class="number">23090</span> <span class="literal">ip</span> <span class="literal">link</span> set eth<span class="number">0</span> up</span><br><span class="line">[yaxin@cube2x ~]$sudo <span class="literal">ip</span> netns <span class="keyword">exec</span> <span class="number">23090</span> <span class="literal">ip</span> addr add <span class="number">172.17</span>.<span class="number">111.10</span>/<span class="number">16</span> dev eth<span class="number">0</span></span><br><span class="line">[yaxin@cube2x ~]$sudo <span class="literal">ip</span> netns <span class="keyword">exec</span> <span class="number">23090</span> <span class="literal">ip</span> route add <span class="keyword">default</span> via <span class="number">172.17</span>.<span class="number">42.1</span></span><br></pre></td></tr></table></figure></p>
+<pre><code>[yaxin@cube2x ~]$sudo ip netns exec 23090 ip link set dev X name eth0
+[yaxin@cube2x ~]$sudo ip netns exec 23090 ip link set eth0 up
+[yaxin@cube2x ~]$sudo ip netns exec 23090 ip addr add 172.17.111.10/16 dev eth0
+[yaxin@cube2x ~]$sudo ip netns exec 23090 ip route add default via 172.17.42.1
+</code></pre>
 <p><strong>注意: 指定给container的IP必须跟docker0在同一网段,且给container的网关应该为docker0的IP</strong></p>
 <p>最后，写成shell脚本如下:</p>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">#!/usr/bin/env bash&#10;# filename: bind_addr.sh&#10;&#10;if [ `id -u` -ne 0 ];then&#10;    echo &#39;&#24517;&#39035;&#20351;&#29992;root&#26435;&#38480;&#39;&#10;    exit&#10;fi&#10;&#10;if [ $# != 2 ]; then&#10;    echo &#34;&#20351;&#29992;&#26041;&#27861;: $0 &#23481;&#22120;&#21517;&#23383; IP&#34;&#10;    exit 1&#10;fi&#10;&#10;container_name=$1&#10;bind_ip=$2&#10;&#10;container_id=`docker inspect -f &#123;% raw %&#125;&#39;&#123;&#123;.Id&#125;&#125;&#39;&#123;% endraw %&#125; $container_name 2&#62; /dev/null`&#10;if [ ! $container_id ];then&#10;    echo &#34;&#23481;&#22120;&#19981;&#23384;&#22312;&#34;&#10;    exit 2&#10;fi&#10;bind_ip=`echo $bind_ip | egrep &#39;^(([0-9]|[1-9][0-9]|1[0-9]&#123;2&#125;|2[0-4][0-9]|25[0-5])\.)&#123;3&#125;([0-9]|[1-9][0-9]|1[0-9]&#123;2&#125;|2[0-4][0-9]|25[0-5])$&#39;`&#10;if [ ! $bind_ip ];then&#10;    echo &#34;IP&#22320;&#22336;&#26684;&#24335;&#19981;&#27491;&#30830;&#34;&#10;    exit 3&#10;fi&#10;&#10;container_minid=`echo $container_id | cut -c 1-10`&#10;container_netmask=`ip addr show docker0 | grep &#34;inet\b&#34; | awk &#39;&#123;print $2&#125;&#39; | cut -d / -f2`&#10;container_gw=`ip addr show docker0 | grep &#34;inet\b&#34; | awk &#39;&#123;print $2&#125;&#39; | cut -d / -f1`&#10;&#10;bridge_name=&#34;veth_$container_minid&#34;&#10;container_ip=$bind_ip/$container_netmask&#10;pid=`docker inspect -f &#123;% raw %&#125;&#39;&#123;&#123;.State.Pid&#125;&#125;&#39;&#123;% endraw %&#125; $container_name 2&#62; /dev/null`&#10;if [ ! $pid ];then&#10;    echo &#34;&#33719;&#21462;&#23481;&#22120;$container_name&#30340;id&#22833;&#36133;&#34;&#10;    exit 4&#10;fi&#10;&#10;if [ ! -d /var/run/netns ];then&#10;    mkdir -p /var/run/netns&#10;fi&#10;&#10;ln -sf /proc/$pid/ns/net /var/run/netns/$pid&#10;&#10;ip link add $bridge_name type veth peer name X&#10;brctl addif docker0 $bridge_name&#10;ip link set $bridge_name up&#10;ip link set X netns $pid&#10;ip netns exec $pid ip link set dev X name eth0&#10;ip netns exec $pid ip link set eth0 up&#10;ip netns exec $pid ip addr add $container_ip dev eth0&#10;ip netns exec $pid ip route add default via $container_gw</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-shell">#!/usr/bin/env bash
+# filename: bind_addr.sh
+
+if [ `id -u` -ne 0 ];then
+    echo '必须使用root权限'
+    exit
+fi
+
+if [ $# != 2 ]; then
+    echo &quot;使用方法: $0 容器名字 IP&quot;
+    exit 1
+fi
+
+container_name=$1
+bind_ip=$2
+
+container_id=`docker inspect -f '{{.Id}}' $container_name 2&gt; /dev/null`
+if [ ! $container_id ];then
+    echo &quot;容器不存在&quot;
+    exit 2
+fi
+bind_ip=`echo $bind_ip | egrep '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'`
+if [ ! $bind_ip ];then
+    echo &quot;IP地址格式不正确&quot;
+    exit 3
+fi
+
+container_minid=`echo $container_id | cut -c 1-10`
+container_netmask=`ip addr show docker0 | grep &quot;inet\b&quot; | awk '{print $2}' | cut -d / -f2`
+container_gw=`ip addr show docker0 | grep &quot;inet\b&quot; | awk '{print $2}' | cut -d / -f1`
+
+bridge_name=&quot;veth_$container_minid&quot;
+container_ip=$bind_ip/$container_netmask
+pid=`docker inspect -f '{{.State.Pid}}' $container_name 2&gt; /dev/null`
+if [ ! $pid ];then
+    echo &quot;获取容器$container_name的id失败&quot;
+    exit 4
+fi
+
+if [ ! -d /var/run/netns ];then
+    mkdir -p /var/run/netns
+fi
+
+ln -sf /proc/$pid/ns/net /var/run/netns/$pid
+
+ip link add $bridge_name type veth peer name X
+brctl addif docker0 $bridge_name
+ip link set $bridge_name up
+ip link set X netns $pid
+ip netns exec $pid ip link set dev X name eth0
+ip netns exec $pid ip link set eth0 up
+ip netns exec $pid ip addr add $container_ip dev eth0
+ip netns exec $pid ip route add default via $container_gw
+</code></pre>
 
     </div> <!-- .entry-content -->
   </article>
@@ -326,9 +653,41 @@
     </header>
     <div class="entry-content" itemprop="description">
         <p>写一个数据分析的程序，中间要处理一个2x3矩阵的相加，遂写出了下面的代码</p>
-<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span><span class="params">(x, y)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> x + y</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">two_matrix_add</span><span class="params">(x, y)</span>:</span></span><br><span class="line">    result = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> xrange(len(x)):</span><br><span class="line">        result.append(tuple(map(<span class="keyword">lambda</span> t: reduce(add, t), zip(x[i], y[i]))))</span><br><span class="line">    <span class="keyword">return</span> tuple(result)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">matrix_add</span><span class="params">(matrix_list)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> reduce(two_matrix_add, matrix_list)</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">def add(x, y):
+    return x + y
+
+
+def two_matrix_add(x, y):
+    result = []
+    for i in xrange(len(x)):
+        result.append(tuple(map(lambda t: reduce(add, t), zip(x[i], y[i]))))
+    return tuple(result)
+
+
+def matrix_add(matrix_list):
+    return reduce(two_matrix_add, matrix_list)
+</code></pre>
 <p>下面测试一下：</p>
-<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="prompt">&gt;&gt;&gt; </span>matrix_1 = [</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>],</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>],</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>]</span><br><span class="line"><span class="prompt">... </span>]</span><br><span class="line"><span class="prompt">&gt;&gt;&gt; </span>matrix_2 = [</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">128</span>, <span class="number">204</span>, <span class="number">125</span>, <span class="number">66</span>],</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">230</span>, <span class="number">222</span>, <span class="number">186</span>, <span class="number">220</span>],</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">110</span>, <span class="number">86</span>, <span class="number">176</span>, <span class="number">249</span>]</span><br><span class="line"><span class="prompt">... </span>]</span><br><span class="line"><span class="prompt">&gt;&gt;&gt; </span>matrix_3 = [</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">189</span>, <span class="number">138</span>, <span class="number">188</span>, <span class="number">113</span>],</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">214</span>, <span class="number">85</span>, <span class="number">180</span>, <span class="number">217</span>],</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">126</span>, <span class="number">195</span>, <span class="number">203</span>, <span class="number">207</span>]</span><br><span class="line"><span class="prompt">... </span>]</span><br><span class="line"><span class="prompt">&gt;&gt;&gt; </span>matrix_add([matrix_1, matrix_2])</span><br><span class="line">((<span class="number">128</span>, <span class="number">205</span>, <span class="number">127</span>, <span class="number">69</span>), (<span class="number">234</span>, <span class="number">227</span>, <span class="number">192</span>, <span class="number">227</span>), (<span class="number">118</span>, <span class="number">95</span>, <span class="number">186</span>, <span class="number">260</span>))</span><br><span class="line"><span class="prompt">&gt;&gt;&gt; </span>matrix_add([matrix_1, matrix_2, matrix_3])</span><br><span class="line">((<span class="number">317</span>, <span class="number">343</span>, <span class="number">315</span>, <span class="number">182</span>), (<span class="number">448</span>, <span class="number">312</span>, <span class="number">372</span>, <span class="number">444</span>), (<span class="number">244</span>, <span class="number">290</span>, <span class="number">389</span>, <span class="number">467</span>))</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">&gt;&gt;&gt; matrix_1 = [
+...     [0, 1, 2, 3],
+...     [4, 5, 6, 7],
+...     [8, 9, 10, 11]
+... ]
+&gt;&gt;&gt; matrix_2 = [
+...     [128, 204, 125, 66],
+...     [230, 222, 186, 220],
+...     [110, 86, 176, 249]
+... ]
+&gt;&gt;&gt; matrix_3 = [
+...     [189, 138, 188, 113],
+...     [214, 85, 180, 217],
+...     [126, 195, 203, 207]
+... ]
+&gt;&gt;&gt; matrix_add([matrix_1, matrix_2])
+((128, 205, 127, 69), (234, 227, 192, 227), (118, 95, 186, 260))
+&gt;&gt;&gt; matrix_add([matrix_1, matrix_2, matrix_3])
+((317, 343, 315, 182), (448, 312, 372, 444), (244, 290, 389, 467))
+</code></pre>
 
     </div> <!-- .entry-content -->
   </article>
@@ -354,11 +713,20 @@
 <p>ubuntu提供了一个交互式的选择时区的命令<code>dpkg-reconfigure tzdata</code>，直接在命令行中输入此命令，然后选择自己的时区即可</p>
 <h3>2. 直接修改</h3>
 <p>另外一种方法相对简单，即直接复制相应的时区文件覆盖当前系统的时区文件</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox:~]$ cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime</span><br><span class="line">[yaxin@ubox:~]$ date</span><br><span class="line">Tue Nov  <span class="number">4</span> <span class="number">16</span>:<span class="number">18</span>:<span class="number">55</span> CST <span class="number">2014</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox:~]$ cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+[yaxin@ubox:~]$ date
+Tue Nov  4 16:18:55 CST 2014
+</code></pre>
 <p>修改是立即生效的。</p>
 <h2>二、修改语系</h2>
 <p>首先你需要使用<code>locale-gen</code>编译locale定义文件，直接在命令后面指定要编译的locale（可以查看/usr/share/i18n/SUPPORTED来获取locale的格式）</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox:~]$ sudo locale-gen zh_CN.UTF-<span class="number">8</span> en_US.UTF-<span class="number">8</span></span><br><span class="line">Generating locales...</span><br><span class="line">  en_US.UTF-<span class="number">8</span>... up-to-date</span><br><span class="line">  zh_CN.UTF-<span class="number">8</span>... up-to-date</span><br><span class="line">Generation complete.</span><br><span class="line">[yaxin@ubox:~]$ <span class="built_in">echo</span> <span class="string">'LANG="en_US.UTF-8"'</span> &gt; /etc/default/locale</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox:~]$ sudo locale-gen zh_CN.UTF-8 en_US.UTF-8
+Generating locales...
+  en_US.UTF-8... up-to-date
+  zh_CN.UTF-8... up-to-date
+Generation complete.
+[yaxin@ubox:~]$ echo 'LANG=&quot;en_US.UTF-8&quot;' &gt; /etc/default/locale
+</code></pre>
 <p>语系的修改并不是立即生效的，你需要重启机器才能生效。</p>
 
     </div> <!-- .entry-content -->
@@ -383,12 +751,26 @@
         <p><a href="http://php.net/manual/zh/class.datetime.php" target="_blank" rel="external"><code>DataTime</code></a>类跟<code>date()</code>,<code>strtotime()</code>,<code>gmdate()</code>等函数有相同的作用，都是用来处理日期和时间的，但<code>DateTime</code>类更加直观、方便, 所以在PHP5.2.0以后推荐使用<code>DateTime</code>类而不是相应的函数。</p>
 <p>下面来看一下<code>DateTime</code>类的用法。</p>
 <h2>1. 获取当前系统时间并打印</h2>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">&lt;?php
+$date = new DateTime();
+echo $date-&gt;format('Y-m-d H:i:s');
+?&gt;
+</code></pre>
 <blockquote>
 <p>执行结果为：2014-08-25 12:58:29</p>
 </blockquote>
 <h2>2. 获取特定时间并打印</h2>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime(<span class="string">'2014-05-04'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="variable">$date2</span> = <span class="keyword">new</span> DateTime(<span class="string">'tomorrow'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date2</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="variable">$date2</span> = <span class="keyword">new</span> DateTime(<span class="string">'+2 days'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date2</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">&lt;?php
+$date = new DateTime('2014-05-04');
+echo $date-&gt;format('Y-m-d H:i:s');
+echo &quot;\n&quot;;
+$date2 = new DateTime('tomorrow');
+echo $date2-&gt;format('Y-m-d H:i:s');
+echo &quot;\n&quot;;
+$date2 = new DateTime('+2 days');
+echo $date2-&gt;format('Y-m-d H:i:s');
+?&gt;
+</code></pre>
 <blockquote>
 <p>执行结果为：
 2014-05-04 00:00:00
@@ -396,7 +778,26 @@
 2014-08-27 13:13:34</p>
 </blockquote>
 <p>或则通过DateTime的其他方法</p>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="comment">// add方法</span></span><br><span class="line"><span class="variable">$date</span>-&gt;add(<span class="keyword">new</span> DateInterval(<span class="string">'P1D'</span>));</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="comment">// modify方法</span></span><br><span class="line"><span class="variable">$date</span>-&gt;modify(<span class="string">'+1 day'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="comment">// setDate方法</span></span><br><span class="line"><span class="variable">$date</span>-&gt;setDate(<span class="string">'1989-11-10'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="comment">// setTime方法</span></span><br><span class="line"><span class="variable">$date</span>-&gt;setTime(<span class="string">'11:10:10'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">&lt;?php
+$date = new DateTime();
+// add方法
+$date-&gt;add(new DateInterval('P1D'));
+echo $date-&gt;format('Y-m-d H:i:s');
+echo &quot;\n&quot;;
+// modify方法
+$date-&gt;modify('+1 day');
+echo $date-&gt;format('Y-m-d H:i:s');
+echo &quot;\n&quot;;
+// setDate方法
+$date-&gt;setDate('1989-11-10');
+echo $date-&gt;format('Y-m-d H:i:s');
+echo &quot;\n&quot;;
+// setTime方法
+$date-&gt;setTime('11:10:10');
+echo $date-&gt;format('Y-m-d H:i:s');
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
 <blockquote>
 <p>执行结果分别为：
 2014-08-26 15:02:57
@@ -406,24 +807,61 @@
 </blockquote>
 <h2>3. unix时间戳的转换</h2>
 <h3>获取当前时间的时间戳</h3>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'U'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">&lt;?php
+$date = new DateTime();
+echo $date-&gt;format('U');
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
 <blockquote>
 <p>执行结果为：1408950651</p>
 </blockquote>
 <p>或者</p>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;getTimestamp();</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">&lt;?php
+$date = new DateTime();
+echo $date-&gt;getTimestamp();
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
 <h3>将时间戳转换为可读时间</h3>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime(<span class="string">'@1408950651'</span>);</span><br><span class="line"><span class="variable">$date</span>-&gt;setTimezone(<span class="keyword">new</span> DateTimeZone(<span class="string">'Asia/Shanghai'</span>));</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">&lt;?php
+$date = new DateTime('@1408950651');
+$date-&gt;setTimezone(new DateTimeZone('Asia/Shanghai'));
+echo $date-&gt;format('Y-m-d H:i:s');
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
 <blockquote>
 <p>执行结果为：2014-08-25 15:10:51</p>
 </blockquote>
 <p>或者</p>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="variable">$date</span>-&gt;setTimestamp(<span class="number">1408950651</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$date</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">&lt;?php
+$date = new DateTime();
+$date-&gt;setTimestamp(1408950651);
+echo $date-&gt;format('Y-m-d H:i:s');
+echo &quot;\n&quot;;
+?&gt;
+</code></pre>
 <h2>4. 日期的比较</h2>
 <h3>日期大小比较</h3>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date1</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="variable">$date2</span> = <span class="keyword">new</span> DateTime(<span class="string">'2014-09-15'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="variable">$date1</span> &lt; <span class="variable">$date2</span>) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="variable">$date2</span>-&gt;format(<span class="string">'Y-m-d H:i:s'</span>) . <span class="string">' is in the future'</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">&lt;?php
+$date1 = new DateTime();
+$date2 = new DateTime('2014-09-15');
+
+if($date1 &lt; $date2) {
+    echo $date2-&gt;format('Y-m-d H:i:s') . ' is in the future';
+}
+?&gt;
+</code></pre>
 <h3>日期间隔</h3>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date1</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="variable">$date2</span> = <span class="keyword">new</span> DateTime(<span class="string">'2014-09-15'</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$diff</span> = <span class="variable">$date1</span>-&gt;diff(<span class="variable">$date2</span>);</span><br><span class="line">print_r(<span class="variable">$diff</span>);</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">&lt;?php
+$date1 = new DateTime();
+$date2 = new DateTime('2014-09-15');
+
+$diff = $date1-&gt;diff($date2);
+print_r($diff);
+?&gt;
+</code></pre>
 <blockquote>
 <p>执行结果为:
 DateInterval Object
@@ -446,7 +884,14 @@ DateInterval Object
 )</p>
 </blockquote>
 <p>将返回的对象格式化输出</p>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$date1</span> = <span class="keyword">new</span> DateTime();</span><br><span class="line"><span class="variable">$date2</span> = <span class="keyword">new</span> DateTime(<span class="string">'2014-09-15'</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$diff</span> = <span class="variable">$date1</span>-&gt;diff(<span class="variable">$date2</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$diff</span>-&gt;format(<span class="string">"The future will come in %Y years %m months and %d days"</span>);</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">&lt;?php
+$date1 = new DateTime();
+$date2 = new DateTime('2014-09-15');
+
+$diff = $date1-&gt;diff($date2);
+echo $diff-&gt;format(&quot;The future will come in %Y years %m months and %d days&quot;);
+?&gt;
+</code></pre>
 <blockquote>
 <p>输出结果为：The future will come in 00 years 0 months and 20 days</p>
 </blockquote>
@@ -472,12 +917,25 @@ DateInterval Object
     <div class="entry-content" itemprop="description">
         <p>ssh到ubuntu14.04卡的要死，google一下无非是修改<strong>sshd_config</strong>文件中的<code>GSSAPIAuthentication</code>和<code>UseDNS</code>选项，但依然无济于事。</p>
 <p>使用<code>-v</code>参数（可以输出ssh详细过程）ssh发现卡顿是发生在输入密码之后的</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yaxin@<span class="number">192.168</span>.<span class="number">1.1</span><span class="string">'s password:</span><br><span class="line">debug1: Authentication succeeded (password).</span><br><span class="line">debug1: channel 0: new [client-session]</span><br><span class="line">debug1: Requesting no-more-sessions@openssh.com</span><br><span class="line">debug1: Entering interactive session. # 卡一段时间</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">yaxin@192.168.1.1's password:
+debug1: Authentication succeeded (password).
+debug1: channel 0: new [client-session]
+debug1: Requesting no-more-sessions@openssh.com
+debug1: Entering interactive session. # 卡一段时间
+</code></pre>
 <p>这说明进入交互式终端的时候卡了，再来看登录后</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Welcome to Ubuntu <span class="number">14.04</span> LTS (GNU/Linux <span class="number">3.13</span>.<span class="number">0</span>-<span class="number">24</span>-generic x86_64)</span><br><span class="line">......</span><br><span class="line"><span class="number">62</span> packages can be updated.</span><br><span class="line"><span class="number">43</span> updates are security updates.</span><br><span class="line"></span><br><span class="line">Last login: Tue Jul  <span class="number">8</span> <span class="number">20</span>:<span class="number">29</span>:<span class="number">20</span> <span class="number">2014</span> from <span class="number">192.168</span>.<span class="number">1.5</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
+......
+62 packages can be updated.
+43 updates are security updates.
+
+Last login: Tue Jul  8 20:29:20 2014 from 192.168.1.5
+</code></pre>
 <p>上面的内容在其它版本中为<code>/etc/motd</code>中的内容，但ubuntu是动态生成该内容，生成脚本在<code>/etc/update-motd.d</code>目录下，查看脚本可以是联网检测系统更新等情况。呵呵，如何禁用。</p>
 <p>修改<code>/etc/pam.d/sshd</code>和<code>/etc/pam.d/login</code>文件中的有<strong>pam_motd.so</strong>的行注释掉</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#session    optional     pam_motd.so  motd=/run/motd.dynamic noupdate</span></span><br><span class="line"><span class="comment">#session    optional     pam_motd.so # [1]</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">#session    optional     pam_motd.so  motd=/run/motd.dynamic noupdate
+#session    optional     pam_motd.so # [1]
+</code></pre>
 <p>再次ssh，这次没有了上面的update等信息了，但ssh也不卡顿了。</p>
 
     </div> <!-- .entry-content -->

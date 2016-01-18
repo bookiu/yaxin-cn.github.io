@@ -56,29 +56,109 @@
     <div class="post-content">
       <p>搭建了一个禅道的项目管理平台，但是Nginx下并不是伪静态的，URL看着不是很舒服，上网搜索配置规则，但是没有一个可以正常使用的，于是乎自己琢磨一下。</p>
 <p>先给出最终配置，有兴趣看原因的可以往下看</p>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">server &#123;&#10;    listen 80;&#10;    root /zentao/root/path/www;&#10;    index index.php index.html index.htm;&#10;    server_name domain_name;&#10;&#10;    location / &#123;&#10;        try_files $uri /index.php$uri;&#10;    &#125;&#10;&#10;    location ~ \.php(/.+)?$ &#123;&#10;        fastcgi_pass unix:/var/run/php-fpm.sock;&#10;        fastcgi_index index.php;&#10;        include fastcgi.conf;&#10;        fastcgi_split_path_info ^(.+\.php)(/.+)$;&#10;        fastcgi_param PATH_INFO $fastcgi_path_info;&#10;    &#125;&#10;    access_log off;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-conf">server {
+    listen 80;
+    root /zentao/root/path/www;
+    index index.php index.html index.htm;
+    server_name domain_name;
+
+    location / {
+        try_files $uri /index.php$uri;
+    }
+
+    location ~ \.php(/.+)?$ {
+        fastcgi_pass unix:/var/run/php-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+    access_log off;
+}
+</code></pre>
 <p>禅道给出了apache的伪静态规则，但是我尝试了半天也没有转换成可用的nginx伪静态规则，但是禅道是基于PHP的，而PHP伪静态一般基于<code>$_SERVER</code>变量中的一些变量来实现的，既然apache可以实现伪静态，那么就打印一下伪静态后的<code>$_SERVER</code>变量的值。</p>
 <p>修改禅道根目录下<code>www/index.php</code>文件，在最上面修改为如下代码:</p>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;pre&gt;"</span>;</span><br><span class="line">    print_r(<span class="variable">$_SERVER</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;/pre&gt;"</span>;</span><br><span class="line">    <span class="keyword">die</span>;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">&lt;?php
+    echo &quot;&lt;pre&gt;&quot;;
+    print_r($_SERVER);
+    echo &quot;&lt;/pre&gt;&quot;;
+    die;
+</code></pre>
 <p>然后访问http://domain/user-login-Lw==.html (此为禅道登陆url)</p>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 仅给出几个重要的变量</span></span><br><span class="line"><span class="keyword">Array</span></span><br><span class="line">(</span><br><span class="line">    [REDIRECT_URL] =&gt; /user-login-Lw==.html</span><br><span class="line">    [REQUEST_URI] =&gt; /user-login-Lw==.html</span><br><span class="line">    [SCRIPT_NAME] =&gt; /index.php</span><br><span class="line">    [PATH_INFO] =&gt; /user-login-Lw==.html</span><br><span class="line">    [PATH_TRANSLATED] =&gt; redirect:/index.php/user-login-Lw==.html</span><br><span class="line">    [PHP_SELF] =&gt; /index.php/user-login-Lw==.html</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">// 仅给出几个重要的变量
+Array
+(
+    [REDIRECT_URL] =&gt; /user-login-Lw==.html
+    [REQUEST_URI] =&gt; /user-login-Lw==.html
+    [SCRIPT_NAME] =&gt; /index.php
+    [PATH_INFO] =&gt; /user-login-Lw==.html
+    [PATH_TRANSLATED] =&gt; redirect:/index.php/user-login-Lw==.html
+    [PHP_SELF] =&gt; /index.php/user-login-Lw==.html
+)
+</code></pre>
 <p>对于未配置过的nginx做相同的操作:</p>
 <p><strong>未配置的nginx并不是什么都没配置，基本的还是要配置的</strong></p>
-<p><figure class="highlight nginx"><table><tr><td class="code"><pre><span class="line"><span class="title">location</span> / &#123;</span><br><span class="line">    <span class="title">try_files</span> <span class="variable">$uri</span> /index.php;</span><br><span class="line">&#125;</span><br><span class="line"><span class="title">location</span> <span class="regexp">~ \.php$</span> &#123;</span><br><span class="line">    <span class="comment"># With php5-fpm:</span></span><br><span class="line">    <span class="title">fastcgi_pass</span> <span class="url">unix:/var/run/php-fpm.sock</span>;</span><br><span class="line">    <span class="title">fastcgi_index</span> index.php;</span><br><span class="line">    <span class="title">include</span> fastcgi.conf;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-nginx">    location / {
+        try_files $uri /index.php;
+    }
+    location ~ \.php$ {
+        # With php5-fpm:
+        fastcgi_pass unix:/var/run/php-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+    }
+</code></pre>
 <p>如上，这两个location还是要有的，一个是将所有的请求重定向到<code>index.php</code>，一个是解析php文件的.</p>
 <p>这次，php返回的信息为</p>
-<p><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 仅给出几个重要的变量</span></span><br><span class="line"><span class="keyword">Array</span></span><br><span class="line">(</span><br><span class="line">    [SCRIPT_NAME] =&gt; /index.php</span><br><span class="line">    [REQUEST_URI] =&gt; /user-login-Lw==.html</span><br><span class="line">    [DOCUMENT_URI] =&gt; /index.php</span><br><span class="line">    [PHP_SELF] =&gt; /index.php</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-php">// 仅给出几个重要的变量
+Array
+(
+    [SCRIPT_NAME] =&gt; /index.php
+    [REQUEST_URI] =&gt; /user-login-Lw==.html
+    [DOCUMENT_URI] =&gt; /index.php
+    [PHP_SELF] =&gt; /index.php
+)
+</code></pre>
 <p>对比一下，发现不同了吧。nginx少了<code>PATH_INFO</code>，而且<code>PHP_SELF</code>也是不一样的，至于<code>REDIRECT_URL</code>和<code>PATH_TRANSLATED</code>这些变量都是apache自己加的，禅道并不会用到。</p>
 <p>回想一下禅道的配置文件<code>config/config.php</code>和<code>config/my.php</code>中有一项<code>$config-&gt;requestType</code>配置，如果配置为**<code>GET</code><strong>的话，就会禁用伪静态，而通过query string的方式，如果配置成</strong><code>PATH_INFO</code>**的话就需要nginx或apache配置伪静态规则，也就是说禅道通过解析PATH_INFO来实现伪静态的。</p>
 <p>那么PATH_INFO又是什么东东，根据<a href="http://php.net/manual/zh/reserved.variables.server.php" target="_blank" rel="external">PHP官方文档</a>的解释，如果我访问http://www.example.com/php/path_info.php/some/stuff?foo=bar这个url，那个PATH_INFO就应该等于/some/stuff，也就是所<code>PATH_INFO</code>等于url中跟在真实脚本名称之后并且在查询语句（query string）之前的字符串，你可能会说，我访问的url中根本没有filename.php啊，那是因为nginx帮你添加了，记得配置中的<code>try_files $uri /index.php$uri</code>吧，这个内部跳转就是干这个事情的。</p>
 <p>找到了原因就开始解决，Nginx和PHP是通过cgi协议传递数据的，可以通过nginx开启<a href="http://nginx.org/en/docs/debugging_log.html" target="_blank" rel="external">debug</a> (<a href="http://nginx.org/en/docs/debugging_log.html" target="_blank" rel="external">http://nginx.org/en/docs/debugging_log.html</a>)来查看传递nginx和php交换的数据。</p>
 <p>这里不给出详细debug log了，反正开启log后发现nginx并没有传递PATH_INFO给php，于是在解析php的location中添加一行</p>
-<p><figure class="highlight nginx"><table><tr><td class="code"><pre><span class="line"><span class="title">location</span> <span class="regexp">~ \.php$</span> &#123;</span><br><span class="line">    <span class="title">fastcgi_pass</span> <span class="url">unix:/var/run/php-fpm.sock</span>;</span><br><span class="line">    <span class="title">fastcgi_index</span> index.php;</span><br><span class="line">    <span class="title">include</span> fastcgi.conf;</span><br><span class="line">    <span class="title">fastcgi_split_path_info</span><span class="regexp"> ^(.+\.php)(/.+)$</span>;</span><br><span class="line">    <span class="title">fastcgi_param</span> PATH_INFO <span class="variable">$fastcgi_path_info</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-nginx">    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+</code></pre>
 <p>但只有这个还是不行，因为此时nginx内部变量<code>$uri</code>(就相当于PHP_SELF的值)还是*/index.php*，需要再修改一个地方</p>
-<p><figure class="highlight nginx"><table><tr><td class="code"><pre><span class="line"><span class="title">location</span> / &#123;</span><br><span class="line">    <span class="title">try_files</span> <span class="variable">$uri</span> /index.php;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-nginx">    location / {
+        try_files $uri /index.php;
+    }
+</code></pre>
 <p>修改之后php那个location就没办法被识别了，需要修改为<code>\.php(/.+)?$</code></p>
 <p>最终的效果就是</p>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">server &#123;&#10;    listen 80;&#10;    root /zentao/root/path/www;&#10;    index index.php index.html index.htm;&#10;    server_name domain_name;&#10;&#10;    location / &#123;&#10;        try_files $uri /index.php$uri;&#10;    &#125;&#10;&#10;    location ~ \.php(/.+)?$ &#123;&#10;        fastcgi_pass unix:/var/run/php-fpm.sock;&#10;        fastcgi_index index.php;&#10;        include fastcgi.conf;&#10;        fastcgi_split_path_info ^(.+\.php)(/.+)$;&#10;        fastcgi_param PATH_INFO $fastcgi_path_info;&#10;    &#125;&#10;    access_log off;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-conf">server {
+    listen 80;
+    root /zentao/root/path/www;
+    index index.php index.html index.htm;
+    server_name domain_name;
+
+    location / {
+        try_files $uri /index.php$uri;
+    }
+
+    location ~ \.php(/.+)?$ {
+        fastcgi_pass unix:/var/run/php-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+    access_log off;
+}
+</code></pre>
 
     </div> <!-- .post-content -->
     <div class="post-footer">

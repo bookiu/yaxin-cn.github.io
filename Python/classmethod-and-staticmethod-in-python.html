@@ -57,7 +57,32 @@
       <p>Python类中有两个特殊的修饰符@classmethod和@staticmethod(即类方法和静态方法), 想要理解需要先理解类属性和实例属性的感念</p>
 <h2>类属性和实例属性</h2>
 <p>看下面的代码</p>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; class TestProperty(object):</span><br><span class="line">...     class_property = "class property"</span><br><span class="line">...     </span><br><span class="line">...     def __init__(self):</span><br><span class="line">...         self.instance_property = "instance property"</span><br><span class="line">&gt;&gt;&gt; </span><br><span class="line">&gt;&gt;&gt; test_property = TestProperty()</span><br><span class="line">&gt;&gt;&gt; # 实例可以访问实例属性和类属性</span><br><span class="line">&gt;&gt;&gt; print test_property.class_property</span><br><span class="line">class property</span><br><span class="line">&gt;&gt;&gt; print test_property.instance_property</span><br><span class="line">instance property</span><br><span class="line">&gt;&gt;&gt; # 类可以访问类属性</span><br><span class="line">&gt;&gt;&gt; print TestProperty.class_property</span><br><span class="line">class property</span><br><span class="line">&gt;&gt;&gt; # 但不可以访问实例属性</span><br><span class="line">&gt;&gt;&gt; print TestProperty.instance_property</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File "&lt;stdin&gt;", line 1, in &lt;module&gt;</span><br><span class="line">AttributeError: type object 'TestProperty' has no attribute 'instance_property'</span><br><span class="line">&gt;&gt;&gt; # 注意下面的报错</span><br><span class="line">&gt;&gt;&gt; del test_property.class_property</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File "&lt;stdin&gt;", line 1, in &lt;module&gt;</span><br><span class="line">AttributeError: class_property</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">&gt;&gt;&gt; class TestProperty(object):
+...     class_property = &quot;class property&quot;
+...     
+...     def __init__(self):
+...         self.instance_property = &quot;instance property&quot;
+&gt;&gt;&gt; 
+&gt;&gt;&gt; test_property = TestProperty()
+&gt;&gt;&gt; # 实例可以访问实例属性和类属性
+&gt;&gt;&gt; print test_property.class_property
+class property
+&gt;&gt;&gt; print test_property.instance_property
+instance property
+&gt;&gt;&gt; # 类可以访问类属性
+&gt;&gt;&gt; print TestProperty.class_property
+class property
+&gt;&gt;&gt; # 但不可以访问实例属性
+&gt;&gt;&gt; print TestProperty.instance_property
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+AttributeError: type object 'TestProperty' has no attribute 'instance_property'
+&gt;&gt;&gt; # 注意下面的报错
+&gt;&gt;&gt; del test_property.class_property
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+AttributeError: class_property
+</code></pre>
 <p>总结起来就是:</p>
 <ol>
 <li><strong>实例属性</strong>的初始化在<code>__init__</code>构造器方法中进行(当然也可以通过其它方法赋值)</li>
@@ -68,16 +93,86 @@
 <li>为什么要有类属性, 一句话<strong>命名空间</strong></li>
 </ol>
 <h2>类方法和静态方法</h2>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; class TestMethod(object):</span><br><span class="line">...     class_property = "class property"</span><br><span class="line">...     def __init__(self):</span><br><span class="line">...         self.instance_property = "instance property"</span><br><span class="line">...     def instance_method(self, arvg):</span><br><span class="line">...         print "instance_method(%s, %s)" % (self, arvg)</span><br><span class="line">...         print "instance property: ", self.instance_property</span><br><span class="line">...     @classmethod</span><br><span class="line">...     def class_method(cls, arvg):</span><br><span class="line">...         print "class_method(%s, %s)" % (cls, arvg)</span><br><span class="line">...         print "class property: ", cls.class_property</span><br><span class="line">...     @staticmethod</span><br><span class="line">...     def static_method(arvg):</span><br><span class="line">...         print "static_method(%s)" % arvg</span><br><span class="line">... </span><br><span class="line">&gt;&gt;&gt;</span><br><span class="line">&gt;&gt;&gt; test_method = TestMethod()</span><br><span class="line">&gt;&gt;&gt; # 执行普通方法, 打印出实例的内存地址和实例属性</span><br><span class="line">&gt;&gt;&gt; test_method.instance_method("Hello")</span><br><span class="line">instance_method(&lt;__main__.TestMethod object at 0x7fd8fc56eb90&gt;, Hello)</span><br><span class="line">instance property:  instance property</span><br><span class="line">&gt;&gt;&gt; # 执行类方法</span><br><span class="line">&gt;&gt;&gt; # 通过实例访问, 打印出类本身和类属性</span><br><span class="line">&gt;&gt;&gt; test_method.class_method("Hello")</span><br><span class="line">class_method(&lt;class '__main__.TestMethod'&gt;, Hello)</span><br><span class="line">class property:  class property</span><br><span class="line">&gt;&gt;&gt; # 通过类直接访问, 同上</span><br><span class="line">&gt;&gt;&gt; TestMethod.class_method("Hello")</span><br><span class="line">class_method(&lt;class '__main__.TestMethod'&gt;, Hello)</span><br><span class="line">class property:  class property</span><br><span class="line">&gt;&gt;&gt; # 执行静态方法</span><br><span class="line">&gt;&gt;&gt; # 通过实例访问, 打印出静态方法本身</span><br><span class="line">&gt;&gt;&gt; test_method.static_method("Hello")</span><br><span class="line">static_method(Hello)</span><br><span class="line">&gt;&gt;&gt; # 通过类直接访问, 同上</span><br><span class="line">&gt;&gt;&gt; TestMethod.static_method("Hello")</span><br><span class="line">static_method(Hello)</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">&gt;&gt;&gt; class TestMethod(object):
+...     class_property = &quot;class property&quot;
+...     def __init__(self):
+...         self.instance_property = &quot;instance property&quot;
+...     def instance_method(self, arvg):
+...         print &quot;instance_method(%s, %s)&quot; % (self, arvg)
+...         print &quot;instance property: &quot;, self.instance_property
+...     @classmethod
+...     def class_method(cls, arvg):
+...         print &quot;class_method(%s, %s)&quot; % (cls, arvg)
+...         print &quot;class property: &quot;, cls.class_property
+...     @staticmethod
+...     def static_method(arvg):
+...         print &quot;static_method(%s)&quot; % arvg
+... 
+&gt;&gt;&gt;
+&gt;&gt;&gt; test_method = TestMethod()
+&gt;&gt;&gt; # 执行普通方法, 打印出实例的内存地址和实例属性
+&gt;&gt;&gt; test_method.instance_method(&quot;Hello&quot;)
+instance_method(&lt;__main__.TestMethod object at 0x7fd8fc56eb90&gt;, Hello)
+instance property:  instance property
+&gt;&gt;&gt; # 执行类方法
+&gt;&gt;&gt; # 通过实例访问, 打印出类本身和类属性
+&gt;&gt;&gt; test_method.class_method(&quot;Hello&quot;)
+class_method(&lt;class '__main__.TestMethod'&gt;, Hello)
+class property:  class property
+&gt;&gt;&gt; # 通过类直接访问, 同上
+&gt;&gt;&gt; TestMethod.class_method(&quot;Hello&quot;)
+class_method(&lt;class '__main__.TestMethod'&gt;, Hello)
+class property:  class property
+&gt;&gt;&gt; # 执行静态方法
+&gt;&gt;&gt; # 通过实例访问, 打印出静态方法本身
+&gt;&gt;&gt; test_method.static_method(&quot;Hello&quot;)
+static_method(Hello)
+&gt;&gt;&gt; # 通过类直接访问, 同上
+&gt;&gt;&gt; TestMethod.static_method(&quot;Hello&quot;)
+static_method(Hello)
+</code></pre>
 <p>可以看出类方法中<code>cls</code>代表的是类本身, 如果将类方法中的访问类属性的cls去掉, 则会报出<em>NameError</em>的错误</p>
-<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="prompt">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">TestMethod</span><span class="params">(object)</span>:</span></span><br><span class="line"><span class="prompt">... </span>    class_property = <span class="string">"class property"</span></span><br><span class="line"><span class="prompt">... </span>    <span class="decorator">@classmethod</span></span><br><span class="line"><span class="prompt">... </span>    <span class="function"><span class="keyword">def</span> <span class="title">class_method</span><span class="params">(cls, arvg)</span>:</span></span><br><span class="line"><span class="prompt">... </span>        <span class="keyword">print</span> <span class="string">"class property: "</span>, cls.class_property</span><br><span class="line"><span class="prompt">... </span></span><br><span class="line"><span class="prompt">&gt;&gt;&gt; </span>TestMethod.class_method(<span class="string">"Hello"</span>)</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">property</span>:</span> </span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">5</span>, <span class="keyword">in</span> class_method</span><br><span class="line">NameError: <span class="keyword">global</span> name <span class="string">'class_property'</span> <span class="keyword">is</span> <span class="keyword">not</span> defined</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">&gt;&gt;&gt; class TestMethod(object):
+...     class_property = &quot;class property&quot;
+...     @classmethod
+...     def class_method(cls, arvg):
+...         print &quot;class property: &quot;, cls.class_property
+... 
+&gt;&gt;&gt; TestMethod.class_method(&quot;Hello&quot;)
+class property: 
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;stdin&gt;&quot;, line 5, in class_method
+NameError: global name 'class_property' is not defined
+</code></pre>
 <ol>
 <li><strong>类方法是为了访问类属性更加方便</strong></li>
 <li>类方法和静态方法可以通过类和实例来访问,效果是相同的</li>
 <li>静态方法跟普通函数没有什么区别</li>
 </ol>
 <p>可以通过在实例方法中直接通过<code>TestMethod.class_property</code>来访问, 但是这样不方便也不好维护(如果类名称改了,就会出错), 也可以使用<code>self.class_property</code>来访问, 但注意, 实例本身获取的并不应该是类属性即<code>TestMethod.class_property</code>, 只是因为实例中并没有<code>class_property</code>这个变量, 而是通过查找类属性,发现有同名变量,然后打印出来,通过上面无法实例无法删除类属性是可以看出来的. 当然,如果不信,可以看下面的例子</p>
-<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; class TestMethod(object):</span><br><span class="line">...     class_property = "class property"</span><br><span class="line">...     def __init__(self):</span><br><span class="line">...         pass</span><br><span class="line">... </span><br><span class="line">&gt;&gt;&gt; test_method = TestMethod()</span><br><span class="line">&gt;&gt;&gt; id(test_method.class_property)</span><br><span class="line">140488040794968</span><br><span class="line">&gt;&gt;&gt; id(TestMethod.class_property)</span><br><span class="line">140488040794968</span><br><span class="line">&gt;&gt;&gt; print test_method.class_property</span><br><span class="line">class property</span><br><span class="line">&gt;&gt;&gt; test_method.class_property = test_method.class_property + "!!!"</span><br><span class="line">&gt;&gt;&gt; print test_method.class_property</span><br><span class="line">class property!!!</span><br><span class="line">&gt;&gt;&gt; print TestMethod.class_property</span><br><span class="line">class property</span><br><span class="line">&gt;&gt;&gt; id(test_method.class_property)</span><br><span class="line">140488040795080</span><br><span class="line">&gt;&gt;&gt; id(TestMethod.class_property)</span><br><span class="line">140488040794968</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">&gt;&gt;&gt; class TestMethod(object):
+...     class_property = &quot;class property&quot;
+...     def __init__(self):
+...         pass
+... 
+&gt;&gt;&gt; test_method = TestMethod()
+&gt;&gt;&gt; id(test_method.class_property)
+140488040794968
+&gt;&gt;&gt; id(TestMethod.class_property)
+140488040794968
+&gt;&gt;&gt; print test_method.class_property
+class property
+&gt;&gt;&gt; test_method.class_property = test_method.class_property + &quot;!!!&quot;
+&gt;&gt;&gt; print test_method.class_property
+class property!!!
+&gt;&gt;&gt; print TestMethod.class_property
+class property
+&gt;&gt;&gt; id(test_method.class_property)
+140488040795080
+&gt;&gt;&gt; id(TestMethod.class_property)
+140488040794968
+</code></pre>
 
     </div> <!-- .post-content -->
     <div class="post-footer">

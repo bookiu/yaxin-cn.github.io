@@ -72,10 +72,32 @@
 <p>由于是开发环境，我们首先需要将docker container开启ssh服务，以便随时登录到上面查看修改配置，之后再去搭建真正的开发环境。所以我们可以先创建一个开启了ssh服务的image来作为base image，然后在它的基础之上搭建不通的开发环境。</p>
 <p>创建镜像需要使用到Dockerfile，Dockerfile的具体语法可以到<a href="http://docker-docs.qiniudn.com/reference/builder/" title="Dockerfile文档" target="_blank" rel="external">官网</a>去查看，这里不详细介绍。</p>
 <p>先上<em>Dockerfile</em>内容：</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># sshd</span></span><br><span class="line"><span class="comment"># VERSION 1.0.0</span></span><br><span class="line"></span><br><span class="line">FROM ubuntu:<span class="number">14.04</span></span><br><span class="line">MAINTAINER yaxin &lt;yaxin.me@gmail.com&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># make sure the package repository is up to date</span></span><br><span class="line">RUN sed -i <span class="string">"s/archive.ubuntu.com/mirrors.aliyun.com/g"</span> /etc/apt/sources.list</span><br><span class="line">RUN apt-get update</span><br><span class="line">RUN apt-get install -y openssh-server</span><br><span class="line"><span class="comment"># Config ssh server</span></span><br><span class="line">RUN mkdir -p /var/run/sshd</span><br><span class="line">RUN sed -i <span class="string">"s/^PermitRootLogin without-password/PermitRootLogin yes/g"</span> /etc/ssh/sshd_config</span><br><span class="line">RUN sed -i <span class="string">"s/^#GSSAPIAuthentication no/GSSAPIAuthentication no/g"</span> /etc/ssh/sshd_config</span><br><span class="line">RUN <span class="built_in">echo</span> <span class="string">"UseDNS no"</span> &gt;&gt; /etc/ssh/sshd_config</span><br><span class="line">RUN <span class="built_in">echo</span> <span class="string">'root:root'</span> | chpasswd</span><br><span class="line"></span><br><span class="line">EXPOSE <span class="number">22</span></span><br><span class="line">CMD [<span class="string">"/usr/sbin/sshd"</span>, <span class="string">"-D"</span>]</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash"># sshd
+# VERSION 1.0.0
+
+FROM ubuntu:14.04
+MAINTAINER yaxin &lt;yaxin.me@gmail.com&gt;
+
+# make sure the package repository is up to date
+RUN sed -i &quot;s/archive.ubuntu.com/mirrors.aliyun.com/g&quot; /etc/apt/sources.list
+RUN apt-get update
+RUN apt-get install -y openssh-server
+# Config ssh server
+RUN mkdir -p /var/run/sshd
+RUN sed -i &quot;s/^PermitRootLogin without-password/PermitRootLogin yes/g&quot; /etc/ssh/sshd_config
+RUN sed -i &quot;s/^#GSSAPIAuthentication no/GSSAPIAuthentication no/g&quot; /etc/ssh/sshd_config
+RUN echo &quot;UseDNS no&quot; &gt;&gt; /etc/ssh/sshd_config
+RUN echo 'root:root' | chpasswd
+
+EXPOSE 22
+CMD [&quot;/usr/sbin/sshd&quot;, &quot;-D&quot;]
+</code></pre>
 <p>新建文件夹并将上面的代码保存为以<strong>Dockerfile</strong>命名的文本文件。</p>
 <p>然后执行</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox sshd]<span class="variable">$ls</span></span><br><span class="line">Dockerfile</span><br><span class="line">[yaxin@ubox sshd]<span class="variable">$docker</span> build -t ubuntu:base .</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox sshd]$ls
+Dockerfile
+[yaxin@ubox sshd]$docker build -t ubuntu:base .
+</code></pre>
 <p>来创建镜像。下面来稍微解释一下Dockerfile的内容</p>
 <h3>FROM</h3>
 <p>必须是Dockerfile的第一句，之后的操作都是在这个镜像之上进行的。如果你没有，那要先下载，<code>docker pull ubuntu</code>，如果无法下载，翻墙吧。如果你有国外vps，那么你可以在vps上<code>docker pull ubuntu</code>下载该镜像然后<code>docker save ubuntu:14.04 | bzip2 -9 -c &gt; ubuntu_14.04.tar.bz2</code>，然后下载ubuntu_14.04.tar.bz2到本机，运行<code>bzip2 -d -c &lt; ubuntu_14.04.tar.bz2 | docker load</code>导入镜像，我就是这么干的。</p>
@@ -88,11 +110,38 @@
 <h3>CMD</h3>
 <p>跟<code>RUN</code>一样，也是执行shell命令，不同的是<code>RUN</code>是在创建镜像的时候执行，而<code>CMD</code>是在每次执行<code>docker run image</code>的时候执行。</p>
 <p>build完镜像后，我们执行<code>docker images</code>会发现多了一个镜像</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox sshd]<span class="variable">$docker</span> images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE</span><br><span class="line">ubuntu              base                <span class="number">615</span>ea4d4c1e0        <span class="number">2</span> weeks ago         <span class="number">396.4</span> MB</span><br><span class="line">ubuntu              <span class="number">14.04</span>               ad892dd21d60        <span class="number">4</span> weeks ago         <span class="number">275.5</span> MB</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox sshd]$docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+ubuntu              base                615ea4d4c1e0        2 weeks ago         396.4 MB
+ubuntu              14.04               ad892dd21d60        4 weeks ago         275.5 MB
+</code></pre>
 <p>然后启动镜像</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox sshd]<span class="variable">$docker</span> run <span class="operator">-d</span> -P --name=<span class="string">"sshd"</span> ubuntu:base</span><br><span class="line">c2518b7cf9289567c258171e93462bdb7fffe873bf2251d7086<span class="built_in">cd</span>97e03e3ee57</span><br><span class="line">[yaxin@ubox sshd]<span class="variable">$docker</span> ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                   NAMES</span><br><span class="line">c2518b7cf928        ubuntu:base         /usr/sbin/sshd -D      <span class="number">4</span> seconds ago       Up <span class="number">3</span> seconds        <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">49153</span>-&gt;<span class="number">22</span>/tcp   sshd</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox sshd]$docker run -d -P --name=&quot;sshd&quot; ubuntu:base
+c2518b7cf9289567c258171e93462bdb7fffe873bf2251d7086cd97e03e3ee57
+[yaxin@ubox sshd]$docker ps
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                   NAMES
+c2518b7cf928        ubuntu:base         /usr/sbin/sshd -D      4 seconds ago       Up 3 seconds        0.0.0.0:49153-&gt;22/tcp   sshd
+</code></pre>
 <p>然后ssh 49153端口</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox sshd]<span class="variable">$ssh</span> root@localhost -p <span class="number">49153</span></span><br><span class="line">The authenticity of host <span class="string">'[localhost]:49153 ([::1]:49153)'</span> can<span class="string">'t be established.</span><br><span class="line">ECDSA key fingerprint is c4:a5:26:07:8b:72:97:40:f2:42:fa:35:9a:7c:d0:79.</span><br><span class="line">Are you sure you want to continue connecting (yes/no)? yes</span><br><span class="line">Warning: Permanently added '</span>[localhost]:<span class="number">49153</span><span class="string">' (ECDSA) to the list of known hosts.</span><br><span class="line">root@localhost'</span>s password: </span><br><span class="line">Welcome to Ubuntu <span class="number">14.04</span> LTS (GNU/Linux <span class="number">3.2</span>.<span class="number">0</span>-<span class="number">58</span>-generic x86_64)</span><br><span class="line"></span><br><span class="line"> * Documentation:  https://help.ubuntu.com/</span><br><span class="line"></span><br><span class="line">The programs included with the Ubuntu system are free software;</span><br><span class="line">the exact distribution terms <span class="keyword">for</span> each program are described <span class="keyword">in</span> the</span><br><span class="line">individual files <span class="keyword">in</span> /usr/share/doc/*/copyright.</span><br><span class="line"></span><br><span class="line">Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by</span><br><span class="line">applicable law.</span><br><span class="line"></span><br><span class="line">root@c2518b7cf928:~<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox sshd]$ssh root@localhost -p 49153
+The authenticity of host '[localhost]:49153 ([::1]:49153)' can't be established.
+ECDSA key fingerprint is c4:a5:26:07:8b:72:97:40:f2:42:fa:35:9a:7c:d0:79.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '[localhost]:49153' (ECDSA) to the list of known hosts.
+root@localhost's password: 
+Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.2.0-58-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+root@c2518b7cf928:~# 
+</code></pre>
 <p>自此，一个装有ssh服务的可以运行的base image就创建成功了。</p>
 
     </div> <!-- .entry-content -->
@@ -139,7 +188,23 @@
 <p>~3106 =&gt; CEF9</p>
 <p><em><em>C语言的</em>按位求反</em>是让操作数的二进制位上的1变为0，0变为1， 而python的<em>按位求反</em>这是将操作数加一然后乘以负一（~5 == -6），两者之所以出现不同就在于操作数是否是unsigned**</p>
 <p>附上最后的程序（注意一下如何将python的<em>按位求反</em>转为C语言的<em>按位求反</em>）</p>
-<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">checksum</span><span class="params">(data)</span>:</span></span><br><span class="line">    length = len(data)</span><br><span class="line">    s = <span class="number">0</span></span><br><span class="line">    n = length % <span class="number">2</span></span><br><span class="line">    <span class="comment"># 分割数据每两比特(16bit)为一组</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, length - n, <span class="number">2</span>):</span><br><span class="line">        s += ord(data[i]) + (ord(data[i+<span class="number">1</span>]) &lt;&lt; <span class="number">8</span>)</span><br><span class="line">    <span class="comment"># 如果数据长度为基数,则将最后一位单独相加</span></span><br><span class="line">    <span class="keyword">if</span> n:</span><br><span class="line">        s += ord(data[-<span class="number">1</span>])</span><br><span class="line">    <span class="comment"># 重复将高16位与低16位相加直到高16位为0</span></span><br><span class="line">    <span class="keyword">while</span> (s &gt;&gt; <span class="number">16</span>):</span><br><span class="line">        s = (s &amp; <span class="number">0xFFFF</span>) + (s &gt;&gt; <span class="number">16</span>)</span><br><span class="line">    s = ~s &amp; <span class="number">0xffff</span></span><br><span class="line">    <span class="comment"># 返回的是十进制整数</span></span><br><span class="line">    <span class="keyword">return</span> s</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">def checksum(data):
+    length = len(data)
+    s = 0
+    n = length % 2
+    # 分割数据每两比特(16bit)为一组
+    for i in range(0, length - n, 2):
+        s += ord(data[i]) + (ord(data[i+1]) &lt;&lt; 8)
+    # 如果数据长度为基数,则将最后一位单独相加
+    if n:
+        s += ord(data[-1])
+    # 重复将高16位与低16位相加直到高16位为0
+    while (s &gt;&gt; 16):
+        s = (s &amp; 0xFFFF) + (s &gt;&gt; 16)
+    s = ~s &amp; 0xffff
+    # 返回的是十进制整数
+    return s
+</code></pre>
 
     </div> <!-- .entry-content -->
   </article>
@@ -161,7 +226,11 @@
     </header>
     <div class="entry-content" itemprop="description">
         <p>在Python中数值和字符串对象是不可以改变的，但对于新手的我们很难理解，于是乎会有下面的代码:</p>
-<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">x = <span class="string">'Hello World'</span></span><br><span class="line"><span class="keyword">print</span> x</span><br><span class="line">x = <span class="string">'Hello Hello'</span></span><br><span class="line"><span class="keyword">print</span> x</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">x = 'Hello World'
+print x
+x = 'Hello Hello'
+print x
+</code></pre>
 <p>上面的代码明显的说明了变量<code>x</code>是可以改变的。其实变量<code>x</code>的改变伴随着<code>x</code>内存地址的变化，也就是说系统重新创建了一个名为<strong>x</strong>的变量用于保存新字符串。想要证明这个需要用到Python的<code>id</code>函数。</p>
 <p>id函数返回一个数字，这个数字跟该对象的分配内存地址密切相关。也可以近似认为这个数值就是该对象（变量）的所在内存地址。</p>
 <blockquote>
@@ -173,7 +242,15 @@ id(object) -&gt; integer</p>
 simultaneously existing objects.  (Hint: it's the object's memory address.)</p>
 </blockquote>
 <p>现在再来看下面的代码：</p>
-<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">x = <span class="string">'Hello World'</span></span><br><span class="line"><span class="keyword">print</span> id(x)</span><br><span class="line">x = <span class="string">'Hello Hello'</span></span><br><span class="line"><span class="keyword">print</span> id(x)</span><br><span class="line">y = [<span class="string">'a'</span>, <span class="string">'b'</span>]</span><br><span class="line"><span class="keyword">print</span> id(y)</span><br><span class="line">y.append(<span class="string">'c'</span>)</span><br><span class="line"><span class="keyword">print</span> id(y)</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-python">x = 'Hello World'
+print id(x)
+x = 'Hello Hello'
+print id(x)
+y = ['a', 'b']
+print id(y)
+y.append('c')
+print id(y)
+</code></pre>
 <p>你运行结果如下：</p>
 <blockquote>
 <p>21908576
@@ -203,9 +280,22 @@ simultaneously existing objects.  (Hint: it's the object's memory address.)</p>
     </header>
     <div class="entry-content" itemprop="description">
         <p>docker中删除images的命令是<code>docker rmi</code>，但有时候执行此命令并不能删除images</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE</span><br><span class="line">eg_sshd             latest              ed9c93747fe1        <span class="number">45</span> hours ago        <span class="number">329.8</span> MB</span><br><span class="line">CentOS65            latest              e55a74a32125        <span class="number">2</span> days ago          <span class="number">360.6</span> MB</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> rmi ed9c93747fe1</span><br><span class="line">Untagged: ed9c93747fe16627be822ad3f7feeb8b4468200e5357877d3046aa83cc44c6af</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE</span><br><span class="line">&lt;none&gt;              &lt;none&gt;              ed9c93747fe1        <span class="number">45</span> hours ago        <span class="number">329.8</span> MB</span><br><span class="line">CentOS65            latest              e55a74a32125        <span class="number">2</span> days ago          <span class="number">360.6</span> MB</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox ~]$docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+eg_sshd             latest              ed9c93747fe1        45 hours ago        329.8 MB
+CentOS65            latest              e55a74a32125        2 days ago          360.6 MB
+[yaxin@ubox ~]$docker rmi ed9c93747fe1
+Untagged: ed9c93747fe16627be822ad3f7feeb8b4468200e5357877d3046aa83cc44c6af
+[yaxin@ubox ~]$docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+&lt;none&gt;              &lt;none&gt;              ed9c93747fe1        45 hours ago        329.8 MB
+CentOS65            latest              e55a74a32125        2 days ago          360.6 MB
+</code></pre>
 <p>可以看出，image并没有被删除，只是他的tag被删除了，再次执行<code>docker rmi IMAGE_ID</code>只会报错</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> rmi ed9c93747fe1</span><br><span class="line">Error: image_delete: Conflict, ed9c93747fe1 wasn<span class="string">'t deleted</span><br><span class="line">2014/03/22 15:58:27 Error: failed to remove one or more images</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox ~]$docker rmi ed9c93747fe1
+Error: image_delete: Conflict, ed9c93747fe1 wasn't deleted
+2014/03/22 15:58:27 Error: failed to remove one or more images
+</code></pre>
 <p>查看docker的帮助会发现有两个与删除有关的命令<code>rm</code>和<code>rmi</code></p>
 <blockquote>
 <p>rm        Remove one or more containers<br>
@@ -214,12 +304,34 @@ rmi       Remove one or more images</p>
 <p>这里有两个不同的单词，<strong>images</strong>和<strong>container</strong>。其中images很好理解，跟平常使用的虚拟机的镜像一个意思，相当于一个模版，而container则是images运行时的的状态。docker对于运行过的image都保留一个状态（container），可以使用命令<code>docker ps</code>来查看正在运行的container，对于已经退出的container，则可以使用<code>docker ps -a</code>来查看。 如果你退出了一个container而忘记保存其中的数据，你可以使用<code>docker ps -a</code>来找到对应的运行过的container使用<code>docker commit</code>命令将其保存为image然后运行。</p>
 <p>回到之前的问题，由于image被某个container引用（拿来运行），如果不将这个引用的container销毁（删除），那image肯定是不能被删除。</p>
 <p>所以想要删除运行过的images必须首先删除它的container。继续来看刚才的例子，</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> ps <span class="operator">-a</span></span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                   NAMES</span><br><span class="line"><span class="number">117843</span>ade696        ed9c93747fe1        /bin/sh -c /usr/sbin   <span class="number">46</span> hours ago        Up <span class="number">46</span> hours         <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">49153</span>-&gt;<span class="number">22</span>/tcp   <span class="built_in">test</span>_sshd</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox ~]$docker ps -a
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                   NAMES
+117843ade696        ed9c93747fe1        /bin/sh -c /usr/sbin   46 hours ago        Up 46 hours         0.0.0.0:49153-&gt;22/tcp   test_sshd
+</code></pre>
 <p>可以看出<strong>ed9c93747fe1</strong>的image被<strong>117843ade696</strong>的container使用着，所以必须首先删除该container</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> rm <span class="number">117843</span>ade696</span><br><span class="line">Error: container_delete: Impossible to remove a running container, please stop it first</span><br><span class="line"><span class="number">2014</span>/<span class="number">03</span>/<span class="number">22</span> <span class="number">16</span>:<span class="number">36</span>:<span class="number">44</span> Error: failed to remove one or more containers</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox ~]$docker rm 117843ade696
+Error: container_delete: Impossible to remove a running container, please stop it first
+2014/03/22 16:36:44 Error: failed to remove one or more containers
+</code></pre>
 <p>出现错误，这是因为该container正在运行中(运行<code>docker ps</code>查看)，先将其关闭</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> stop <span class="number">117843</span>ade696</span><br><span class="line"><span class="number">117843</span>ade696</span><br></pre></td></tr></table></figure></p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> rm <span class="number">117843</span>ade696</span><br><span class="line"><span class="number">117843</span>ade696</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> rmi ed9c93747fe1</span><br><span class="line">Deleted: ed9c93747fe16627be822ad3f7feeb8b4468200e5357877d3046aa83cc44c6af</span><br><span class="line">Deleted: c8a0c19429daf73074040a14e527ad5734e70363c644f18c6815388b63eedc9b</span><br><span class="line">Deleted: <span class="number">95</span>dba4c468f0e53e5f1e5d76b8581d6740aab9f59141f783f8e263ccd7cf2a8e</span><br><span class="line">Deleted: c25dc743e40af6858c34375d450851bd606a70ace5d04e231a7fcc6d2ea23cc1</span><br><span class="line">Deleted: <span class="number">20562</span>f5714a5ce764845119399ef75e652e23135<span class="built_in">cd</span>5c54265ff8218b61ccbd33</span><br><span class="line">Deleted: c8af1dc23af7a7aea0c25ba9b28bdee68caa8866f056e4f2aa2a5fa1bcb12693</span><br><span class="line">Deleted: <span class="number">38</span>fdb2c5432e08ec6121f8dbb17e1fde17d5db4c1f149a9b702785dbf7b0f3be</span><br><span class="line">Deleted: <span class="number">79</span>ca14274c80ac1df1333b89b2a41c0e0e3b91<span class="built_in">cd</span>1b267b31bef852ceab3b2044</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE</span><br><span class="line">CentOS65            latest              e55a74a32125        <span class="number">2</span> days ago          <span class="number">360.6</span> MB</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@ubox ~]$docker stop 117843ade696
+117843ade696
+</code></pre>
+<pre><code class="language-bash">[yaxin@ubox ~]$docker rm 117843ade696
+117843ade696
+[yaxin@ubox ~]$docker rmi ed9c93747fe1
+Deleted: ed9c93747fe16627be822ad3f7feeb8b4468200e5357877d3046aa83cc44c6af
+Deleted: c8a0c19429daf73074040a14e527ad5734e70363c644f18c6815388b63eedc9b
+Deleted: 95dba4c468f0e53e5f1e5d76b8581d6740aab9f59141f783f8e263ccd7cf2a8e
+Deleted: c25dc743e40af6858c34375d450851bd606a70ace5d04e231a7fcc6d2ea23cc1
+Deleted: 20562f5714a5ce764845119399ef75e652e23135cd5c54265ff8218b61ccbd33
+Deleted: c8af1dc23af7a7aea0c25ba9b28bdee68caa8866f056e4f2aa2a5fa1bcb12693
+Deleted: 38fdb2c5432e08ec6121f8dbb17e1fde17d5db4c1f149a9b702785dbf7b0f3be
+Deleted: 79ca14274c80ac1df1333b89b2a41c0e0e3b91cd1b267b31bef852ceab3b2044
+[yaxin@ubox ~]$docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+CentOS65            latest              e55a74a32125        2 days ago          360.6 MB
+</code></pre>
 <p>可以看出，image已经被删除。</p>
 
     </div> <!-- .entry-content -->
@@ -244,19 +356,69 @@ rmi       Remove one or more images</p>
         <p>shell脚本可以使用read -s来默认禁止回显输入字符，这样做一定程度上可以保证安全性。但这并不是一个好的交互，因为对于输入密码并不能知道已经输入了多少个字符。而使用*（星号）来代替输入的字符是一个很不错的想法，即保证安全又有好的交互性。</p>
 <p>程序的实现</p>
 <p>首先要实现不显示输入字符，这个可以使用命令stty来实现</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">stty cbreak -echo</span><br><span class="line">dd <span class="keyword">if</span>=/dev/tty bs=<span class="number">1</span> count=<span class="number">1</span> <span class="number">2</span>&gt;/dev/null</span><br><span class="line">stty -cbreak <span class="built_in">echo</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">stty cbreak -echo
+dd if=/dev/tty bs=1 count=1 2&gt;/dev/null
+stty -cbreak echo
+</code></pre>
 <p>运行上面的命令（放在脚本中），可以发现输入一个字符并不会在屏幕上显示出来，这是因为<code>stty -echo</code>会禁止回显，而<code>dd if=/dev/tty bs=1 count=1 2&gt;/dev/null</code>则是获取刚刚输入的字符，如果将上面的命令放在$()中运行，并将其赋值给变量，打印会发现就是刚刚输入的字符。</p>
 <p>由于上面的命令只是接收一个字符，要多个字符的话需要使用while语句来实现，然后通过判断输入的字符是否为回车键来实现结束输入。</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">while</span> : ;<span class="keyword">do</span></span><br><span class="line">    char=`</span><br><span class="line">        stty cbreak -echo</span><br><span class="line">        dd <span class="keyword">if</span>=/dev/tty bs=<span class="number">1</span> count=<span class="number">1</span> <span class="number">2</span>&gt;/dev/null</span><br><span class="line">        stty -cbreak <span class="built_in">echo</span></span><br><span class="line">    `</span><br><span class="line">    <span class="keyword">if</span> [ <span class="string">"<span class="variable">$char</span>"</span> =  <span class="string">""</span> ];<span class="keyword">then</span></span><br><span class="line">        <span class="built_in">break</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    password=<span class="string">"<span class="variable">$password</span><span class="variable">$char</span>"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">while : ;do
+    char=`
+        stty cbreak -echo
+        dd if=/dev/tty bs=1 count=1 2&gt;/dev/null
+        stty -cbreak echo
+    `
+    if [ &quot;$char&quot; =  &quot;&quot; ];then
+        break
+    fi
+    password=&quot;$password$char&quot;
+done
+</code></pre>
 <p>然后我们来实现输出为星号。这个很简单，上面的程序在整个过程中不会输出任何字符，要实现输出只需要在每次while循环的结束输出一个*即可。</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">while</span> : ;<span class="keyword">do</span></span><br><span class="line">    char=`</span><br><span class="line">        stty cbreak -echo</span><br><span class="line">        dd <span class="keyword">if</span>=/dev/tty bs=<span class="number">1</span> count=<span class="number">1</span> <span class="number">2</span>&gt;/dev/null</span><br><span class="line">        stty -cbreak <span class="built_in">echo</span></span><br><span class="line">    `</span><br><span class="line">    <span class="keyword">if</span> [ <span class="string">"<span class="variable">$char</span>"</span> =  <span class="string">""</span> ];<span class="keyword">then</span></span><br><span class="line">        <span class="built_in">break</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    password=<span class="string">"<span class="variable">$password</span><span class="variable">$char</span>"</span></span><br><span class="line">    <span class="built_in">echo</span> -n <span class="string">"*"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">while : ;do
+    char=`
+        stty cbreak -echo
+        dd if=/dev/tty bs=1 count=1 2&gt;/dev/null
+        stty -cbreak echo
+    `
+    if [ &quot;$char&quot; =  &quot;&quot; ];then
+        break
+    fi
+    password=&quot;$password$char&quot;
+    echo -n &quot;*&quot;
+done
+</code></pre>
 <p>OK，全部实现完毕，密码存在password变量中。</p>
 <p>错误解决</p>
 <p>但在运行中会发现，按删除（backspace）不会减少个数，反而增加了。直接运行read命令，然后按backspace键，会发现输出了“^H”，这是因为backspace并未绑定为删除功能，需要在脚本中添加<code>stty erase &quot;^H&quot;</code>来解决这一问题。但此时问题还是存在，原因在于backspace也是一个按键，而while中的判断并未判断按键为backspace的情况，因而程序会运行到输出一行。解决的方法就是在while中判断backspace按键并进行相应的操作。</p>
 <p>首先是判断backspace按键，获取backspace按键的方法有两种：第一种是使用子shell输出backspace的转义字符即<code>$(echo -ne &quot;\b&quot;)</code>、第二种是利用vim，先按ctrl+v然后再backspace，就会输出backspace的标志。</p>
 <p>然后是删除之前的一个字符，这里使用shell的ANSI控制码，首先将光标前移一个字符<code>printf &quot;33[1D&quot;</code>，然后删除光标之后的字符<code>printf &quot;33[K&quot;</code>，当然，还要将最后一个字符从password变量中移除。</p>
 <p>最后完整的程序应该是：</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">x=<span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> : ;<span class="keyword">do</span></span><br><span class="line">    char=`</span><br><span class="line">        stty cbreak -echo</span><br><span class="line">        dd <span class="keyword">if</span>=/dev/tty bs=<span class="number">1</span> count=<span class="number">1</span> <span class="number">2</span>&gt;/dev/null</span><br><span class="line">        stty -cbreak <span class="built_in">echo</span></span><br><span class="line">    `</span><br><span class="line">    <span class="keyword">if</span> [ <span class="string">"<span class="variable">$char</span>"</span> =  <span class="string">""</span> ];<span class="keyword">then</span></span><br><span class="line">        <span class="built_in">break</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">if</span> [[ <span class="string">"<span class="variable">$ret</span>"</span> == $(<span class="built_in">echo</span> <span class="operator">-ne</span> <span class="string">'\b'</span>) ]];<span class="keyword">then</span></span><br><span class="line">        <span class="keyword">if</span> [ <span class="variable">$x</span> <span class="operator">-eq</span> <span class="number">0</span> ];<span class="keyword">then</span></span><br><span class="line">            <span class="built_in">continue</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">        password=<span class="string">"<span class="variable">$&#123;password%?&#125;</span>"</span></span><br><span class="line">        <span class="built_in">printf</span> <span class="string">"33[1D"</span></span><br><span class="line">        <span class="built_in">printf</span> <span class="string">"33[K"</span></span><br><span class="line">        <span class="built_in">let</span> x--</span><br><span class="line">        <span class="built_in">continue</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    password=<span class="string">"<span class="variable">$password</span><span class="variable">$char</span>"</span></span><br><span class="line">    <span class="built_in">echo</span> -n <span class="string">"*"</span></span><br><span class="line">    <span class="built_in">let</span> x++</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">x=0
+while : ;do
+    char=`
+        stty cbreak -echo
+        dd if=/dev/tty bs=1 count=1 2&gt;/dev/null
+        stty -cbreak echo
+    `
+    if [ &quot;$char&quot; =  &quot;&quot; ];then
+        break
+    fi
+    if [[ &quot;$ret&quot; == $(echo -ne '\b') ]];then
+        if [ $x -eq 0 ];then
+            continue
+        fi
+        password=&quot;${password%?}&quot;
+        printf &quot;33[1D&quot;
+        printf &quot;33[K&quot;
+        let x--
+        continue
+    fi
+    password=&quot;$password$char&quot;
+    echo -n &quot;*&quot;
+    let x++
+done
+</code></pre>
 
     </div> <!-- .entry-content -->
   </article>
@@ -278,7 +440,22 @@ rmi       Remove one or more images</p>
     </header>
     <div class="entry-content" itemprop="description">
         <p>一直以来都是使用<a href="http://xinmu.me/blog" target="_blank" rel="external">xinmu.me/blog</a>作为博客的首页，而<a href="http://xinmu.me" target="_blank" rel="external">xinmu.me</a>则一直荒废着。今天忽然想起了它，便想着先放一个链接上去，一个链接还是居中的好（浏览器正中央）。上网搜了各种方法，都需要知道元素的高度才可以，遂上SegmentFault（一个很好的地方）提问，得到了大神神飞的帮助，解决了问题，下面只是将解决办法复制、粘贴一下，原问题在此<a href="http://segmentfault.com/q/1010000000153017" target="_blank" rel="external">http://segmentfault.com/q/1010000000153017</a></p>
-<p><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="doctype">&lt;!DOCTYPE HTML&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">meta</span> <span class="attribute">http-equiv</span>=<span class="value">"Content-Type"</span> <span class="attribute">content</span>=<span class="value">"text/html; charset=utf-8"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">title</span>&gt;</span>只是文字的水平和垂直居中<span class="tag">&lt;/<span class="title">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">style</span>&gt;</span><span class="css"></span><br><span class="line"><span class="tag">html</span>,<span class="tag">body</span><span class="rules">&#123;<span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">100%</span></span></span>;<span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">100%</span></span></span>;<span class="rule"><span class="attribute">margin</span>:<span class="value"> <span class="number">0</span></span></span>;<span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span>&#125;</span><br><span class="line">body&#123;background-color: green</span></span>;<span class="rule"><span class="attribute">display</span>:<span class="value"> table</span></span>;&#125;</span></span><br><span class="line"><span class="tag">p</span><span class="rules">&#123;<span class="rule"><span class="attribute">line-height</span>:<span class="value"> <span class="number">1.6</span></span></span>;<span class="rule"><span class="attribute">text-align</span>:<span class="value"> center</span></span>;<span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span></span></span>;<span class="rule"><span class="attribute">margin</span>:<span class="value"> <span class="number">0</span></span></span>;<span class="rule"><span class="attribute">display</span>:<span class="value"> table-cell</span></span>;<span class="rule"><span class="attribute">vertical-align</span>:<span class="value"> middle</span></span>;&#125;</span></span><br><span class="line"></span><span class="tag">&lt;/<span class="title">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">body</span>&gt;</span></span><br><span class="line">true<span class="tag">&lt;<span class="title">p</span>&gt;</span>wording<span class="tag">&lt;/<span class="title">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">html</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-html">&lt;!DOCTYPE HTML&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;
+&lt;title&gt;只是文字的水平和垂直居中&lt;/title&gt;
+&lt;style&gt;
+html,body{width: 100%;height: 100%;margin: 0;padding: 0}
+body{background-color: green;display: table;}
+p{line-height: 1.6;text-align: center;padding: 0;margin: 0;display: table-cell;vertical-align: middle;}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;p&gt;wording&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
 
     </div> <!-- .entry-content -->
   </article>
@@ -301,14 +478,47 @@ rmi       Remove one or more images</p>
     <div class="entry-content" itemprop="description">
         <h2>方法一：使用ifconfig命令</h2>
 <p>直接在命令行中ifconfig，即可看到所有已连接网线（已经激活的网卡）的网卡信息</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@oishi ~]<span class="variable">$ifconfig</span></span><br><span class="line">eth0      Link encap:Ethernet  HWaddr <span class="number">00</span>:<span class="number">50</span>:<span class="number">56</span>:AC:<span class="number">57</span>:<span class="number">30</span>  </span><br><span class="line">          inet addr:<span class="number">10.10</span>.<span class="number">8.110</span>  Bcast:<span class="number">10.10</span>.<span class="number">8.255</span>  Mask:<span class="number">255.255</span>.<span class="number">255.0</span></span><br><span class="line">          UP BROADCAST RUNNING MULTICAST  MTU:<span class="number">1500</span>  Metric:<span class="number">1</span></span><br><span class="line">          RX packets:<span class="number">11645825</span> errors:<span class="number">0</span> dropped:<span class="number">0</span> overruns:<span class="number">0</span> frame:<span class="number">0</span></span><br><span class="line">          TX packets:<span class="number">9430946</span> errors:<span class="number">0</span> dropped:<span class="number">0</span> overruns:<span class="number">0</span> carrier:<span class="number">0</span></span><br><span class="line">          collisions:<span class="number">0</span> txqueuelen:<span class="number">1000</span> </span><br><span class="line">          RX bytes:<span class="number">2446979632</span> (<span class="number">2.2</span> GiB)  TX bytes:<span class="number">1937455163</span> (<span class="number">1.8</span> GiB)</span><br><span class="line"></span><br><span class="line">eth0:<span class="number">1</span>    Link encap:Ethernet  HWaddr <span class="number">00</span>:<span class="number">50</span>:<span class="number">56</span>:AC:<span class="number">57</span>:<span class="number">30</span>  </span><br><span class="line">          inet addr:<span class="number">10.10</span>.<span class="number">8.10</span>  Bcast:<span class="number">10.10</span>.<span class="number">8.255</span>  Mask:<span class="number">255.255</span>.<span class="number">255.0</span></span><br><span class="line">          UP BROADCAST RUNNING MULTICAST  MTU:<span class="number">1500</span>  Metric:<span class="number">1</span></span><br><span class="line"></span><br><span class="line">lo        Link encap:Local Loopback  </span><br><span class="line">          inet addr:<span class="number">127.0</span>.<span class="number">0.1</span>  Mask:<span class="number">255.0</span>.<span class="number">0.0</span></span><br><span class="line">          UP LOOPBACK RUNNING  MTU:<span class="number">16436</span>  Metric:<span class="number">1</span></span><br><span class="line">          RX packets:<span class="number">12722</span> errors:<span class="number">0</span> dropped:<span class="number">0</span> overruns:<span class="number">0</span> frame:<span class="number">0</span></span><br><span class="line">          TX packets:<span class="number">12722</span> errors:<span class="number">0</span> dropped:<span class="number">0</span> overruns:<span class="number">0</span> carrier:<span class="number">0</span></span><br><span class="line">          collisions:<span class="number">0</span> txqueuelen:<span class="number">0</span> </span><br><span class="line">          RX bytes:<span class="number">710416</span> (<span class="number">693.7</span> KiB)  TX bytes:<span class="number">710416</span> (<span class="number">693.7</span> KiB)</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@oishi ~]$ifconfig
+eth0      Link encap:Ethernet  HWaddr 00:50:56:AC:57:30  
+          inet addr:10.10.8.110  Bcast:10.10.8.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:11645825 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:9430946 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:2446979632 (2.2 GiB)  TX bytes:1937455163 (1.8 GiB)
+
+eth0:1    Link encap:Ethernet  HWaddr 00:50:56:AC:57:30  
+          inet addr:10.10.8.10  Bcast:10.10.8.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:12722 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:12722 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:710416 (693.7 KiB)  TX bytes:710416 (693.7 KiB)
+</code></pre>
 <h2>方法二：使用/sys目录</h2>
 <p>使用cd命令进入/sys/class/net/目录，然后ls查看目录下的文件，你会惊奇的发现里面有以网卡名命名的文件夹，</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@oishi net]<span class="variable">$ls</span></span><br><span class="line">eth0  lo</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@oishi net]$ls
+eth0  lo
+</code></pre>
 <p>这些文件夹便是你电脑中所有网卡，包括激活和未激活的（lo是本地回环网卡，并不是真实的网卡），cd进入任何一个目录（不是lo），然后，该网卡的所有信息便包含在里面(包括网卡的MAC地址信息)。</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@oishi net]<span class="variable">$ls</span></span><br><span class="line">eth0  lo</span><br><span class="line">[yaxin@oishi net]<span class="variable">$cd</span> eth0/</span><br><span class="line">[yaxin@oishi eth0]<span class="variable">$ls</span></span><br><span class="line">addr_assign_<span class="built_in">type</span>  broadcast  dev_id   features  ifindex    mtu        queues      subsystem     uevent</span><br><span class="line">address           carrier    dormant  flags     iflink     operstate  speed       tx_queue_len</span><br><span class="line">addr_len          device     duplex   ifalias   link_mode  power      statistics  <span class="built_in">type</span></span><br><span class="line">[yaxin@oishi eth0]$</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@oishi net]$ls
+eth0  lo
+[yaxin@oishi net]$cd eth0/
+[yaxin@oishi eth0]$ls
+addr_assign_type  broadcast  dev_id   features  ifindex    mtu        queues      subsystem     uevent
+address           carrier    dormant  flags     iflink     operstate  speed       tx_queue_len
+addr_len          device     duplex   ifalias   link_mode  power      statistics  type
+[yaxin@oishi eth0]$
+</code></pre>
 <p>然后使用cat命令查看一下address文件，显示的便是该网卡的MAC地址</p>
-<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@oishi eth0]<span class="variable">$cat</span> address </span><br><span class="line"><span class="number">00</span>:<span class="number">50</span>:<span class="number">56</span>:ac:<span class="number">57</span>:<span class="number">30</span></span><br><span class="line">[yaxin@oishi eth0]$</span><br></pre></td></tr></table></figure></p>
+<pre><code class="language-bash">[yaxin@oishi eth0]$cat address 
+00:50:56:ac:57:30
+[yaxin@oishi eth0]$
+</code></pre>
 
     </div> <!-- .entry-content -->
   </article>
