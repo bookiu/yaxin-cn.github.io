@@ -52,6 +52,48 @@
 </header> <!-- #site-header -->
   <div id="site-main">
     
+  <article id="post-1404821734" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
+    <header class="entry-header">
+      <div class="entry-meta">
+        <span class="entry-date date published updated">
+          <time datetime="2014-07-08T12:15:34.000Z" itemprop="datePublished"><a href="/Linux/solve-ssh-slow-to-ubuntu.html"><i class="icon-clock"></i>2014-07-08</a></time>
+        </span>
+        <span>•</span>
+        <span class="entry-comments">
+          <a href="/Linux/solve-ssh-slow-to-ubuntu.html#comments"><i class="icon-chat"></i>评论</a>
+        </span>
+      </div><!-- .entry-meta -->
+      <h1 class="entry-title" itemprop="name">
+        <a href="http://yaxin-cn.github.io/Linux/solve-ssh-slow-to-ubuntu.html" rel="bookmark" title="解决ssh到ubuntu server卡顿" itemprop="url">解决ssh到ubuntu server卡顿</a>
+      </h1> <!-- .entry-title -->
+    </header>
+    <div class="entry-content" itemprop="description">
+        <p>ssh到ubuntu14.04卡的要死，google一下无非是修改<strong>sshd_config</strong>文件中的<code>GSSAPIAuthentication</code>和<code>UseDNS</code>选项，但依然无济于事。</p>
+<p>使用<code>-v</code>参数（可以输出ssh详细过程）ssh发现卡顿是发生在输入密码之后的</p>
+<pre><code class="language-bash">yaxin@192.168.1.1's password:
+debug1: Authentication succeeded (password).
+debug1: channel 0: new [client-session]
+debug1: Requesting no-more-sessions@openssh.com
+debug1: Entering interactive session. # 卡一段时间
+</code></pre>
+<p>这说明进入交互式终端的时候卡了，再来看登录后</p>
+<pre><code class="language-bash">Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
+......
+62 packages can be updated.
+43 updates are security updates.
+
+Last login: Tue Jul  8 20:29:20 2014 from 192.168.1.5
+</code></pre>
+<p>上面的内容在其它版本中为<code>/etc/motd</code>中的内容，但ubuntu是动态生成该内容，生成脚本在<code>/etc/update-motd.d</code>目录下，查看脚本可以是联网检测系统更新等情况。呵呵，如何禁用。</p>
+<p>修改<code>/etc/pam.d/sshd</code>和<code>/etc/pam.d/login</code>文件中的有<strong>pam_motd.so</strong>的行注释掉</p>
+<pre><code class="language-bash">#session    optional     pam_motd.so  motd=/run/motd.dynamic noupdate
+#session    optional     pam_motd.so # [1]
+</code></pre>
+<p>再次ssh，这次没有了上面的update等信息了，但ssh也不卡顿了。</p>
+
+    </div> <!-- .entry-content -->
+  </article>
+
   <article id="post-1404450418" class="section-box article article-type-post entry-article" itemscope itemprop="blogPost">
     <header class="entry-header">
       <div class="entry-meta">

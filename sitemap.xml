@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yaxin-cn.github.io/Linux/expose-port-of-running-docker-container.html</loc>
+    <lastmod>2016-01-26T09:57:25.150Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://yaxin-cn.github.io/googlee16e317884a67617.html</loc>
     <lastmod>2016-01-16T07:53:32.512Z</lastmod>
   </url>
@@ -29,11 +34,6 @@
   <url>
     <loc>http://yaxin-cn.github.io/about.html</loc>
     <lastmod>2015-05-13T09:52:27.018Z</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://yaxin-cn.github.io/front-end/make-element-vertical-center-with-css.html</loc>
-    <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
   <url>
@@ -78,6 +78,11 @@
   
   <url>
     <loc>http://yaxin-cn.github.io/Linux/manage-startup-program-on-ubuntu-server.html</loc>
+    <lastmod>2015-05-13T09:52:06.326Z</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://yaxin-cn.github.io/front-end/make-element-vertical-center-with-css.html</loc>
     <lastmod>2015-05-13T09:52:06.326Z</lastmod>
   </url>
   
