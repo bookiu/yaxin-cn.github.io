@@ -68,9 +68,9 @@
       </h1> <!-- .entry-title -->
     </header>
     <div class="entry-content" itemprop="description">
-        <p>docker自带了<code>EXPOSE</code>命令，可以通过编写<code>dockerfile</code>加<code>-p</code>参数方便的映射container内部端口，但是对于已经运行的container，如果你想对外开放一个新的对口，只能编辑<code>dockerfile</code>然后重新build，有点不太方便。</p>
-<p>其实docker使用了<code>iptables</code>来做端口映射的，所以我们可以通过一些简单的操作来实现动态映射运行中的container端口。</p>
-<p>通过运行<code>iptables</code>命令可以看到具体的端口映射(下面的实例中IP为172.17.0.2的container开放了50000和8080端口)</p>
+        <p>docker自带了<code>EXPOSE</code>命令，可以通过编写<code>dockerfile</code>加<code>-p</code>参数方便的映射container内部端口，但是对于已经运行的container，如果你想对外开放一个新的端口，只能编辑<code>dockerfile</code>然后重新build，有点不太方便。</p>
+<p>其实docker本身使用了<code>iptables</code>来做端口映射的，所以我们可以通过一些简单的操作来实现动态映射运行中的container端口。</p>
+<p>通过运行<code>iptables</code>命令可以看到具体的端口映射(下面的实例中IP为192.168.42.41的container开放了22和20280等端口)</p>
 <pre><code class="language-shell">[yaxin@ubox ~]$sudo iptables -nvxL
 Chain INPUT (policy ACCEPT 262 packets, 529689 bytes)
     pkts      bytes target     prot opt in     out     source               destination
