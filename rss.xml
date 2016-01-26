@@ -7,13 +7,13 @@
     <link>http://yaxin-cn.github.io/</link>
     <atom:link href="/rss.xml" rel="self" type="application/rss+xml"/>
     <description><![CDATA[为梦想添砖加瓦]]></description>
-    <pubDate>Tue, 26 Jan 2016 10:13:57 GMT</pubDate>
+    <pubDate>Tue, 26 Jan 2016 10:26:42 GMT</pubDate>
     <generator>http://hexo.io/</generator>
     
     <item>
       <title><![CDATA[docker动态映射运行的container端口]]></title>
-      <link>http://yaxin-cn.github.io/Linux/expose-port-of-running-docker-container.html</link>
-      <guid>http://yaxin-cn.github.io/Linux/expose-port-of-running-docker-container.html</guid>
+      <link>http://yaxin-cn.github.io/Docker/expose-port-of-running-docker-container.html</link>
+      <guid>http://yaxin-cn.github.io/Docker/expose-port-of-running-docker-container.html</guid>
       <pubDate>Tue, 26 Jan 2016 09:12:03 GMT</pubDate>
       <description>
       <![CDATA[<p>docker自带了<code>EXPOSE</code>命令，可以通过编写<code>dockerfile</code>加<code>-p</code>参数方便的映射container内部端口，但是对于已经运行的container，如果你想对外开放一个新的端口，只能编辑<c]]>
@@ -276,7 +276,7 @@ else
 fi
 </code></pre>
 ]]></content:encoded>
-      <comments>http://yaxin-cn.github.io/Linux/expose-port-of-running-docker-container.html#disqus_comments</comments>
+      <comments>http://yaxin-cn.github.io/Docker/expose-port-of-running-docker-container.html#disqus_comments</comments>
     </item>
     
     <item>
