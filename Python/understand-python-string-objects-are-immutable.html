@@ -9,42 +9,58 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
 <head>
-  <meta charset="utf-8">
-  
-  <title>理解Python中数值和字符串对象是不可变化的 | 馨木</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>理解Python中数值和字符串对象是不可变化的 | 馨木</title>
+    <link rel="icon" href="/assets/favicon.ico">
+    <meta name="description" content="在Python中数值和字符串对象是不可以改变的，但对于新手的我们很难理解，于是乎会有下面的代码:
+x = 'Hello World'
+print x
+x = 'Hello Hello'
+print x
+
+上面的代码明显的说明了变量x是可以改变的。其实变量x的改变伴随着x内存地址的变化，也就是说系统重新创建了一个名为x的变量用于保存新字符串。想要证明这个需要用到Python的id函数。
+id函数返回一个数字，这个数字跟该对象的分配内存地址密切相关。也可以近似认为这个数值就是该对象（变量）的所在内存地址。
+
+python中id函数的说明
+Help on built-in function id in module builtin:
+id(...)
+id(object) -&gt; integer
+Return the identity of an object.  This is gua...">
+    
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
-  
-  
-  <link rel="icon" href="/assets/favicon.ico">
-  <link rel="stylesheet" href="/assets/app.css">
+    
+    
+    <link rel="stylesheet" href="/assets/app.css">
 <link rel="stylesheet" href="/assets/highlight-default.css">
 <link rel="stylesheet" href="/assets/pace-theme-flash.css">
 
-  <!-- <script src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script> -->
-  <!--[if lt IE 9]>
+    <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
-  <![endif]-->
+    <![endif]-->
 </head>
 
 
-<body id="sinle-post">
-  <header id="site-header">
-  <div id="site-nav">
-    <nav class="site-nav">
-      <ul>
-        <li ><a href="/">所有文章</a></li>
-        <li ><a href="/about.html">关于我</a></li>
-      </ul>
-    </nav>
-  </div>
-  <div id="site-title">
-	
-  </div>
+
+<body id="sinle-post" class="">
+<header id="site-header">
+    <div id="site-nav">
+        <nav class="site-nav">
+            <ul>
+                <li 
+                ><a href="/">所有文章</a></li>
+                <li 
+                ><a href="/about.html">关于我</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div id="site-title">
+        
+    </div>
 </header> <!-- #site-header -->
-  <div id="site-main">
+<div id="site-main">
     <article id="post-1400505092" class="article article-type-post">
   <header class="post-header">
     <div class="post-header-wrap">
@@ -125,8 +141,8 @@ print id(y)
 </div>
 
 
-  </div> <!-- #site-main -->
-  <footer id="site-footer">
+</div> <!-- #site-main -->
+<footer id="site-footer">
   <div class="copyright">
     <span>&copy; 2014 yaxin</span>
   </div>

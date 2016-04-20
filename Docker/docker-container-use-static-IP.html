@@ -9,42 +9,51 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
 <head>
-  <meta charset="utf-8">
-  
-  <title>Docker中使用固定IP | 馨木</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Docker中使用固定IP | 馨木</title>
+    <link rel="icon" href="/assets/favicon.ico">
+    <meta name="description" content="默认情况下启动一个container，其会自动获取一个跟docker0同网段的IP，而且重启container其IP一般会发生变化，但有时候我们会需要固定的IP。要实现这个并不困难。
+docker run启动一个container的命令有一个--net的参数用于指定container的网络类型
+
+--net=&quot;bridge&quot;  Set the Network mode for the container
+     'bridge': creates a new network stack for the container on the docker bridge
+     'none': no networking for this container
+     'container:&lt;name|id&gt;': reuses another contai...">
+    
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
-  
-  
-  <link rel="icon" href="/assets/favicon.ico">
-  <link rel="stylesheet" href="/assets/app.css">
+    
+    
+    <link rel="stylesheet" href="/assets/app.css">
 <link rel="stylesheet" href="/assets/highlight-default.css">
 <link rel="stylesheet" href="/assets/pace-theme-flash.css">
 
-  <!-- <script src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script> -->
-  <!--[if lt IE 9]>
+    <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
-  <![endif]-->
+    <![endif]-->
 </head>
 
 
-<body id="sinle-post">
-  <header id="site-header">
-  <div id="site-nav">
-    <nav class="site-nav">
-      <ul>
-        <li ><a href="/">所有文章</a></li>
-        <li ><a href="/about.html">关于我</a></li>
-      </ul>
-    </nav>
-  </div>
-  <div id="site-title">
-	
-  </div>
+
+<body id="sinle-post" class="">
+<header id="site-header">
+    <div id="site-nav">
+        <nav class="site-nav">
+            <ul>
+                <li 
+                ><a href="/">所有文章</a></li>
+                <li 
+                ><a href="/about.html">关于我</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div id="site-title">
+        
+    </div>
 </header> <!-- #site-header -->
-  <div id="site-main">
+<div id="site-main">
     <article id="post-1418278448" class="article article-type-post">
   <header class="post-header">
     <div class="post-header-wrap">
@@ -218,8 +227,8 @@ ip netns exec $pid ip route add default via $container_gw
 </div>
 
 
-  </div> <!-- #site-main -->
-  <footer id="site-footer">
+</div> <!-- #site-main -->
+<footer id="site-footer">
   <div class="copyright">
     <span>&copy; 2014 yaxin</span>
   </div>

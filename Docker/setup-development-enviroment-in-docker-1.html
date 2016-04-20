@@ -9,42 +9,55 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
 <head>
-  <meta charset="utf-8">
-  
-  <title>Docker中搭建开发环境1 | 馨木</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Docker中搭建开发环境1 | 馨木</title>
+    <link rel="icon" href="/assets/favicon.ico">
+    <meta name="description" content="由于docker有很好的隔离性，所以开发使用最适合不过。windows下配合**boot2docker**轻松击败重量级虚拟机。
+由于是开发环境，我们首先需要将docker container开启ssh服务，以便随时登录到上面查看修改配置，之后再去搭建真正的开发环境。所以我们可以先创建一个开启了ssh服务的image来作为base image，然后在它的基础之上搭建不通的开发环境。
+创建镜像需要使用到Dockerfile，Dockerfile的具体语法可以到官网去查看，这里不详细介绍。
+先上Dockerfile内容：
+# sshd
+# VERSION 1.0.0
+
+FROM ubuntu:14.04
+MAINTAINER yaxin &lt;yaxin.me@gmail.com&gt;
+
+# make sure the package repository is up to date...">
+    
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
-  
-  
-  <link rel="icon" href="/assets/favicon.ico">
-  <link rel="stylesheet" href="/assets/app.css">
+    
+    
+    <link rel="stylesheet" href="/assets/app.css">
 <link rel="stylesheet" href="/assets/highlight-default.css">
 <link rel="stylesheet" href="/assets/pace-theme-flash.css">
 
-  <!-- <script src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script> -->
-  <!--[if lt IE 9]>
+    <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
-  <![endif]-->
+    <![endif]-->
 </head>
 
 
-<body id="sinle-post">
-  <header id="site-header">
-  <div id="site-nav">
-    <nav class="site-nav">
-      <ul>
-        <li ><a href="/">所有文章</a></li>
-        <li ><a href="/about.html">关于我</a></li>
-      </ul>
-    </nav>
-  </div>
-  <div id="site-title">
-	
-  </div>
+
+<body id="sinle-post" class="">
+<header id="site-header">
+    <div id="site-nav">
+        <nav class="site-nav">
+            <ul>
+                <li 
+                ><a href="/">所有文章</a></li>
+                <li 
+                ><a href="/about.html">关于我</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div id="site-title">
+        
+    </div>
 </header> <!-- #site-header -->
-  <div id="site-main">
+<div id="site-main">
     <article id="post-1404450418" class="article article-type-post">
   <header class="post-header">
     <div class="post-header-wrap">
@@ -166,8 +179,8 @@ root@c2518b7cf928:~#
 </div>
 
 
-  </div> <!-- #site-main -->
-  <footer id="site-footer">
+</div> <!-- #site-main -->
+<footer id="site-footer">
   <div class="copyright">
     <span>&copy; 2014 yaxin</span>
   </div>

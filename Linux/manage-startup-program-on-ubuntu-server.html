@@ -9,42 +9,59 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
 <head>
-  <meta charset="utf-8">
-  
-  <title>管理ubuntu server自启程序 | 馨木</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>管理ubuntu server自启程序 | 馨木</title>
+    <link rel="icon" href="/assets/favicon.ico">
+    <meta name="description" content="本文所使用的环境为ubuntu14.04，ubuntu15.04使用systemd，可能会有很大的不同
+方法一
+使用类图形的sysv-rc-conf命令，你需要首先安装sysv-rc-conf
+[yaxin@~]$sudo apt-get install sysv-rc-conf
+[yaxin@~]$sudo sysv-rc-conf
+
+运行之后会有一个类图形的界面, 这个操作起来相当简单, 也容易懂，这里就不多介绍
+方法二
+首先使用runlevel命令获取系统运行在哪个level下（ubuntu server一般是2），如下：
+[yaxin@~]$runlevel
+N 2
+[yaxin@~]$
+
+然后将启动脚本放到/etc/rcX.d 其中X为运行级别，如/etc/rc2.d, 注意脚本要以大写S开头, 后面接一个两位数的数字，表示启动顺序，数字越小表示越先启动
+一般/etc/rc...">
+    
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
-  
-  
-  <link rel="icon" href="/assets/favicon.ico">
-  <link rel="stylesheet" href="/assets/app.css">
+    
+    
+    <link rel="stylesheet" href="/assets/app.css">
 <link rel="stylesheet" href="/assets/highlight-default.css">
 <link rel="stylesheet" href="/assets/pace-theme-flash.css">
 
-  <!-- <script src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script> -->
-  <!--[if lt IE 9]>
+    <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
-  <![endif]-->
+    <![endif]-->
 </head>
 
 
-<body id="sinle-post">
-  <header id="site-header">
-  <div id="site-nav">
-    <nav class="site-nav">
-      <ul>
-        <li ><a href="/">所有文章</a></li>
-        <li ><a href="/about.html">关于我</a></li>
-      </ul>
-    </nav>
-  </div>
-  <div id="site-title">
-	
-  </div>
+
+<body id="sinle-post" class="">
+<header id="site-header">
+    <div id="site-nav">
+        <nav class="site-nav">
+            <ul>
+                <li 
+                ><a href="/">所有文章</a></li>
+                <li 
+                ><a href="/about.html">关于我</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div id="site-title">
+        
+    </div>
 </header> <!-- #site-header -->
-  <div id="site-main">
+<div id="site-main">
     <article id="post-1431520110" class="article article-type-post">
   <header class="post-header">
     <div class="post-header-wrap">
@@ -142,8 +159,8 @@ stop on runlevel [!2345]
 </div>
 
 
-  </div> <!-- #site-main -->
-  <footer id="site-footer">
+</div> <!-- #site-main -->
+<footer id="site-footer">
   <div class="copyright">
     <span>&copy; 2014 yaxin</span>
   </div>

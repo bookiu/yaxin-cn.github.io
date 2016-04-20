@@ -9,42 +9,58 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
 <head>
-  <meta charset="utf-8">
-  
-  <title>icmp包检验和计算方法及python实现 | 馨木</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>icmp包检验和计算方法及python实现 | 馨木</title>
+    <link rel="icon" href="/assets/favicon.ico">
+    <meta name="description" content="发送icmp包时，需要计算icmp包的校验和，与ip包不同的是，icmp包需要连通头部信息加数据本身一起进行校验（ip包只需要校验头部信息）
+校验方法如下：
+
+把校验和字段置为0
+将icmp包（包括header和data）以16bit（2个字节）为一组，并将所有组相加（二进制求和）
+若高16bit不为0，则将高16bit与低16bit反复相加，直到高16bit的值为0，从而获得一个只有16bit长度的值
+将此16bit值进行按位求反操作，将所得值替换到校验和字段
+
+注意: 第四步中的按位求反值C语言的的按位求反（即~操作符），不是python中的按位求反
+例如下图中的icmp包：
+
+其中icmp包的内容为：
+
+08 00 F9 CE 7C E2 01 00 20 28 20 52 64 77 6A 6D 58 67 65 42 5A 2A 61 64 52 41 44 78 75 4...">
+    
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
-  
-  
-  <link rel="icon" href="/assets/favicon.ico">
-  <link rel="stylesheet" href="/assets/app.css">
+    
+    
+    <link rel="stylesheet" href="/assets/app.css">
 <link rel="stylesheet" href="/assets/highlight-default.css">
 <link rel="stylesheet" href="/assets/pace-theme-flash.css">
 
-  <!-- <script src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script> -->
-  <!--[if lt IE 9]>
+    <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
-  <![endif]-->
+    <![endif]-->
 </head>
 
 
-<body id="sinle-post">
-  <header id="site-header">
-  <div id="site-nav">
-    <nav class="site-nav">
-      <ul>
-        <li ><a href="/">所有文章</a></li>
-        <li ><a href="/about.html">关于我</a></li>
-      </ul>
-    </nav>
-  </div>
-  <div id="site-title">
-	
-  </div>
+
+<body id="sinle-post" class="">
+<header id="site-header">
+    <div id="site-nav">
+        <nav class="site-nav">
+            <ul>
+                <li 
+                ><a href="/">所有文章</a></li>
+                <li 
+                ><a href="/about.html">关于我</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div id="site-title">
+        
+    </div>
 </header> <!-- #site-header -->
-  <div id="site-main">
+<div id="site-main">
     <article id="post-1401431041" class="article article-type-post">
   <header class="post-header">
     <div class="post-header-wrap">
@@ -133,8 +149,8 @@
 </div>
 
 
-  </div> <!-- #site-main -->
-  <footer id="site-footer">
+</div> <!-- #site-main -->
+<footer id="site-footer">
   <div class="copyright">
     <span>&copy; 2014 yaxin</span>
   </div>

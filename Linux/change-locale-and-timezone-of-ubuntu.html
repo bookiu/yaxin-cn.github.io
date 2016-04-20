@@ -9,42 +9,57 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
 <head>
-  <meta charset="utf-8">
-  
-  <title>更改ubuntu语系和时区 | 馨木</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>更改ubuntu语系和时区 | 馨木</title>
+    <link rel="icon" href="/assets/favicon.ico">
+    <meta name="description" content="一、修改时区
+1. 交互式修改
+ubuntu提供了一个交互式的选择时区的命令dpkg-reconfigure tzdata，直接在命令行中输入此命令，然后选择自己的时区即可
+2. 直接修改
+另外一种方法相对简单，即直接复制相应的时区文件覆盖当前系统的时区文件
+[yaxin@ubox:~]$ cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+[yaxin@ubox:~]$ date
+Tue Nov  4 16:18:55 CST 2014
+
+修改是立即生效的。
+二、修改语系
+首先你需要使用locale-gen编译locale定义文件，直接在命令后面指定要编译的locale（可以查看/usr/share/i18n/SUPPORTED来获取locale的格式）
+[yaxin@ubox:~]$ sudo locale-gen zh_CN....">
+    
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
-  
-  
-  <link rel="icon" href="/assets/favicon.ico">
-  <link rel="stylesheet" href="/assets/app.css">
+    
+    
+    <link rel="stylesheet" href="/assets/app.css">
 <link rel="stylesheet" href="/assets/highlight-default.css">
 <link rel="stylesheet" href="/assets/pace-theme-flash.css">
 
-  <!-- <script src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script> -->
-  <!--[if lt IE 9]>
+    <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
-  <![endif]-->
+    <![endif]-->
 </head>
 
 
-<body id="sinle-post">
-  <header id="site-header">
-  <div id="site-nav">
-    <nav class="site-nav">
-      <ul>
-        <li ><a href="/">所有文章</a></li>
-        <li ><a href="/about.html">关于我</a></li>
-      </ul>
-    </nav>
-  </div>
-  <div id="site-title">
-	
-  </div>
+
+<body id="sinle-post" class="">
+<header id="site-header">
+    <div id="site-nav">
+        <nav class="site-nav">
+            <ul>
+                <li 
+                ><a href="/">所有文章</a></li>
+                <li 
+                ><a href="/about.html">关于我</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div id="site-title">
+        
+    </div>
 </header> <!-- #site-header -->
-  <div id="site-main">
+<div id="site-main">
     <article id="post-1415087969" class="article article-type-post">
   <header class="post-header">
     <div class="post-header-wrap">
@@ -111,8 +126,8 @@ Generation complete.
 </div>
 
 
-  </div> <!-- #site-main -->
-  <footer id="site-footer">
+</div> <!-- #site-main -->
+<footer id="site-footer">
   <div class="copyright">
     <span>&copy; 2014 yaxin</span>
   </div>
