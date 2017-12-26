@@ -18,9 +18,7 @@
     <meta name="description" content="docker自带了EXPOSE命令，可以通过编写dockerfile加-p参数方便的映射container内部端口，但是对于已经运行的container，如果你想对外开放一个新的端口，只能编辑dockerfile然后重新build，有点不太方便。
 其实docker本身使用了iptables来做端口映射的，所以我们可以通过一些简单的操作来实现动态映射运行中的container端口。
 通过运行iptables命令可以看到具体的端口映射(下面的实例中IP为192.168.42.41的container开放了22和20280等端口)
-[yaxin@ubox ~]$sudo iptables -nvxL
-Chain INPUT (policy ACCEPT 262 packets, 529689 bytes)
-    pkts      bytes target     prot opt in...">
+[yaxin@ubox ~]$sudo iptables -nvxL&#10;Chain INPUT (policy ACCEPT 262 packets, 529689 bytes)&#10;    pkts      bytes target     pro...">
     
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
     
@@ -32,6 +30,15 @@ Chain INPUT (policy ACCEPT 262 packets, 529689 bytes)
     <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
     <![endif]-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111552353-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-111552353-1');
+    </script>
 </head>
 
 
@@ -65,54 +72,7 @@ Chain INPUT (policy ACCEPT 262 packets, 529689 bytes)
       <p>docker自带了<code>EXPOSE</code>命令，可以通过编写<code>dockerfile</code>加<code>-p</code>参数方便的映射container内部端口，但是对于已经运行的container，如果你想对外开放一个新的端口，只能编辑<code>dockerfile</code>然后重新build，有点不太方便。</p>
 <p>其实docker本身使用了<code>iptables</code>来做端口映射的，所以我们可以通过一些简单的操作来实现动态映射运行中的container端口。</p>
 <p>通过运行<code>iptables</code>命令可以看到具体的端口映射(下面的实例中IP为192.168.42.41的container开放了22和20280等端口)</p>
-<pre><code class="language-shell">[yaxin@ubox ~]$sudo iptables -nvxL
-Chain INPUT (policy ACCEPT 262 packets, 529689 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
-   14355   789552 DROP       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:25
-
-Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
- 5479459 653248187 DOCKER     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0
-   93990 314970368 ACCEPT     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
- 4705395 2183219154 ACCEPT     all  --  docker0 !docker0  0.0.0.0/0            0.0.0.0/0
-       0        0 ACCEPT     all  --  docker0 docker0  0.0.0.0/0            0.0.0.0/0
-
-Chain OUTPUT (policy ACCEPT 282 packets, 622495 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
-
-Chain DOCKER (1 references)
-    pkts      bytes target     prot opt in     out     source               destination
-     218    13193 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:22280
- 4868186 297463902 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:20280
-   78663 13128102 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:22
-      47     4321 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:28159
-[yaxin@ubox ~]$sudo iptables -t nat -nvxL
-Chain PREROUTING (policy ACCEPT 210199 packets, 14035875 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
- 1219483 82563968 DOCKER     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL
-
-Chain INPUT (policy ACCEPT 197679 packets, 13316595 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
-
-Chain OUTPUT (policy ACCEPT 271553 packets, 16671466 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
-    1643    99251 DOCKER     all  --  *      *       0.0.0.0/0           !127.0.0.0/8          ADDRTYPE match dst-type LOCAL
-
-Chain POSTROUTING (policy ACCEPT 271743 packets, 16682594 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
-   13468   811013 MASQUERADE  all  --  *      !docker0  192.168.42.0/24      0.0.0.0/0
-       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:22280
-       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:20280
-       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:22
-       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:28159
-
-Chain DOCKER (2 references)
-    pkts      bytes target     prot opt in     out     source               destination
-      22     1404 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22280 to:192.168.42.41:22280
-     288    17156 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:20280 to:192.168.42.41:20280
-      93     5952 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22222 to:192.168.42.41:22
-       8      512 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:28159 to:192.168.42.41:28159
-</code></pre>
+<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]$sudo iptables -nvxL&#10;Chain INPUT (policy ACCEPT 262 packets, 529689 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;   14355   789552 DROP       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:25&#10;&#10;Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10; 5479459 653248187 DOCKER     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0&#10;   93990 314970368 ACCEPT     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED&#10; 4705395 2183219154 ACCEPT     all  --  docker0 !docker0  0.0.0.0/0            0.0.0.0/0&#10;       0        0 ACCEPT     all  --  docker0 docker0  0.0.0.0/0            0.0.0.0/0&#10;&#10;Chain OUTPUT (policy ACCEPT 282 packets, 622495 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;&#10;Chain DOCKER (1 references)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;     218    13193 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:22280&#10; 4868186 297463902 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:20280&#10;   78663 13128102 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:22&#10;      47     4321 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:28159&#10;[yaxin@ubox ~]$sudo iptables -t nat -nvxL&#10;Chain PREROUTING (policy ACCEPT 210199 packets, 14035875 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10; 1219483 82563968 DOCKER     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL&#10;&#10;Chain INPUT (policy ACCEPT 197679 packets, 13316595 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;&#10;Chain OUTPUT (policy ACCEPT 271553 packets, 16671466 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;    1643    99251 DOCKER     all  --  *      *       0.0.0.0/0           !127.0.0.0/8          ADDRTYPE match dst-type LOCAL&#10;&#10;Chain POSTROUTING (policy ACCEPT 271743 packets, 16682594 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;   13468   811013 MASQUERADE  all  --  *      !docker0  192.168.42.0/24      0.0.0.0/0&#10;       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:22280&#10;       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:20280&#10;       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:22&#10;       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:28159&#10;&#10;Chain DOCKER (2 references)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;      22     1404 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22280 to:192.168.42.41:22280&#10;     288    17156 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:20280 to:192.168.42.41:20280&#10;      93     5952 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22222 to:192.168.42.41:22&#10;       8      512 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:28159 to:192.168.42.41:28159</span><br></pre></td></tr></table></figure></p>
 <p>我们要做的就是根据自己container的情况配置iptables规则。</p>
 <p>首先是<strong>filter</strong>这个表，我们要配置其放通转发，docker默认已经将所有的<em>FORWARD</em>规则放到了<em>DOCKER</em>这个自建链(chain)中了，这样方便配置，也方便查看。</p>
 <p>然后再配置<strong>nat</strong>表为其配置<em>DNAT</em>，这个才是端口转发的核心配置。这个表中只需要配置<em>POSTROUTING</em>和<em>DOCKER</em>链即可，这里不讲为什么这么配置，如果想要深入了解iptables请google一下。</p>
@@ -121,20 +81,15 @@ Chain DOCKER (2 references)
 <ol>
 <li>找到docker为nginx分配的IP</li>
 </ol>
-<pre><code class="language-bash">[yaxin@ubox ~]$sudo docker inspect -f '{{.NetworkSettings.IPAddress}}' nginx
-192.168.42.43
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$sudo</span> docker inspect <span class="operator">-f</span> &#123;% raw %&#125;<span class="string">'&#123;&#123;.NetworkSettings.IPAddress&#125;&#125;'</span>&#123;% endraw %&#125; nginx</span><br><span class="line"><span class="number">192.168</span>.<span class="number">42.43</span></span><br></pre></td></tr></table></figure></p>
 <ol start="2">
 <li>配置iptables中filter表的FORWARD(DOCKER)链</li>
 </ol>
-<pre><code class="language-bash">[yaxin@ubox ~]$sudo iptables -A DOCKER ! -i docker0 -o docker0 -p tcp --dport 8888 -d 192.168.42.43 -j ACCEPT
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$sudo</span> iptables -A DOCKER ! -i docker0 -o docker0 -p tcp --dport <span class="number">8888</span> <span class="operator">-d</span> <span class="number">192.168</span>.<span class="number">42.43</span> -j ACCEPT</span><br></pre></td></tr></table></figure></p>
 <ol start="3">
 <li>配置iptables中nat表的PREROUTING(DOCKER)和POSTROUTING链</li>
 </ol>
-<pre><code class="language-bash">[yaxin@ubox ~]$sudo iptables -t nat -A POSTROUTING -p tcp --dport 8888 -s 192.168.42.43 -d 192.168.42.43 -j MASQUERADE
-[yaxin@ubox ~]$sudo iptables -t nat -A DOCKER ! -i dokcer0 -p tcp --dport 8899 -j DNAT --to-destination 192.168.42.43:8888
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$sudo</span> iptables -t nat -A POSTROUTING -p tcp --dport <span class="number">8888</span> <span class="operator">-s</span> <span class="number">192.168</span>.<span class="number">42.43</span> <span class="operator">-d</span> <span class="number">192.168</span>.<span class="number">42.43</span> -j MASQUERADE</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$sudo</span> iptables -t nat -A DOCKER ! -i dokcer0 -p tcp --dport <span class="number">8899</span> -j DNAT --to-destination <span class="number">192.168</span>.<span class="number">42.43</span>:<span class="number">8888</span></span><br></pre></td></tr></table></figure></p>
 <ol start="4">
 <li>
 <p>通过外网访问<code>curl http://IP:8899</code>就会显示nginx下配置的html页面</p>
@@ -143,182 +98,9 @@ Chain DOCKER (2 references)
 <p>最后iptables规则</p>
 </li>
 </ol>
-<pre><code class="language-shell">[yaxin@ubox ~]$sudo iptables -nvxL
-Chain INPUT (policy ACCEPT 67893 packets, 212661547 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
-   14364   790008 DROP       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:25
-
-Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
- 5479682 653269356 DOCKER     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0
-   94186 314986910 ACCEPT     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
- 4705658 2183254076 ACCEPT     all  --  docker0 !docker0  0.0.0.0/0            0.0.0.0/0
-       0        0 ACCEPT     all  --  docker0 docker0  0.0.0.0/0            0.0.0.0/0
-
-Chain OUTPUT (policy ACCEPT 71253 packets, 222512872 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
-
-Chain DOCKER (1 references)
-    pkts      bytes target     prot opt in     out     source               destination
-     218    13193 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:22280
- 4868186 297463902 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:20280
-   78663 13128102 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:22
-      47     4321 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:28159
-      27     4627 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.43        tcp dpt:8888
-[yaxin@ubox ~]$sudo iptables -t nat -nvxL
-Chain PREROUTING (policy ACCEPT 232 packets, 16606 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
- 1220281 82620790 DOCKER     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL
-
-Chain INPUT (policy ACCEPT 216 packets, 15671 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
-
-Chain OUTPUT (policy ACCEPT 317 packets, 19159 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
-    1644    99311 DOCKER     all  --  *      *       0.0.0.0/0           !127.0.0.0/8          ADDRTYPE match dst-type LOCAL
-
-Chain POSTROUTING (policy ACCEPT 321 packets, 19367 bytes)
-    pkts      bytes target     prot opt in     out     source               destination
-   13512   813656 MASQUERADE  all  --  *      !docker0  192.168.42.0/24      0.0.0.0/0
-       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:22280
-       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:20280
-       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:22
-       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:28159
-       0        0 MASQUERADE  tcp  --  *      *       192.168.42.43        192.168.42.43        tcp dpt:8888
-
-Chain DOCKER (2 references)
-    pkts      bytes target     prot opt in     out     source               destination
-      22     1404 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22280 to:192.168.42.41:22280
-     288    17156 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:20280 to:192.168.42.41:20280
-      93     5952 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22222 to:192.168.42.41:22
-       8      512 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:28159 to:192.168.42.41:28159
-       4      208 DNAT       tcp  --  !dokcer0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:8899 to:192.168.42.43:8888
-
-</code></pre>
+<p><figure class="highlight"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]$sudo iptables -nvxL&#10;Chain INPUT (policy ACCEPT 67893 packets, 212661547 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;   14364   790008 DROP       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:25&#10;&#10;Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10; 5479682 653269356 DOCKER     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0&#10;   94186 314986910 ACCEPT     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED&#10; 4705658 2183254076 ACCEPT     all  --  docker0 !docker0  0.0.0.0/0            0.0.0.0/0&#10;       0        0 ACCEPT     all  --  docker0 docker0  0.0.0.0/0            0.0.0.0/0&#10;&#10;Chain OUTPUT (policy ACCEPT 71253 packets, 222512872 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;&#10;Chain DOCKER (1 references)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;     218    13193 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:22280&#10; 4868186 297463902 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:20280&#10;   78663 13128102 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:22&#10;      47     4321 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.41        tcp dpt:28159&#10;      27     4627 ACCEPT     tcp  --  !docker0 docker0  0.0.0.0/0            192.168.42.43        tcp dpt:8888&#10;[yaxin@ubox ~]$sudo iptables -t nat -nvxL&#10;Chain PREROUTING (policy ACCEPT 232 packets, 16606 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10; 1220281 82620790 DOCKER     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL&#10;&#10;Chain INPUT (policy ACCEPT 216 packets, 15671 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;&#10;Chain OUTPUT (policy ACCEPT 317 packets, 19159 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;    1644    99311 DOCKER     all  --  *      *       0.0.0.0/0           !127.0.0.0/8          ADDRTYPE match dst-type LOCAL&#10;&#10;Chain POSTROUTING (policy ACCEPT 321 packets, 19367 bytes)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;   13512   813656 MASQUERADE  all  --  *      !docker0  192.168.42.0/24      0.0.0.0/0&#10;       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:22280&#10;       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:20280&#10;       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:22&#10;       0        0 MASQUERADE  tcp  --  *      *       192.168.42.41        192.168.42.41        tcp dpt:28159&#10;       0        0 MASQUERADE  tcp  --  *      *       192.168.42.43        192.168.42.43        tcp dpt:8888&#10;&#10;Chain DOCKER (2 references)&#10;    pkts      bytes target     prot opt in     out     source               destination&#10;      22     1404 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22280 to:192.168.42.41:22280&#10;     288    17156 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:20280 to:192.168.42.41:20280&#10;      93     5952 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22222 to:192.168.42.41:22&#10;       8      512 DNAT       tcp  --  !docker0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:28159 to:192.168.42.41:28159&#10;       4      208 DNAT       tcp  --  !dokcer0 *       0.0.0.0/0            0.0.0.0/0            tcp dpt:8899 to:192.168.42.43:8888</span><br></pre></td></tr></table></figure></p>
 <p>当然，使用手动配置也是比较麻烦的，所以我写了一个脚本来自动配置端口映射，使用方法脚本中有说明</p>
-<pre><code class="language-bash">#!/bin/bash
-# filename: docker_expose.sh
-
-if [ `id -u` -ne 0 ];then
-    echo &quot;[EROOR] Please use root to run this script&quot;
-    exit 23
-fi
-
-if [ $# -ne 3 ];then
-    echo &quot;Usage: $0 &lt;container_name&gt; &lt;add|del&gt; [[&lt;machine_ip&gt;:]&lt;machine_port&gt;:]&lt;container_port&gt;[/&lt;protocol_type&gt;]&quot;
-    exit 1
-fi
-
-IPV4_RE='(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])'
-
-container_name=$1
-action=$2
-arguments=$3
-
-# check action
-if [ &quot;$action&quot;x != &quot;add&quot;x -a &quot;$action&quot;x != &quot;del&quot;x ];then
-    echo &quot;[ERROR] Please use add or del parameter to add port map or delete port map&quot;
-    exit 654
-fi
-if [ &quot;$action&quot;x == &quot;add&quot;x ];then
-    action=&quot;A&quot;
-else
-    action=&quot;D&quot;
-fi
-
-# get container ip by container name
-container_ip=`docker inspect -f '{{.NetworkSettings.IPAddress}}' $container_name 2&gt; /dev/null`
-if [ -z $container_ip ];then
-    echo &quot;[ERROR] Get container's (${container_name}) IP error, please ensure you have this container&quot;
-    exit 2
-fi
-
-# parse arguments
-protocol_type=`echo $arguments | awk -F '/' '{print $2}'`
-if [ -z $protocol_type ];then
-    protocol_type=&quot;tcp&quot;
-fi
-
-# check protocol
-if [ &quot;$protocol_type&quot;x != &quot;tcp&quot;x -a &quot;$protocol_type&quot;x != &quot;udp&quot;x ];then
-    echo &quot;[ERROR] Only tcp or udp protocol is allowed&quot;
-    exit 99
-fi
-
-machine_ip=''
-machine_port=''
-container_port=''
-# split the left arguments
-arguments=${arguments%/*}
-machine_ip=`echo $arguments | awk -F ':' '{print $1}'`
-machine_port=`echo $arguments | awk -F ':' '{print $2}'`
-container_port=`echo $arguments | awk -F ':' '{print $3}'`
-if [ -z $machine_port ];then
-    # arguments is: 234
-    container_port=$machine_ip
-    machine_port=$machine_ip
-    unset machine_ip
-elif [ -z $container_port ];then
-    # arguments is: 234:456
-    container_port=$machine_ip
-    machine_port=$machine_port
-    unset machine_ip
-fi
-
-# check port number function
-_check_port_number() {
-    local port_num=$1
-    if ! echo $port_num | egrep &quot;^[0-9]+$&quot; &amp;&gt; /dev/null;then
-        echo &quot;[ERROR] Invalid port number $port_num&quot;
-        exit 3
-    fi
-    if [ $port_num -gt 65535 -o $port_num -lt 1 ];then
-        echo &quot;[ERROR] Port number $port_num is out of range(1-56635)&quot;
-        exit 4
-    fi
-}
-
-# check port and ip address
-_check_port_number $container_port
-_check_port_number $machine_port
-
-if [ ! -z $machine_ip ];then
-    if ! echo $machine_ip | egrep &quot;^${IPV4_RE}$&quot; &amp;&gt; /dev/null;then
-        echo &quot;[ERROR] Invalid Ip Adress $machine_ip&quot;
-        exit 5
-    fi
-
-    # check which interface bind the IP
-    for interface in `ifconfig -s | sed -n '2,$p' | awk '{print $1}'`;do
-        interface_ip=`ifconfig $interface | awk '/inet addr/{print substr($2,6)}'`
-        if [ &quot;$interface_ip&quot;x == &quot;$machine_ip&quot;x ];then
-            interface_name=$interface
-            break
-        fi
-    done
-
-    if [ -z $interface_name ];then
-        echo &quot;[ERROR] Can not find interface bind with $machine_ip&quot;
-        exit 98
-    fi
-fi
-
-# run iptables command
-echo &quot;[INFO] Now start to change rules to iptables&quot;
-echo &quot;[INFO] Changing POSTROUTING chain of nat table&quot;
-iptables -t nat -${action} POSTROUTING -p ${protocol_type} --dport ${container_port} -s ${container_ip} -d ${container_ip} -j MASQUERADE
-if [ -z $interface_name ];then
-    echo &quot;[INFO] Changing DOCKER chain of filter table&quot;
-    iptables -${action} DOCKER ! -i docker0 -o docker0 -p ${protocol_type} --dport ${container_port} -d ${container_ip} -j ACCEPT
-    echo &quot;[INFO] Changing DOCKER chain of nat table&quot;
-    iptables -t nat -${action} DOCKER ! -i docker0 -p ${protocol_type} --dport ${machine_port} -j DNAT --to-destination ${container_ip}:${container_port}
-else
-    echo &quot;[INFO] Changing DOCKER chain of filter table&quot;
-    iptables -${action} DOCKER -i $interface_name -o docker0 -p ${protocol_type} --dport ${container_port} -d ${container_ip} -j ACCEPT
-    echo &quot;[INFO] Changing DOCKER chain of nat table&quot;
-    iptables -t nat -${action} DOCKER -i $interface_name -p ${protocol_type} --dport ${machine_port} -j DNAT --to-destination ${container_ip}:${container_port}
-fi
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="shebang">#!/bin/bash</span></span><br><span class="line"><span class="comment"># filename: docker_expose.sh</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [ `id -u` <span class="operator">-ne</span> <span class="number">0</span> ];<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"[EROOR] Please use root to run this script"</span></span><br><span class="line">    <span class="built_in">exit</span> <span class="number">23</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$#</span> <span class="operator">-ne</span> <span class="number">3</span> ];<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"Usage: <span class="variable">$0</span> &lt;container_name&gt; &lt;add|del&gt; [[&lt;machine_ip&gt;:]&lt;machine_port&gt;:]&lt;container_port&gt;[/&lt;protocol_type&gt;]"</span></span><br><span class="line">    <span class="built_in">exit</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">IPV4_RE=<span class="string">'(([0-9]|[1-9][0-9]|1[0-9]&#123;2&#125;|2[0-4][0-9]|25[0-5])\.)&#123;3&#125;([0-9]|[1-9][0-9]|1[0-9]&#123;2&#125;|2[0-4][0-9]|25[0-5])'</span></span><br><span class="line"></span><br><span class="line">container_name=<span class="variable">$1</span></span><br><span class="line">action=<span class="variable">$2</span></span><br><span class="line">arguments=<span class="variable">$3</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># check action</span></span><br><span class="line"><span class="keyword">if</span> [ <span class="string">"<span class="variable">$action</span>"</span>x != <span class="string">"add"</span>x <span class="operator">-a</span> <span class="string">"<span class="variable">$action</span>"</span>x != <span class="string">"del"</span>x ];<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"[ERROR] Please use add or del parameter to add port map or delete port map"</span></span><br><span class="line">    <span class="built_in">exit</span> <span class="number">654</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="keyword">if</span> [ <span class="string">"<span class="variable">$action</span>"</span>x == <span class="string">"add"</span>x ];<span class="keyword">then</span></span><br><span class="line">    action=<span class="string">"A"</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    action=<span class="string">"D"</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># get container ip by container name</span></span><br><span class="line">container_ip=`docker inspect <span class="operator">-f</span> <span class="string">'&#123;% raw %&#125;&#123;&#123;.NetworkSettings.IPAddress&#125;&#125;&#123;% endraw %&#125;'</span> <span class="variable">$container_name</span> <span class="number">2</span>&gt; /dev/null`</span><br><span class="line"><span class="keyword">if</span> [ -z <span class="variable">$container_ip</span> ];<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"[ERROR] Get container's (<span class="variable">$&#123;container_name&#125;</span>) IP error, please ensure you have this container"</span></span><br><span class="line">    <span class="built_in">exit</span> <span class="number">2</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># parse arguments</span></span><br><span class="line">protocol_<span class="built_in">type</span>=`<span class="built_in">echo</span> <span class="variable">$arguments</span> | awk -F <span class="string">'/'</span> <span class="string">'&#123;print $2&#125;'</span>`</span><br><span class="line"><span class="keyword">if</span> [ -z <span class="variable">$protocol_type</span> ];<span class="keyword">then</span></span><br><span class="line">    protocol_<span class="built_in">type</span>=<span class="string">"tcp"</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># check protocol</span></span><br><span class="line"><span class="keyword">if</span> [ <span class="string">"<span class="variable">$protocol_type</span>"</span>x != <span class="string">"tcp"</span>x <span class="operator">-a</span> <span class="string">"<span class="variable">$protocol_type</span>"</span>x != <span class="string">"udp"</span>x ];<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"[ERROR] Only tcp or udp protocol is allowed"</span></span><br><span class="line">    <span class="built_in">exit</span> <span class="number">99</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">machine_ip=<span class="string">''</span></span><br><span class="line">machine_port=<span class="string">''</span></span><br><span class="line">container_port=<span class="string">''</span></span><br><span class="line"><span class="comment"># split the left arguments</span></span><br><span class="line">arguments=<span class="variable">$&#123;arguments%/*&#125;</span></span><br><span class="line">machine_ip=`<span class="built_in">echo</span> <span class="variable">$arguments</span> | awk -F <span class="string">':'</span> <span class="string">'&#123;print $1&#125;'</span>`</span><br><span class="line">machine_port=`<span class="built_in">echo</span> <span class="variable">$arguments</span> | awk -F <span class="string">':'</span> <span class="string">'&#123;print $2&#125;'</span>`</span><br><span class="line">container_port=`<span class="built_in">echo</span> <span class="variable">$arguments</span> | awk -F <span class="string">':'</span> <span class="string">'&#123;print $3&#125;'</span>`</span><br><span class="line"><span class="keyword">if</span> [ -z <span class="variable">$machine_port</span> ];<span class="keyword">then</span></span><br><span class="line">    <span class="comment"># arguments is: 234</span></span><br><span class="line">    container_port=<span class="variable">$machine_ip</span></span><br><span class="line">    machine_port=<span class="variable">$machine_ip</span></span><br><span class="line">    <span class="built_in">unset</span> machine_ip</span><br><span class="line"><span class="keyword">elif</span> [ -z <span class="variable">$container_port</span> ];<span class="keyword">then</span></span><br><span class="line">    <span class="comment"># arguments is: 234:456</span></span><br><span class="line">    container_port=<span class="variable">$machine_ip</span></span><br><span class="line">    machine_port=<span class="variable">$machine_port</span></span><br><span class="line">    <span class="built_in">unset</span> machine_ip</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># check port number function</span></span><br><span class="line"><span class="function"><span class="title">_check_port_number</span></span>() &#123;</span><br><span class="line">    <span class="built_in">local</span> port_num=<span class="variable">$1</span></span><br><span class="line">    <span class="keyword">if</span> ! <span class="built_in">echo</span> <span class="variable">$port_num</span> | egrep <span class="string">"^[0-9]+$"</span> &amp;&gt; /dev/null;<span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"[ERROR] Invalid port number <span class="variable">$port_num</span>"</span></span><br><span class="line">        <span class="built_in">exit</span> <span class="number">3</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">if</span> [ <span class="variable">$port_num</span> <span class="operator">-gt</span> <span class="number">65535</span> -o <span class="variable">$port_num</span> <span class="operator">-lt</span> <span class="number">1</span> ];<span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"[ERROR] Port number <span class="variable">$port_num</span> is out of range(1-56635)"</span></span><br><span class="line">        <span class="built_in">exit</span> <span class="number">4</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># check port and ip address</span></span><br><span class="line">_check_port_number <span class="variable">$container_port</span></span><br><span class="line">_check_port_number <span class="variable">$machine_port</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [ ! -z <span class="variable">$machine_ip</span> ];<span class="keyword">then</span></span><br><span class="line">    <span class="keyword">if</span> ! <span class="built_in">echo</span> <span class="variable">$machine_ip</span> | egrep <span class="string">"^<span class="variable">$&#123;IPV4_RE&#125;</span>$"</span> &amp;&gt; /dev/null;<span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"[ERROR] Invalid Ip Adress <span class="variable">$machine_ip</span>"</span></span><br><span class="line">        <span class="built_in">exit</span> <span class="number">5</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># check which interface bind the IP</span></span><br><span class="line">    <span class="keyword">for</span> interface <span class="keyword">in</span> `ifconfig <span class="operator">-s</span> | sed -n <span class="string">'2,$p'</span> | awk <span class="string">'&#123;print $1&#125;'</span>`;<span class="keyword">do</span></span><br><span class="line">        interface_ip=`ifconfig <span class="variable">$interface</span> | awk <span class="string">'/inet addr/&#123;print substr($2,6)&#125;'</span>`</span><br><span class="line">        <span class="keyword">if</span> [ <span class="string">"<span class="variable">$interface_ip</span>"</span>x == <span class="string">"<span class="variable">$machine_ip</span>"</span>x ];<span class="keyword">then</span></span><br><span class="line">            interface_name=<span class="variable">$interface</span></span><br><span class="line">            <span class="built_in">break</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> [ -z <span class="variable">$interface_name</span> ];<span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"[ERROR] Can not find interface bind with <span class="variable">$machine_ip</span>"</span></span><br><span class="line">        <span class="built_in">exit</span> <span class="number">98</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># run iptables command</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"[INFO] Now start to change rules to iptables"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"[INFO] Changing POSTROUTING chain of nat table"</span></span><br><span class="line">iptables -t nat -<span class="variable">$&#123;action&#125;</span> POSTROUTING -p <span class="variable">$&#123;protocol_type&#125;</span> --dport <span class="variable">$&#123;container_port&#125;</span> <span class="operator">-s</span> <span class="variable">$&#123;container_ip&#125;</span> <span class="operator">-d</span> <span class="variable">$&#123;container_ip&#125;</span> -j MASQUERADE</span><br><span class="line"><span class="keyword">if</span> [ -z <span class="variable">$interface_name</span> ];<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"[INFO] Changing DOCKER chain of filter table"</span></span><br><span class="line">    iptables -<span class="variable">$&#123;action&#125;</span> DOCKER ! -i docker0 -o docker0 -p <span class="variable">$&#123;protocol_type&#125;</span> --dport <span class="variable">$&#123;container_port&#125;</span> <span class="operator">-d</span> <span class="variable">$&#123;container_ip&#125;</span> -j ACCEPT</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"[INFO] Changing DOCKER chain of nat table"</span></span><br><span class="line">    iptables -t nat -<span class="variable">$&#123;action&#125;</span> DOCKER ! -i docker0 -p <span class="variable">$&#123;protocol_type&#125;</span> --dport <span class="variable">$&#123;machine_port&#125;</span> -j DNAT --to-destination <span class="variable">$&#123;container_ip&#125;</span>:<span class="variable">$&#123;container_port&#125;</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"[INFO] Changing DOCKER chain of filter table"</span></span><br><span class="line">    iptables -<span class="variable">$&#123;action&#125;</span> DOCKER -i <span class="variable">$interface_name</span> -o docker0 -p <span class="variable">$&#123;protocol_type&#125;</span> --dport <span class="variable">$&#123;container_port&#125;</span> <span class="operator">-d</span> <span class="variable">$&#123;container_ip&#125;</span> -j ACCEPT</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"[INFO] Changing DOCKER chain of nat table"</span></span><br><span class="line">    iptables -t nat -<span class="variable">$&#123;action&#125;</span> DOCKER -i <span class="variable">$interface_name</span> -p <span class="variable">$&#123;protocol_type&#125;</span> --dport <span class="variable">$&#123;machine_port&#125;</span> -j DNAT --to-destination <span class="variable">$&#123;container_ip&#125;</span>:<span class="variable">$&#123;container_port&#125;</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
 
     </div> <!-- .post-content -->
     <div class="post-footer">

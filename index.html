@@ -27,6 +27,15 @@
     <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
     <![endif]-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111552353-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-111552353-1');
+    </script>
 </head>
 
 
@@ -97,11 +106,7 @@
         
             搭建了一个禅道的项目管理平台，但是Nginx下并不是伪静态的，URL看着不是很舒服，上网搜索配置规则，但是没有一个可以正常使用的，于是乎自己琢磨一下。
 先给出最终配置，有兴趣看原因的可以往下看
-server {
-    listen 80;
-    root /zentao/root/path/www;
-    index index.php index.html index.htm;
-    s
+server &#123;&#10;    listen 80;&#10;    root /zentao/root/path/www;&#10;    index index.php index.html
         
     </div> <!-- .entry-content -->
 </article>
@@ -148,8 +153,7 @@ server {
         
             添加
 Ubuntu下添加根证书非常简单, 只要将证书(扩展名为crt)复制到**/usr/local/share/ca-certificates**文件夹然后运行update-ca-certificates即可
-[yaxin@ubox ~]$sudo cp xinmu.crt /usr/local/share/ca-certificates
-[yaxin@ubox ~]$sudo update-c
+[yaxin@ubox ~]$sudo cp xinmu.crt /usr/local/share/ca-certificates[yaxin@ubox ~]$sudo update-ca
         
     </div> <!-- .entry-content -->
 </article>
@@ -174,10 +178,8 @@ Ubuntu下添加根证书非常简单, 只要将证书(扩展名为crt)复制到*
             本文所使用的环境为ubuntu14.04，ubuntu15.04使用systemd，可能会有很大的不同
 方法一
 使用类图形的sysv-rc-conf命令，你需要首先安装sysv-rc-conf
-[yaxin@~]$sudo apt-get install sysv-rc-conf
-[yaxin@~]$sudo sysv-rc-conf
-
-运行之后会有一个类图形的界面, 这个操作起来相当简单, 也容
+[yaxin@~]$sudo apt-get install sysv-rc-conf[yaxin@~]$sudo sysv-rc-conf
+运行之后会有一个类图形的界面, 这个操作起来相当简单, 也容易懂
         
     </div> <!-- .entry-content -->
 </article>
@@ -202,10 +204,7 @@ Ubuntu下添加根证书非常简单, 只要将证书(扩展名为crt)复制到*
             Python类中有两个特殊的修饰符@classmethod和@staticmethod(即类方法和静态方法), 想要理解需要先理解类属性和实例属性的感念
 类属性和实例属性
 看下面的代码
-&gt;&gt;&gt; class TestProperty(object):
-...     class_property = &quot;class property&quot;
-...     
-...  
+&gt;&gt;&gt; class TestProperty(object):...     class_property = "class property"...     ...     def __init
         
     </div> <!-- .entry-content -->
 </article>
@@ -253,14 +252,7 @@ docker run启动一个container的命令有一个--net的参数用于指定conta
     <div class="entry-content" itemprop="description">
         
             写一个数据分析的程序，中间要处理一个2x3矩阵的相加，遂写出了下面的代码
-def add(x, y):
-    return x + y
-
-
-def two_matrix_add(x, y):
-    result = []
-    for i in xrange(len(x)):
-        result.append(tuple(map(lambda t: reduce(add, t), 
+def add(x, y):    return x + ydef two_matrix_add(x, y):    result = []    for i in xrange(len(x)):        result.append(tuple(map(lambda t: reduce(add, t), zip(x[i
         
     </div> <!-- .entry-content -->
 </article>
@@ -287,8 +279,7 @@ def two_matrix_add(x, y):
 ubuntu提供了一个交互式的选择时区的命令dpkg-reconfigure tzdata，直接在命令行中输入此命令，然后选择自己的时区即可
 2. 直接修改
 另外一种方法相对简单，即直接复制相应的时区文件覆盖当前系统的时区文件
-[yaxin@ubox:~]$ cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-[y
+[yaxin@ubox:~]$ cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime[ya
         
     </div> <!-- .entry-content -->
 </article>
@@ -313,9 +304,7 @@ ubuntu提供了一个交互式的选择时区的命令dpkg-reconfigure tzdata，
             DataTime类跟date(),strtotime(),gmdate()等函数有相同的作用，都是用来处理日期和时间的，但DateTime类更加直观、方便, 所以在PHP5.2.0以后推荐使用DateTime类而不是相应的函数。
 下面来看一下DateTime类的用法。
 1. 获取当前系统时间并打印
-&lt;?php
-$date = new DateTime();
-echo $date-&gt;fo
+&lt;?php$date = new DateTime();echo $date-&gt;form
         
     </div> <!-- .entry-content -->
 </article>

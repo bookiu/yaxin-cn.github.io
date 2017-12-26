@@ -27,6 +27,15 @@
     <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
     <![endif]-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111552353-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-111552353-1');
+    </script>
 </head>
 
 
@@ -73,9 +82,7 @@
         
             ssh到ubuntu14.04卡的要死，google一下无非是修改sshd_config文件中的GSSAPIAuthentication和UseDNS选项，但依然无济于事。
 使用-v参数（可以输出ssh详细过程）ssh发现卡顿是发生在输入密码之后的
-yaxin@192.168.1.1's password:
-debug1: Authentication succeeded (password).
-
+yaxin@192.168.1.1's password:debug1: Authentication succeeded (password).de
         
     </div> <!-- .entry-content -->
 </article>
@@ -149,13 +156,9 @@ debug1: Authentication succeeded (password).
     <div class="entry-content" itemprop="description">
         
             在Python中数值和字符串对象是不可以改变的，但对于新手的我们很难理解，于是乎会有下面的代码:
-x = 'Hello World'
-print x
-x = 'Hello Hello'
-print x
-
+x = 'Hello World'print xx = 'Hello Hello'print x
 上面的代码明显的说明了变量x是可以改变的。其实变量x的改变伴随着x内存地址的变化，也就是说系统重新创建了一个名为x的变量用于保存新字符串。想要证明这个需要用到Python的id函数。
-id函数返回
+id函数返回一个数字
         
     </div> <!-- .entry-content -->
 </article>
@@ -178,9 +181,7 @@ id函数返回
     <div class="entry-content" itemprop="description">
         
             docker中删除images的命令是docker rmi，但有时候执行此命令并不能删除images
-[yaxin@ubox ~]$docker images
-REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
-eg_sshd             latest 
+[yaxin@ubox ~]$docker imagesREPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZEeg_sshd             latest   
         
     </div> <!-- .entry-content -->
 </article>
@@ -205,8 +206,7 @@ eg_sshd             latest
             shell脚本可以使用read -s来默认禁止回显输入字符，这样做一定程度上可以保证安全性。但这并不是一个好的交互，因为对于输入密码并不能知道已经输入了多少个字符。而使用*（星号）来代替输入的字符是一个很不错的想法，即保证安全又有好的交互性。
 程序的实现
 首先要实现不显示输入字符，这个可以使用命令stty来实现
-stty cbreak -echo
-dd if=/dev/tty bs=1 count
+stty cbreak -echodd if=/dev/tty bs=1 count=
         
     </div> <!-- .entry-content -->
 </article>
@@ -252,9 +252,7 @@ dd if=/dev/tty bs=1 count
         
             方法一：使用ifconfig命令
 直接在命令行中ifconfig，即可看到所有已连接网线（已经激活的网卡）的网卡信息
-[yaxin@oishi ~]$ifconfig
-eth0      Link encap:Ethernet  HWaddr 00:50:56:AC:57:30  
-          inet addr:10.10.8.110  Bcast:10.10.8.255  Mask:2
+[yaxin@oishi ~]$ifconfigeth0      Link encap:Ethernet  HWaddr 00:50:56:AC:57:30            inet addr:10.10.8.110  Bcast:10.10.8.255  Mask:255
         
     </div> <!-- .entry-content -->
 </article>

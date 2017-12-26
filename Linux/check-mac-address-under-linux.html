@@ -17,12 +17,7 @@
     <link rel="icon" href="/assets/favicon.ico">
     <meta name="description" content="方法一：使用ifconfig命令
 直接在命令行中ifconfig，即可看到所有已连接网线（已经激活的网卡）的网卡信息
-[yaxin@oishi ~]$ifconfig
-eth0      Link encap:Ethernet  HWaddr 00:50:56:AC:57:30  
-          inet addr:10.10.8.110  Bcast:10.10.8.255  Mask:255.255.255.0
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-          RX packets:11645825 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:9430946 errors:0 dropped:0 overrun...">
+[yaxin@oishi ~]$ifconfigeth0      Link encap:Ethernet  HWaddr 00:50:56:AC:57:30            inet addr:10.10.8.110  Bcast:10.10.8.255  Mask:255.255.255.0          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1          RX packets:11645825 errors:0 dropped:0 overruns:0 frame:0          TX packets:9430946 errors:0 dropped:0 overruns:0 c...">
     
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
     
@@ -34,6 +29,15 @@ eth0      Link encap:Ethernet  HWaddr 00:50:56:AC:57:30
     <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
     <![endif]-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111552353-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-111552353-1');
+    </script>
 </head>
 
 
@@ -66,47 +70,14 @@ eth0      Link encap:Ethernet  HWaddr 00:50:56:AC:57:30
     <div class="post-content">
       <h2>方法一：使用ifconfig命令</h2>
 <p>直接在命令行中ifconfig，即可看到所有已连接网线（已经激活的网卡）的网卡信息</p>
-<pre><code class="language-bash">[yaxin@oishi ~]$ifconfig
-eth0      Link encap:Ethernet  HWaddr 00:50:56:AC:57:30  
-          inet addr:10.10.8.110  Bcast:10.10.8.255  Mask:255.255.255.0
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-          RX packets:11645825 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:9430946 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:1000 
-          RX bytes:2446979632 (2.2 GiB)  TX bytes:1937455163 (1.8 GiB)
-
-eth0:1    Link encap:Ethernet  HWaddr 00:50:56:AC:57:30  
-          inet addr:10.10.8.10  Bcast:10.10.8.255  Mask:255.255.255.0
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-
-lo        Link encap:Local Loopback  
-          inet addr:127.0.0.1  Mask:255.0.0.0
-          UP LOOPBACK RUNNING  MTU:16436  Metric:1
-          RX packets:12722 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:12722 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:0 
-          RX bytes:710416 (693.7 KiB)  TX bytes:710416 (693.7 KiB)
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@oishi ~]<span class="variable">$ifconfig</span></span><br><span class="line">eth0      Link encap:Ethernet  HWaddr <span class="number">00</span>:<span class="number">50</span>:<span class="number">56</span>:AC:<span class="number">57</span>:<span class="number">30</span>  </span><br><span class="line">          inet addr:<span class="number">10.10</span>.<span class="number">8.110</span>  Bcast:<span class="number">10.10</span>.<span class="number">8.255</span>  Mask:<span class="number">255.255</span>.<span class="number">255.0</span></span><br><span class="line">          UP BROADCAST RUNNING MULTICAST  MTU:<span class="number">1500</span>  Metric:<span class="number">1</span></span><br><span class="line">          RX packets:<span class="number">11645825</span> errors:<span class="number">0</span> dropped:<span class="number">0</span> overruns:<span class="number">0</span> frame:<span class="number">0</span></span><br><span class="line">          TX packets:<span class="number">9430946</span> errors:<span class="number">0</span> dropped:<span class="number">0</span> overruns:<span class="number">0</span> carrier:<span class="number">0</span></span><br><span class="line">          collisions:<span class="number">0</span> txqueuelen:<span class="number">1000</span> </span><br><span class="line">          RX bytes:<span class="number">2446979632</span> (<span class="number">2.2</span> GiB)  TX bytes:<span class="number">1937455163</span> (<span class="number">1.8</span> GiB)</span><br><span class="line"></span><br><span class="line">eth0:<span class="number">1</span>    Link encap:Ethernet  HWaddr <span class="number">00</span>:<span class="number">50</span>:<span class="number">56</span>:AC:<span class="number">57</span>:<span class="number">30</span>  </span><br><span class="line">          inet addr:<span class="number">10.10</span>.<span class="number">8.10</span>  Bcast:<span class="number">10.10</span>.<span class="number">8.255</span>  Mask:<span class="number">255.255</span>.<span class="number">255.0</span></span><br><span class="line">          UP BROADCAST RUNNING MULTICAST  MTU:<span class="number">1500</span>  Metric:<span class="number">1</span></span><br><span class="line"></span><br><span class="line">lo        Link encap:Local Loopback  </span><br><span class="line">          inet addr:<span class="number">127.0</span>.<span class="number">0.1</span>  Mask:<span class="number">255.0</span>.<span class="number">0.0</span></span><br><span class="line">          UP LOOPBACK RUNNING  MTU:<span class="number">16436</span>  Metric:<span class="number">1</span></span><br><span class="line">          RX packets:<span class="number">12722</span> errors:<span class="number">0</span> dropped:<span class="number">0</span> overruns:<span class="number">0</span> frame:<span class="number">0</span></span><br><span class="line">          TX packets:<span class="number">12722</span> errors:<span class="number">0</span> dropped:<span class="number">0</span> overruns:<span class="number">0</span> carrier:<span class="number">0</span></span><br><span class="line">          collisions:<span class="number">0</span> txqueuelen:<span class="number">0</span> </span><br><span class="line">          RX bytes:<span class="number">710416</span> (<span class="number">693.7</span> KiB)  TX bytes:<span class="number">710416</span> (<span class="number">693.7</span> KiB)</span><br></pre></td></tr></table></figure></p>
 <h2>方法二：使用/sys目录</h2>
 <p>使用cd命令进入/sys/class/net/目录，然后ls查看目录下的文件，你会惊奇的发现里面有以网卡名命名的文件夹，</p>
-<pre><code class="language-bash">[yaxin@oishi net]$ls
-eth0  lo
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@oishi net]<span class="variable">$ls</span></span><br><span class="line">eth0  lo</span><br></pre></td></tr></table></figure></p>
 <p>这些文件夹便是你电脑中所有网卡，包括激活和未激活的（lo是本地回环网卡，并不是真实的网卡），cd进入任何一个目录（不是lo），然后，该网卡的所有信息便包含在里面(包括网卡的MAC地址信息)。</p>
-<pre><code class="language-bash">[yaxin@oishi net]$ls
-eth0  lo
-[yaxin@oishi net]$cd eth0/
-[yaxin@oishi eth0]$ls
-addr_assign_type  broadcast  dev_id   features  ifindex    mtu        queues      subsystem     uevent
-address           carrier    dormant  flags     iflink     operstate  speed       tx_queue_len
-addr_len          device     duplex   ifalias   link_mode  power      statistics  type
-[yaxin@oishi eth0]$
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@oishi net]<span class="variable">$ls</span></span><br><span class="line">eth0  lo</span><br><span class="line">[yaxin@oishi net]<span class="variable">$cd</span> eth0/</span><br><span class="line">[yaxin@oishi eth0]<span class="variable">$ls</span></span><br><span class="line">addr_assign_<span class="built_in">type</span>  broadcast  dev_id   features  ifindex    mtu        queues      subsystem     uevent</span><br><span class="line">address           carrier    dormant  flags     iflink     operstate  speed       tx_queue_len</span><br><span class="line">addr_len          device     duplex   ifalias   link_mode  power      statistics  <span class="built_in">type</span></span><br><span class="line">[yaxin@oishi eth0]$</span><br></pre></td></tr></table></figure></p>
 <p>然后使用cat命令查看一下address文件，显示的便是该网卡的MAC地址</p>
-<pre><code class="language-bash">[yaxin@oishi eth0]$cat address 
-00:50:56:ac:57:30
-[yaxin@oishi eth0]$
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@oishi eth0]<span class="variable">$cat</span> address </span><br><span class="line"><span class="number">00</span>:<span class="number">50</span>:<span class="number">56</span>:ac:<span class="number">57</span>:<span class="number">30</span></span><br><span class="line">[yaxin@oishi eth0]$</span><br></pre></td></tr></table></figure></p>
 
     </div> <!-- .post-content -->
     <div class="post-footer">

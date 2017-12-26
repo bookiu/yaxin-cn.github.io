@@ -16,12 +16,7 @@
     <title>docker中如何删除image（镜像） | 馨木</title>
     <link rel="icon" href="/assets/favicon.ico">
     <meta name="description" content="docker中删除images的命令是docker rmi，但有时候执行此命令并不能删除images
-[yaxin@ubox ~]$docker images
-REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
-eg_sshd             latest              ed9c93747fe1        45 hours ago        329.8 MB
-CentOS65            latest              e55a74a32125        2 days ago          360.6 MB
-[yaxin@ubox ~]$docker rmi ed9c93747fe1
-Untagge...">
+[yaxin@ubox ~]$docker imagesREPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZEeg_sshd             latest              ed9c93747fe1        45 hours ago        329.8 MBCentOS65            latest              e55a74a32125        2 days ago          360.6 MB[yaxin@ubox ~]$docker rmi ed9c93747fe1Untagged: ed...">
     
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
     
@@ -33,6 +28,15 @@ Untagge...">
     <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
     <![endif]-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111552353-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-111552353-1');
+    </script>
 </head>
 
 
@@ -64,22 +68,9 @@ Untagge...">
   <div class="section-box">
     <div class="post-content">
       <p>docker中删除images的命令是<code>docker rmi</code>，但有时候执行此命令并不能删除images</p>
-<pre><code class="language-bash">[yaxin@ubox ~]$docker images
-REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
-eg_sshd             latest              ed9c93747fe1        45 hours ago        329.8 MB
-CentOS65            latest              e55a74a32125        2 days ago          360.6 MB
-[yaxin@ubox ~]$docker rmi ed9c93747fe1
-Untagged: ed9c93747fe16627be822ad3f7feeb8b4468200e5357877d3046aa83cc44c6af
-[yaxin@ubox ~]$docker images
-REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
-&lt;none&gt;              &lt;none&gt;              ed9c93747fe1        45 hours ago        329.8 MB
-CentOS65            latest              e55a74a32125        2 days ago          360.6 MB
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE</span><br><span class="line">eg_sshd             latest              ed9c93747fe1        <span class="number">45</span> hours ago        <span class="number">329.8</span> MB</span><br><span class="line">CentOS65            latest              e55a74a32125        <span class="number">2</span> days ago          <span class="number">360.6</span> MB</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> rmi ed9c93747fe1</span><br><span class="line">Untagged: ed9c93747fe16627be822ad3f7feeb8b4468200e5357877d3046aa83cc44c6af</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE</span><br><span class="line">&lt;none&gt;              &lt;none&gt;              ed9c93747fe1        <span class="number">45</span> hours ago        <span class="number">329.8</span> MB</span><br><span class="line">CentOS65            latest              e55a74a32125        <span class="number">2</span> days ago          <span class="number">360.6</span> MB</span><br></pre></td></tr></table></figure></p>
 <p>可以看出，image并没有被删除，只是他的tag被删除了，再次执行<code>docker rmi IMAGE_ID</code>只会报错</p>
-<pre><code class="language-bash">[yaxin@ubox ~]$docker rmi ed9c93747fe1
-Error: image_delete: Conflict, ed9c93747fe1 wasn't deleted
-2014/03/22 15:58:27 Error: failed to remove one or more images
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> rmi ed9c93747fe1</span><br><span class="line">Error: image_delete: Conflict, ed9c93747fe1 wasn<span class="string">'t deleted</span><br><span class="line">2014/03/22 15:58:27 Error: failed to remove one or more images</span></span><br></pre></td></tr></table></figure></p>
 <p>查看docker的帮助会发现有两个与删除有关的命令<code>rm</code>和<code>rmi</code></p>
 <blockquote>
 <p>rm        Remove one or more containers<br>
@@ -88,34 +79,12 @@ rmi       Remove one or more images</p>
 <p>这里有两个不同的单词，<strong>images</strong>和<strong>container</strong>。其中images很好理解，跟平常使用的虚拟机的镜像一个意思，相当于一个模版，而container则是images运行时的的状态。docker对于运行过的image都保留一个状态（container），可以使用命令<code>docker ps</code>来查看正在运行的container，对于已经退出的container，则可以使用<code>docker ps -a</code>来查看。 如果你退出了一个container而忘记保存其中的数据，你可以使用<code>docker ps -a</code>来找到对应的运行过的container使用<code>docker commit</code>命令将其保存为image然后运行。</p>
 <p>回到之前的问题，由于image被某个container引用（拿来运行），如果不将这个引用的container销毁（删除），那image肯定是不能被删除。</p>
 <p>所以想要删除运行过的images必须首先删除它的container。继续来看刚才的例子，</p>
-<pre><code class="language-bash">[yaxin@ubox ~]$docker ps -a
-CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                   NAMES
-117843ade696        ed9c93747fe1        /bin/sh -c /usr/sbin   46 hours ago        Up 46 hours         0.0.0.0:49153-&gt;22/tcp   test_sshd
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> ps <span class="operator">-a</span></span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                   NAMES</span><br><span class="line"><span class="number">117843</span>ade696        ed9c93747fe1        /bin/sh -c /usr/sbin   <span class="number">46</span> hours ago        Up <span class="number">46</span> hours         <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">49153</span>-&gt;<span class="number">22</span>/tcp   <span class="built_in">test</span>_sshd</span><br></pre></td></tr></table></figure></p>
 <p>可以看出<strong>ed9c93747fe1</strong>的image被<strong>117843ade696</strong>的container使用着，所以必须首先删除该container</p>
-<pre><code class="language-bash">[yaxin@ubox ~]$docker rm 117843ade696
-Error: container_delete: Impossible to remove a running container, please stop it first
-2014/03/22 16:36:44 Error: failed to remove one or more containers
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> rm <span class="number">117843</span>ade696</span><br><span class="line">Error: container_delete: Impossible to remove a running container, please stop it first</span><br><span class="line"><span class="number">2014</span>/<span class="number">03</span>/<span class="number">22</span> <span class="number">16</span>:<span class="number">36</span>:<span class="number">44</span> Error: failed to remove one or more containers</span><br></pre></td></tr></table></figure></p>
 <p>出现错误，这是因为该container正在运行中(运行<code>docker ps</code>查看)，先将其关闭</p>
-<pre><code class="language-bash">[yaxin@ubox ~]$docker stop 117843ade696
-117843ade696
-</code></pre>
-<pre><code class="language-bash">[yaxin@ubox ~]$docker rm 117843ade696
-117843ade696
-[yaxin@ubox ~]$docker rmi ed9c93747fe1
-Deleted: ed9c93747fe16627be822ad3f7feeb8b4468200e5357877d3046aa83cc44c6af
-Deleted: c8a0c19429daf73074040a14e527ad5734e70363c644f18c6815388b63eedc9b
-Deleted: 95dba4c468f0e53e5f1e5d76b8581d6740aab9f59141f783f8e263ccd7cf2a8e
-Deleted: c25dc743e40af6858c34375d450851bd606a70ace5d04e231a7fcc6d2ea23cc1
-Deleted: 20562f5714a5ce764845119399ef75e652e23135cd5c54265ff8218b61ccbd33
-Deleted: c8af1dc23af7a7aea0c25ba9b28bdee68caa8866f056e4f2aa2a5fa1bcb12693
-Deleted: 38fdb2c5432e08ec6121f8dbb17e1fde17d5db4c1f149a9b702785dbf7b0f3be
-Deleted: 79ca14274c80ac1df1333b89b2a41c0e0e3b91cd1b267b31bef852ceab3b2044
-[yaxin@ubox ~]$docker images
-REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
-CentOS65            latest              e55a74a32125        2 days ago          360.6 MB
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> stop <span class="number">117843</span>ade696</span><br><span class="line"><span class="number">117843</span>ade696</span><br></pre></td></tr></table></figure></p>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> rm <span class="number">117843</span>ade696</span><br><span class="line"><span class="number">117843</span>ade696</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> rmi ed9c93747fe1</span><br><span class="line">Deleted: ed9c93747fe16627be822ad3f7feeb8b4468200e5357877d3046aa83cc44c6af</span><br><span class="line">Deleted: c8a0c19429daf73074040a14e527ad5734e70363c644f18c6815388b63eedc9b</span><br><span class="line">Deleted: <span class="number">95</span>dba4c468f0e53e5f1e5d76b8581d6740aab9f59141f783f8e263ccd7cf2a8e</span><br><span class="line">Deleted: c25dc743e40af6858c34375d450851bd606a70ace5d04e231a7fcc6d2ea23cc1</span><br><span class="line">Deleted: <span class="number">20562</span>f5714a5ce764845119399ef75e652e23135<span class="built_in">cd</span>5c54265ff8218b61ccbd33</span><br><span class="line">Deleted: c8af1dc23af7a7aea0c25ba9b28bdee68caa8866f056e4f2aa2a5fa1bcb12693</span><br><span class="line">Deleted: <span class="number">38</span>fdb2c5432e08ec6121f8dbb17e1fde17d5db4c1f149a9b702785dbf7b0f3be</span><br><span class="line">Deleted: <span class="number">79</span>ca14274c80ac1df1333b89b2a41c0e0e3b91<span class="built_in">cd</span>1b267b31bef852ceab3b2044</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$docker</span> images</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE</span><br><span class="line">CentOS65            latest              e55a74a32125        <span class="number">2</span> days ago          <span class="number">360.6</span> MB</span><br></pre></td></tr></table></figure></p>
 <p>可以看出，image已经被删除。</p>
 
     </div> <!-- .post-content -->

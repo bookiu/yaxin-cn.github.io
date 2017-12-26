@@ -16,11 +16,7 @@
     <title>未知元素高度情况下使其垂直居中方案 | 馨木</title>
     <link rel="icon" href="/assets/favicon.ico">
     <meta name="description" content="一直以来都是使用xinmu.me/blog作为博客的首页，而xinmu.me则一直荒废着。今天忽然想起了它，便想着先放一个链接上去，一个链接还是居中的好（浏览器正中央）。上网搜了各种方法，都需要知道元素的高度才可以，遂上SegmentFault（一个很好的地方）提问，得到了大神神飞的帮助，解决了问题，下面只是将解决办法复制、粘贴一下，原问题在此http://segmentfault.com/q/1010000000153017
-&lt;!DOCTYPE HTML&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;
-&lt;title&gt;只是文字的水平和垂直居中&lt;/title&gt;...">
+&lt;!DOCTYPE HTML&gt;&lt;html&gt;&lt;head&gt;&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;&lt;title&gt;只是文字的水平和垂直居中&lt;/title&gt;&lt;style&gt;html,body&#...">
     
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
     
@@ -32,6 +28,15 @@
     <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
     <![endif]-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111552353-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-111552353-1');
+    </script>
 </head>
 
 
@@ -63,22 +68,7 @@
   <div class="section-box">
     <div class="post-content">
       <p>一直以来都是使用<a href="http://xinmu.me/blog" target="_blank" rel="external">xinmu.me/blog</a>作为博客的首页，而<a href="http://xinmu.me" target="_blank" rel="external">xinmu.me</a>则一直荒废着。今天忽然想起了它，便想着先放一个链接上去，一个链接还是居中的好（浏览器正中央）。上网搜了各种方法，都需要知道元素的高度才可以，遂上SegmentFault（一个很好的地方）提问，得到了大神神飞的帮助，解决了问题，下面只是将解决办法复制、粘贴一下，原问题在此<a href="http://segmentfault.com/q/1010000000153017" target="_blank" rel="external">http://segmentfault.com/q/1010000000153017</a></p>
-<pre><code class="language-html">&lt;!DOCTYPE HTML&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;
-&lt;title&gt;只是文字的水平和垂直居中&lt;/title&gt;
-&lt;style&gt;
-html,body{width: 100%;height: 100%;margin: 0;padding: 0}
-body{background-color: green;display: table;}
-p{line-height: 1.6;text-align: center;padding: 0;margin: 0;display: table-cell;vertical-align: middle;}
-&lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;p&gt;wording&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
+<p><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="doctype">&lt;!DOCTYPE HTML&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">meta</span> <span class="attribute">http-equiv</span>=<span class="value">"Content-Type"</span> <span class="attribute">content</span>=<span class="value">"text/html; charset=utf-8"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">title</span>&gt;</span>只是文字的水平和垂直居中<span class="tag">&lt;/<span class="title">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">style</span>&gt;</span><span class="css"></span><br><span class="line"><span class="tag">html</span>,<span class="tag">body</span><span class="rules">&#123;<span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">100%</span></span></span>;<span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">100%</span></span></span>;<span class="rule"><span class="attribute">margin</span>:<span class="value"> <span class="number">0</span></span></span>;<span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span>&#125;</span><br><span class="line">body&#123;background-color: green</span></span>;<span class="rule"><span class="attribute">display</span>:<span class="value"> table</span></span>;&#125;</span></span><br><span class="line"><span class="tag">p</span><span class="rules">&#123;<span class="rule"><span class="attribute">line-height</span>:<span class="value"> <span class="number">1.6</span></span></span>;<span class="rule"><span class="attribute">text-align</span>:<span class="value"> center</span></span>;<span class="rule"><span class="attribute">padding</span>:<span class="value"> <span class="number">0</span></span></span>;<span class="rule"><span class="attribute">margin</span>:<span class="value"> <span class="number">0</span></span></span>;<span class="rule"><span class="attribute">display</span>:<span class="value"> table-cell</span></span>;<span class="rule"><span class="attribute">vertical-align</span>:<span class="value"> middle</span></span>;&#125;</span></span><br><span class="line"></span><span class="tag">&lt;/<span class="title">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">body</span>&gt;</span></span><br><span class="line">true<span class="tag">&lt;<span class="title">p</span>&gt;</span>wording<span class="tag">&lt;/<span class="title">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">html</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
 
     </div> <!-- .post-content -->
     <div class="post-footer">

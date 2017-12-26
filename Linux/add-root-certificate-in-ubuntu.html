@@ -17,13 +17,9 @@
     <link rel="icon" href="/assets/favicon.ico">
     <meta name="description" content="添加
 Ubuntu下添加根证书非常简单, 只要将证书(扩展名为crt)复制到**/usr/local/share/ca-certificates**文件夹然后运行update-ca-certificates即可
-[yaxin@ubox ~]$sudo cp xinmu.crt /usr/local/share/ca-certificates
-[yaxin@ubox ~]$sudo update-ca-certificates
-Updating certificates in /etc/ssl/certs... 1 added, 0 removed; done.
-Running hooks in /etc/ca-certificates/update.d....done.
-
+[yaxin@ubox ~]$sudo cp xinmu.crt /usr/local/share/ca-certificates[yaxin@ubox ~]$sudo update-ca-certificatesUpdating certificates in /etc/ssl/certs... 1 added, 0 removed; done.Running hooks in /etc/ca-certificates/update.d....done.
 删除
-直接将**/usr/local/share/ca-certificates**对应的证书删除，然后执行up...">
+直接将**/usr/local/share/ca-certificates**对应的证书删除，然后执行update...">
     
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
     
@@ -35,6 +31,15 @@ Running hooks in /etc/ca-certificates/update.d....done.
     <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
     <![endif]-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111552353-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-111552353-1');
+    </script>
 </head>
 
 
@@ -67,26 +72,14 @@ Running hooks in /etc/ca-certificates/update.d....done.
     <div class="post-content">
       <h2>添加</h2>
 <p>Ubuntu下添加根证书非常简单, 只要将证书(扩展名为crt)复制到**/usr/local/share/ca-certificates**文件夹然后运行<code>update-ca-certificates</code>即可</p>
-<pre><code class="language-bash">[yaxin@ubox ~]$sudo cp xinmu.crt /usr/local/share/ca-certificates
-[yaxin@ubox ~]$sudo update-ca-certificates
-Updating certificates in /etc/ssl/certs... 1 added, 0 removed; done.
-Running hooks in /etc/ca-certificates/update.d....done.
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$sudo</span> cp xinmu.crt /usr/<span class="built_in">local</span>/share/ca-certificates</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$sudo</span> update-ca-certificates</span><br><span class="line">Updating certificates <span class="keyword">in</span> /etc/ssl/certs... <span class="number">1</span> added, <span class="number">0</span> removed; done.</span><br><span class="line">Running hooks <span class="keyword">in</span> /etc/ca-certificates/update.d....done.</span><br></pre></td></tr></table></figure></p>
 <h2>删除</h2>
 <p>直接将**/usr/local/share/ca-certificates**对应的证书删除，然后执行<code>update-ca-certificates</code></p>
-<pre><code class="language-bash">[yaxin@ubox ~]$sudo rm -f /usr/local/share/ca-certificates/xinmu.crt
-[yaxin@ubox ~]$sudo update-ca-certificates
-Updating certificates in /etc/ssl/certs... 0 added, 0 removed; done.
-Running hooks in /etc/ca-certificates/update.d....done.
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$sudo</span> rm <span class="operator">-f</span> /usr/<span class="built_in">local</span>/share/ca-certificates/xinmu.crt</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$sudo</span> update-ca-certificates</span><br><span class="line">Updating certificates <span class="keyword">in</span> /etc/ssl/certs... <span class="number">0</span> added, <span class="number">0</span> removed; done.</span><br><span class="line">Running hooks <span class="keyword">in</span> /etc/ca-certificates/update.d....done.</span><br></pre></td></tr></table></figure></p>
 <p><strong>注意: 这时候并不会提示1 removed, 但证书是已经被删除了的</strong></p>
 <h2>原理</h2>
 <p>其实<code>update-ca-certificates</code>是一个shell脚本, 使用<code>which</code>找出<code>update-ca-certificates</code>的绝对路径，然后打开就可以查看其源码</p>
-<pre><code class="language-bash">[yaxin@ubox ~]$which update-ca-certificates
-/usr/sbin/update-ca-certificates
-[yaxin@ubox ~]$file /usr/sbin/update-ca-certificates
-/usr/sbin/update-ca-certificates: POSIX shell script, ASCII text executable
-</code></pre>
+<p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[yaxin@ubox ~]<span class="variable">$which</span> update-ca-certificates</span><br><span class="line">/usr/sbin/update-ca-certificates</span><br><span class="line">[yaxin@ubox ~]<span class="variable">$file</span> /usr/sbin/update-ca-certificates</span><br><span class="line">/usr/sbin/update-ca-certificates: POSIX shell script, ASCII text executable</span><br></pre></td></tr></table></figure></p>
 <p>通过阅读源码可以看出, <code>update-ca-certificates</code>命令的本质其实是将PEM格式的根证书内容附加到*/etc/ssl/certs/ca-certificates.crt*, 而*/etc/ssl/certs/ca-certificates.crt*中本身就包含了系统自带的各种可信根证书.</p>
 
     </div> <!-- .post-content -->

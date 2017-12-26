@@ -16,24 +16,9 @@
     <title>Python实现矩阵加法运算 | 馨木</title>
     <link rel="icon" href="/assets/favicon.ico">
     <meta name="description" content="写一个数据分析的程序，中间要处理一个2x3矩阵的相加，遂写出了下面的代码
-def add(x, y):
-    return x + y
-
-
-def two_matrix_add(x, y):
-    result = []
-    for i in xrange(len(x)):
-        result.append(tuple(map(lambda t: reduce(add, t), zip(x[i], y[i]))))
-    return tuple(result)
-
-
-def matrix_add(matrix_list):
-    return reduce(two_matrix_add, matrix_list)
-
+def add(x, y):    return x + ydef two_matrix_add(x, y):    result = []    for i in xrange(len(x)):        result.append(tuple(map(lambda t: reduce(add, t), zip(x[i], y[i]))))    return tuple(result)def matrix_add(matrix_list):    return reduce(two_matrix_add, matrix_list)
 下面测试一下：
-&gt;&gt;&gt; matrix_1 = [
-...     [0, 1, 2, 3],
-...     [4, 5, 6, ...">
+&gt;&gt;&gt; matrix_1 = [...     [0, 1, 2, 3],...     [4, 5, 6, 7],...     [8, ...">
     
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
     
@@ -45,6 +30,15 @@ def matrix_add(matrix_list):
     <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
     <![endif]-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111552353-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-111552353-1');
+    </script>
 </head>
 
 
@@ -76,41 +70,9 @@ def matrix_add(matrix_list):
   <div class="section-box">
     <div class="post-content">
       <p>写一个数据分析的程序，中间要处理一个2x3矩阵的相加，遂写出了下面的代码</p>
-<pre><code class="language-python">def add(x, y):
-    return x + y
-
-
-def two_matrix_add(x, y):
-    result = []
-    for i in xrange(len(x)):
-        result.append(tuple(map(lambda t: reduce(add, t), zip(x[i], y[i]))))
-    return tuple(result)
-
-
-def matrix_add(matrix_list):
-    return reduce(two_matrix_add, matrix_list)
-</code></pre>
+<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span><span class="params">(x, y)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> x + y</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">two_matrix_add</span><span class="params">(x, y)</span>:</span></span><br><span class="line">    result = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> xrange(len(x)):</span><br><span class="line">        result.append(tuple(map(<span class="keyword">lambda</span> t: reduce(add, t), zip(x[i], y[i]))))</span><br><span class="line">    <span class="keyword">return</span> tuple(result)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">matrix_add</span><span class="params">(matrix_list)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> reduce(two_matrix_add, matrix_list)</span><br></pre></td></tr></table></figure></p>
 <p>下面测试一下：</p>
-<pre><code class="language-python">&gt;&gt;&gt; matrix_1 = [
-...     [0, 1, 2, 3],
-...     [4, 5, 6, 7],
-...     [8, 9, 10, 11]
-... ]
-&gt;&gt;&gt; matrix_2 = [
-...     [128, 204, 125, 66],
-...     [230, 222, 186, 220],
-...     [110, 86, 176, 249]
-... ]
-&gt;&gt;&gt; matrix_3 = [
-...     [189, 138, 188, 113],
-...     [214, 85, 180, 217],
-...     [126, 195, 203, 207]
-... ]
-&gt;&gt;&gt; matrix_add([matrix_1, matrix_2])
-((128, 205, 127, 69), (234, 227, 192, 227), (118, 95, 186, 260))
-&gt;&gt;&gt; matrix_add([matrix_1, matrix_2, matrix_3])
-((317, 343, 315, 182), (448, 312, 372, 444), (244, 290, 389, 467))
-</code></pre>
+<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="prompt">&gt;&gt;&gt; </span>matrix_1 = [</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>],</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>],</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>]</span><br><span class="line"><span class="prompt">... </span>]</span><br><span class="line"><span class="prompt">&gt;&gt;&gt; </span>matrix_2 = [</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">128</span>, <span class="number">204</span>, <span class="number">125</span>, <span class="number">66</span>],</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">230</span>, <span class="number">222</span>, <span class="number">186</span>, <span class="number">220</span>],</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">110</span>, <span class="number">86</span>, <span class="number">176</span>, <span class="number">249</span>]</span><br><span class="line"><span class="prompt">... </span>]</span><br><span class="line"><span class="prompt">&gt;&gt;&gt; </span>matrix_3 = [</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">189</span>, <span class="number">138</span>, <span class="number">188</span>, <span class="number">113</span>],</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">214</span>, <span class="number">85</span>, <span class="number">180</span>, <span class="number">217</span>],</span><br><span class="line"><span class="prompt">... </span>    [<span class="number">126</span>, <span class="number">195</span>, <span class="number">203</span>, <span class="number">207</span>]</span><br><span class="line"><span class="prompt">... </span>]</span><br><span class="line"><span class="prompt">&gt;&gt;&gt; </span>matrix_add([matrix_1, matrix_2])</span><br><span class="line">((<span class="number">128</span>, <span class="number">205</span>, <span class="number">127</span>, <span class="number">69</span>), (<span class="number">234</span>, <span class="number">227</span>, <span class="number">192</span>, <span class="number">227</span>), (<span class="number">118</span>, <span class="number">95</span>, <span class="number">186</span>, <span class="number">260</span>))</span><br><span class="line"><span class="prompt">&gt;&gt;&gt; </span>matrix_add([matrix_1, matrix_2, matrix_3])</span><br><span class="line">((<span class="number">317</span>, <span class="number">343</span>, <span class="number">315</span>, <span class="number">182</span>), (<span class="number">448</span>, <span class="number">312</span>, <span class="number">372</span>, <span class="number">444</span>), (<span class="number">244</span>, <span class="number">290</span>, <span class="number">389</span>, <span class="number">467</span>))</span><br></pre></td></tr></table></figure></p>
 
     </div> <!-- .post-content -->
     <div class="post-footer">

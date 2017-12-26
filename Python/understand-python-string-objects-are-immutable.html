@@ -16,11 +16,7 @@
     <title>理解Python中数值和字符串对象是不可变化的 | 馨木</title>
     <link rel="icon" href="/assets/favicon.ico">
     <meta name="description" content="在Python中数值和字符串对象是不可以改变的，但对于新手的我们很难理解，于是乎会有下面的代码:
-x = 'Hello World'
-print x
-x = 'Hello Hello'
-print x
-
+x = 'Hello World'print xx = 'Hello Hello'print x
 上面的代码明显的说明了变量x是可以改变的。其实变量x的改变伴随着x内存地址的变化，也就是说系统重新创建了一个名为x的变量用于保存新字符串。想要证明这个需要用到Python的id函数。
 id函数返回一个数字，这个数字跟该对象的分配内存地址密切相关。也可以近似认为这个数值就是该对象（变量）的所在内存地址。
 
@@ -28,7 +24,7 @@ python中id函数的说明
 Help on built-in function id in module builtin:
 id(...)
 id(object) -&gt; integer
-Return the identity of an object.  This is gua...">
+Return the identity of an object.  This is guarant...">
     
     <link rel="alternative" href="/rss.xml" title="馨木" type="application/rss+xml">
     
@@ -40,6 +36,15 @@ Return the identity of an object.  This is gua...">
     <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
     <![endif]-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111552353-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-111552353-1');
+    </script>
 </head>
 
 
@@ -71,11 +76,7 @@ Return the identity of an object.  This is gua...">
   <div class="section-box">
     <div class="post-content">
       <p>在Python中数值和字符串对象是不可以改变的，但对于新手的我们很难理解，于是乎会有下面的代码:</p>
-<pre><code class="language-python">x = 'Hello World'
-print x
-x = 'Hello Hello'
-print x
-</code></pre>
+<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">x = <span class="string">'Hello World'</span></span><br><span class="line"><span class="keyword">print</span> x</span><br><span class="line">x = <span class="string">'Hello Hello'</span></span><br><span class="line"><span class="keyword">print</span> x</span><br></pre></td></tr></table></figure></p>
 <p>上面的代码明显的说明了变量<code>x</code>是可以改变的。其实变量<code>x</code>的改变伴随着<code>x</code>内存地址的变化，也就是说系统重新创建了一个名为<strong>x</strong>的变量用于保存新字符串。想要证明这个需要用到Python的<code>id</code>函数。</p>
 <p>id函数返回一个数字，这个数字跟该对象的分配内存地址密切相关。也可以近似认为这个数值就是该对象（变量）的所在内存地址。</p>
 <blockquote>
@@ -87,15 +88,7 @@ id(object) -&gt; integer</p>
 simultaneously existing objects.  (Hint: it's the object's memory address.)</p>
 </blockquote>
 <p>现在再来看下面的代码：</p>
-<pre><code class="language-python">x = 'Hello World'
-print id(x)
-x = 'Hello Hello'
-print id(x)
-y = ['a', 'b']
-print id(y)
-y.append('c')
-print id(y)
-</code></pre>
+<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">x = <span class="string">'Hello World'</span></span><br><span class="line"><span class="keyword">print</span> id(x)</span><br><span class="line">x = <span class="string">'Hello Hello'</span></span><br><span class="line"><span class="keyword">print</span> id(x)</span><br><span class="line">y = [<span class="string">'a'</span>, <span class="string">'b'</span>]</span><br><span class="line"><span class="keyword">print</span> id(y)</span><br><span class="line">y.append(<span class="string">'c'</span>)</span><br><span class="line"><span class="keyword">print</span> id(y)</span><br></pre></td></tr></table></figure></p>
 <p>你运行结果如下：</p>
 <blockquote>
 <p>21908576

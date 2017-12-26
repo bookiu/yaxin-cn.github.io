@@ -40,6 +40,15 @@
     <!--[if lt IE 9]>
     <script src="http://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
     <![endif]-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111552353-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-111552353-1');
+    </script>
 </head>
 
 
@@ -95,23 +104,7 @@
 <p>~3106 =&gt; CEF9</p>
 <p><em><em>C语言的</em>按位求反</em>是让操作数的二进制位上的1变为0，0变为1， 而python的<em>按位求反</em>这是将操作数加一然后乘以负一（~5 == -6），两者之所以出现不同就在于操作数是否是unsigned**</p>
 <p>附上最后的程序（注意一下如何将python的<em>按位求反</em>转为C语言的<em>按位求反</em>）</p>
-<pre><code class="language-python">def checksum(data):
-    length = len(data)
-    s = 0
-    n = length % 2
-    # 分割数据每两比特(16bit)为一组
-    for i in range(0, length - n, 2):
-        s += ord(data[i]) + (ord(data[i+1]) &lt;&lt; 8)
-    # 如果数据长度为基数,则将最后一位单独相加
-    if n:
-        s += ord(data[-1])
-    # 重复将高16位与低16位相加直到高16位为0
-    while (s &gt;&gt; 16):
-        s = (s &amp; 0xFFFF) + (s &gt;&gt; 16)
-    s = ~s &amp; 0xffff
-    # 返回的是十进制整数
-    return s
-</code></pre>
+<p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">checksum</span><span class="params">(data)</span>:</span></span><br><span class="line">    length = len(data)</span><br><span class="line">    s = <span class="number">0</span></span><br><span class="line">    n = length % <span class="number">2</span></span><br><span class="line">    <span class="comment"># 分割数据每两比特(16bit)为一组</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, length - n, <span class="number">2</span>):</span><br><span class="line">        s += ord(data[i]) + (ord(data[i+<span class="number">1</span>]) &lt;&lt; <span class="number">8</span>)</span><br><span class="line">    <span class="comment"># 如果数据长度为基数,则将最后一位单独相加</span></span><br><span class="line">    <span class="keyword">if</span> n:</span><br><span class="line">        s += ord(data[-<span class="number">1</span>])</span><br><span class="line">    <span class="comment"># 重复将高16位与低16位相加直到高16位为0</span></span><br><span class="line">    <span class="keyword">while</span> (s &gt;&gt; <span class="number">16</span>):</span><br><span class="line">        s = (s &amp; <span class="number">0xFFFF</span>) + (s &gt;&gt; <span class="number">16</span>)</span><br><span class="line">    s = ~s &amp; <span class="number">0xffff</span></span><br><span class="line">    <span class="comment"># 返回的是十进制整数</span></span><br><span class="line">    <span class="keyword">return</span> s</span><br></pre></td></tr></table></figure></p>
 
     </div> <!-- .post-content -->
     <div class="post-footer">
